@@ -8,11 +8,8 @@
     <meta name="theme-color" content="#0f172a">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Decole Sua Carreira Tech! - FullStack Cursos</title>
-    <!-- Garantindo que o Tailwind CSS seja carregado corretamente -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fontes do Google -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script>
         tailwind.config = {
@@ -217,15 +214,10 @@
             <div class="w-full md:w-1/2 lg:w-1/3 px-4 mb-12 animate-on-scroll">
                 <div class="bg-dark-card rounded-xl overflow-hidden shadow-lg neon-border">
                     <div class="p-6 text-center">
-                        <!-- Substitua o URL da imagem pela URL da sua foto -->
-                        <img src="images/Foto-Perfil.jpg" alt="" class="w-48 h-48 object-cover rounded-full mx-auto mb-6 border-4 border-accent-indigo-primary">
-                        <!-- Substitua por seu nome -->
+                        <img src="images/Foto-Perfil.jpg" alt="Foto de Bruno" class="w-48 h-48 object-cover rounded-full mx-auto mb-6 border-4 border-accent-indigo-primary">
                         <h3 class="text-xl font-bold mb-2 text-light-primary">Bruno</h3>
-                        <!-- Substitua por seu cargo -->
                         <p class="text-accent-indigo-primary font-semibold mb-4">Programador / Vendedor</p>
-                        <!-- Substitua por sua descrição -->
                         <p class="text-light-tertiary mb-6">Um site no estagio inicial, para vender conteudo de qualidade, e transformar voce em um programador Nato.</p>
-                        <!-- Links para redes sociais - substitua pelos seus links -->
                         <div class="flex justify-center space-x-4">
                             <a href="https://www.linkedin.com/in/bruno-passos-380552223/" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in glow-icon"></i></a>
                             <a href="https://github.com/5223Bruno" target="_blank" rel="noopener noreferrer"><i class="fab fa-github glow-icon"></i></a>
@@ -241,7 +233,6 @@
 
     <main>
         <section id="home" class="hero-bg text-white py-20 md:py-32 relative overflow-hidden">
-            <!-- Efeito de partículas tecnológicas (simulado com pseudo-elementos via CSS) -->
             <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDIwIDAgTCAwIDAgTCAwIDIwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIiAvPjwvc3ZnPg==');"></div>
             <div class="container mx-auto px-6 text-center relative z-10">
                 <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight animate-on-scroll">
@@ -349,14 +340,10 @@
                 </div>
             </div>
                 </div>
-                <div class="text-center mt-12">
-                    <a href="#all-courses" class="bg-dark-tertiary hover:bg-opacity-80 text-light-primary font-semibold py-3 px-8 rounded-lg text-lg cta-button neon-border">Ver Todos os Cursos</a>
-                </div>
             </div>
         </section>
 
         <section id="benefits" class="py-16 bg-dark-primary relative">
-            <!-- Padrão de fundo sutil -->
             <div class="absolute inset-0 opacity-5" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+CjxyZWN0IHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNMzAgMzBtLTI4IDBhMjggMjggMCAxIDAgNTYgMGEyOCAyOCAwIDEgMCAtNTYgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjAuNSIvPgo8L3N2Zz4=');"></div>
             <div class="container mx-auto px-6 relative z-10">
                 <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Por que escolher a FullStack Cursos?</h2>
@@ -601,68 +588,6 @@
             </div>
         </section>
 
-        <section id="all-courses" class="py-16 bg-dark-primary hidden">
-            <div class="container mx-auto px-6">
-                <h2 class="text-3xl font-bold text-center mb-12 text-light-primary">Todos os Nossos Cursos</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col">
-                        <img src="https://placehold.co/600x400/3498db/ffffff?text=Desenvolvimento+Web" alt="Imagem do Curso de Desenvolvimento Web" class="w-full h-48 object-cover">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-semibold mb-2 text-light-primary">Desenvolvimento Web Completo</h3>
-                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Do HTML e CSS ao JavaScript moderno, React e Node.js.</p>
-                            <p class="text-lg font-bold text-accent-indigo-primary mb-3">R$ 499,90</p>
-                            <a href="#course-detail-web" class="mt-auto block w-full text-center bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
-                        </div>
-                    </div>
-                    <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col">
-                        <img src="https://placehold.co/600x400/2ecc71/ffffff?text=Ciência+de+Dados" alt="Imagem do Curso de Ciência de Dados" class="w-full h-48 object-cover">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-semibold mb-2 text-light-primary">Ciência de Dados com Python</h3>
-                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Análise de dados, Machine Learning e visualização com Python.</p>
-                            <p class="text-lg font-bold text-accent-emerald-primary mb-3">R$ 599,90</p>
-                            <a href="#course-detail-data" class="mt-auto block w-full text-center bg-accent-emerald-primary hover:bg-accent-emerald-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
-                        </div>
-                    </div>
-                    <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col">
-                        <img src="https://placehold.co/600x400/e74c3c/ffffff?text=Marketing+Digital" alt="Imagem do Curso de Marketing Digital" class="w-full h-48 object-cover">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-semibold mb-2 text-light-primary">Marketing Digital Estratégico</h3>
-                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Domine SEO, SEM, Mídias Sociais e Email Marketing.</p>
-                            <p class="text-lg font-bold text-accent-red-primary mb-3">R$ 399,90</p>
-                            <a href="#course-detail-marketing" class="mt-auto block w-full text-center bg-accent-red-primary hover:bg-accent-red-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
-                        </div>
-                    </div>
-                    <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col">
-                        <img src="https://placehold.co/600x400/8b5cf6/ffffff?text=UX%2FUI+Design" alt="Imagem do Curso de UX/UI Design" class="w-full h-48 object-cover">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-semibold mb-2 text-light-primary">UX/UI Design Pro</h3>
-                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Crie interfaces intuitivas e experiências de usuário memoráveis.</p>
-                            <p class="text-lg font-bold text-accent-purple-primary mb-3">R$ 449,90</p>
-                            <a href="#" onclick="showCustomAlert('Detalhes do curso de UX/UI em breve!', 'success')" class="mt-auto block w-full text-center bg-accent-purple-primary hover:bg-accent-purple-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
-                        </div>
-                    </div>
-                    <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col">
-                        <img src="https://placehold.co/600x400/f39c12/ffffff?text=DevOps" alt="Imagem do Curso de DevOps" class="w-full h-48 object-cover">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-semibold mb-2 text-light-primary">DevOps & Cloud Computing</h3>
-                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Docker, Kubernetes, CI/CD, AWS, Azure e mais.</p>
-                            <p class="text-lg font-bold text-yellow-500 mb-3">R$ 649,90</p>
-                            <a href="#" onclick="showCustomAlert('Detalhes do curso de DevOps em breve!', 'success')" class="mt-auto block w-full text-center bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
-                        </div>
-                    </div>
-                    <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col">
-                        <img src="https://placehold.co/600x400/3498db/ffffff?text=Mobile+Apps" alt="Imagem do Curso de Desenvolvimento Mobile" class="w-full h-48 object-cover">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-semibold mb-2 text-light-primary">Desenvolvimento Mobile</h3>
-                            <p class="text-light-tertiary mb-4 text-sm flex-grow">React Native, Flutter e desenvolvimento nativo para iOS e Android.</p>
-                            <p class="text-lg font-bold text-blue-500 mb-3">R$ 549,90</p>
-                            <a href="#" onclick="showCustomAlert('Detalhes do curso de Mobile em breve!', 'success')" class="mt-auto block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <section id="login" class="py-16 bg-dark-secondary hidden">
             <div class="container mx-auto px-6">
                 <div class="max-w-md mx-auto bg-dark-card p-8 rounded-xl shadow-lg neon-border">
@@ -767,22 +692,18 @@
         </div>
     </footer>
 
-    <!-- Alerta customizado -->
     <div id="custom-alert" class="custom-alert">
         <span id="alert-message"></span>
     </div>
 
-    <!-- Scripts do Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-functions-compat.js"></script>
     
-    <!-- Script do Stripe para processamento de pagamentos -->
     <script src="https://js.stripe.com/v3/"></script>
     
-    <!-- Script de back-end completo -->
     <script src="backend_completo.js"></script>
 
     <script>
@@ -911,3 +832,5 @@
     </script>
 </body>
 </html>
+}
+Obrigado, funcionou as alteraçeos, agora eu gostaria que voce alterasse o nome dos curso, para que fique com nomes chamativos para os clientes, e tambem a descriçãodo cursos, o preço pode deixar o mesmo que ja esta, obrigado e tenha um otimo dia.

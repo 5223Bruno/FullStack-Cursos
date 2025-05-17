@@ -1,5 +1,5 @@
 /**
- * BACKEND COMPLETO PARA O SITE TECHFLIX
+ * BACKEND COMPLETO PARA O SITE FullStackCursos
  * 
  * Este arquivo contém todas as funcionalidades de back-end necessárias para o site,
  * incluindo autenticação, gerenciamento de cursos, pagamentos, área do aluno e administração.
@@ -1591,13 +1591,13 @@ function displaySearchResults(courses, query) {
 }
 
 // Exportar sistemas para uso global
-window.TechFlixAuth = AuthSystem;
-window.TechFlixCourses = CourseSystem;
-window.TechFlixPayment = PaymentSystem;
-window.TechFlixAdmin = AdminSystem;
-window.TechFlixNotifications = NotificationSystem;
-window.TechFlixReviews = ReviewSystem;
-window.TechFlixCertificates = CertificateSystem;
+window.FullStackCursosAuth = AuthSystem;
+window.FullStackCursosCourses = CourseSystem;
+window.FullStackCursosPayment = PaymentSystem;
+window.FullStackCursosAdmin = AdminSystem;
+window.FullStackCursosNotifications = NotificationSystem;
+window.FullStackCursosReviews = ReviewSystem;
+window.FullStackCursosCertificates = CertificateSystem;
 
 /**
  * Código para exibir a foto do usuário logado no canto superior direito

@@ -1598,3 +1598,152 @@ window.TechFlixAdmin = AdminSystem;
 window.TechFlixNotifications = NotificationSystem;
 window.TechFlixReviews = ReviewSystem;
 window.TechFlixCertificates = CertificateSystem;
+
+/**
+ * Código para exibir a foto do usuário logado no canto superior direito
+ * Este código deve ser adicionado ao seu arquivo backend_completo.js
+ */
+
+// Função para atualizar a interface após o login
+function updateUserInterface(user) {
+  // Elementos que precisamos modificar
+  const loginButton = document.querySelector('a[href="#login"]');
+  const mobileLoginButton = document.querySelector('#mobile-menu a[href="#login"]');
+  
+  if (user) {
+    // Usuário está logado
+    
+    // Criar elemento para exibir foto e nome do usuário no menu desktop
+    const userProfileDesktop = document.createElement('div');
+    userProfileDesktop.className = 'flex items-center cursor-pointer relative group';
+    userProfileDesktop.innerHTML = `
+      <img src="${user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || user.email)}" 
+           alt="Foto de perfil" 
+           class="w-8 h-8 rounded-full border-2 border-accent-indigo-primary mr-2">
+      <span class="text-light-primary hidden md:inline">${user.displayName || user.email.split('@')[0]}</span>
+      <div class="hidden group-hover:block absolute right-0 top-full mt-2 w-48 bg-dark-card rounded-lg shadow-lg z-50 py-2 border border-gray-700">
+        <a href="#profile" class="block px-4 py-2 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">
+          <i class="fas fa-user mr-2"></i> Meu Perfil
+        </a>
+        <a href="#my-courses" class="block px-4 py-2 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">
+          <i class="fas fa-graduation-cap mr-2"></i> Meus Cursos
+        </a>
+        <a href="#settings" class="block px-4 py-2 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">
+          <i class="fas fa-cog mr-2"></i> Configurações
+        </a>
+        <div class="border-t border-gray-700 my-1"></div>
+        <a href="#" id="logout-button" class="block px-4 py-2 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">
+          <i class="fas fa-sign-out-alt mr-2"></i> Sair
+        </a>
+      </div>
+    `;
+    
+    // Substituir o botão de login pela foto do usuário no menu desktop
+    if (loginButton) {
+      loginButton.parentNode.replaceChild(userProfileDesktop, loginButton);
+    }
+    
+    // Criar elemento para exibir foto e nome do usuário no menu mobile
+    const userProfileMobile = document.createElement('div');
+    userProfileMobile.className = 'block px-6 py-3 bg-dark-tertiary';
+    userProfileMobile.innerHTML = `
+      <div class="flex items-center">
+        <img src="${user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || user.email)}" 
+             alt="Foto de perfil" 
+             class="w-8 h-8 rounded-full border-2 border-accent-indigo-primary mr-2">
+        <span class="text-light-primary">${user.displayName || user.email.split('@')[0]}</span>
+      </div>
+    `;
+    
+    // Adicionar links do perfil no menu mobile
+    const profileLinksMobile = document.createElement('div');
+    profileLinksMobile.innerHTML = `
+      <a href="#profile" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary pl-10">
+        <i class="fas fa-user mr-2"></i> Meu Perfil
+      </a>
+      <a href="#my-courses" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary pl-10">
+        <i class="fas fa-graduation-cap mr-2"></i> Meus Cursos
+      </a>
+      <a href="#settings" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary pl-10">
+        <i class="fas fa-cog mr-2"></i> Configurações
+      </a>
+      <a href="#" id="logout-button-mobile" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary pl-10">
+        <i class="fas fa-sign-out-alt mr-2"></i> Sair
+      </a>
+    `;
+    
+    // Substituir o botão de login pela foto do usuário no menu mobile
+    if (mobileLoginButton) {
+      mobileLoginButton.parentNode.replaceChild(userProfileMobile, mobileLoginButton);
+      userProfileMobile.parentNode.insertBefore(profileLinksMobile, userProfileMobile.nextSibling);
+    }
+    
+    // Adicionar evento de logout aos botões de sair
+    document.getElementById('logout-button').addEventListener('click', (e) => {
+      e.preventDefault();
+      firebase.auth().signOut().then(() => {
+        showCustomAlert('Você saiu com sucesso!', 'success');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      });
+    });
+    
+    if (document.getElementById('logout-button-mobile')) {
+      document.getElementById('logout-button-mobile').addEventListener('click', (e) => {
+        e.preventDefault();
+        firebase.auth().signOut().then(() => {
+          showCustomAlert('Você saiu com sucesso!', 'success');
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        });
+      });
+    }
+    
+  } else {
+    // Usuário não está logado - garantir que os botões de login estejam visíveis
+    // Isso é útil quando o usuário faz logout
+    
+    // Se os botões de login foram substituídos, precisamos restaurá-los
+    const userProfileDesktop = document.querySelector('.flex.items-center.cursor-pointer.relative.group');
+    if (userProfileDesktop && !loginButton) {
+      const newLoginButton = document.createElement('a');
+      newLoginButton.href = '#login';
+      newLoginButton.className = 'gradient-cta text-white px-4 py-2 rounded-lg cta-button';
+      newLoginButton.textContent = 'Login';
+      userProfileDesktop.parentNode.replaceChild(newLoginButton, userProfileDesktop);
+    }
+    
+    // Restaurar botão de login no menu mobile se necessário
+    const userProfileMobile = document.querySelector('#mobile-menu .bg-dark-tertiary');
+    if (userProfileMobile && !mobileLoginButton) {
+      const newMobileLoginButton = document.createElement('a');
+      newMobileLoginButton.href = '#login';
+      newMobileLoginButton.className = 'block px-6 py-3 gradient-cta text-white text-center rounded-b-lg';
+      newMobileLoginButton.textContent = 'Login';
+      
+      // Remover também os links do perfil
+      const profileLinksMobile = userProfileMobile.nextSibling;
+      if (profileLinksMobile) {
+        profileLinksMobile.parentNode.removeChild(profileLinksMobile);
+      }
+      
+      userProfileMobile.parentNode.replaceChild(newMobileLoginButton, userProfileMobile);
+    }
+  }
+}
+
+// Adicionar listener para mudanças no estado de autenticação
+firebase.auth().onAuthStateChanged((user) => {
+  updateUserInterface(user);
+});
+
+// Verificar se o usuário já está logado quando a página carrega
+document.addEventListener('DOMContentLoaded', () => {
+  const user = firebase.auth().currentUser;
+  if (user) {
+    updateUserInterface(user);
+  }
+});
+

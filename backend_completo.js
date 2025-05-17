@@ -27,12 +27,13 @@
 
 // Configuração do Firebase (substitua pelos seus dados)
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "seu-projeto.firebaseapp.com",
-  projectId: "seu-projeto",
-  storageBucket: "seu-projeto.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef123456"
+  apiKey: "AIzaSyB3IPLPzZpJtWJRmf-C466P4mu1fXa05es",
+  authDomain: "fullstack-cursos.firebaseapp.com",
+  projectId: "fullstack-cursos",
+  storageBucket: "fullstack-cursos.firebasestorage.app",
+  messagingSenderId: "934193250493",
+  appId: "1:934193250493:web:e4ecf68f0c5ce85739f7d4",
+  measurementId: "G-6SW1JH0LX6"
 };
 
 // Inicializar Firebase

@@ -1,3 +1,21 @@
+Entendido! Você quer que eu modifique a seção "Nossos Cursos Mais Populares" no seu arquivo `index.html` para que você possa:
+1.  Adicionar **imagens locais** para cada um dos 6 cursos.
+2.  Editar o **título** de cada curso.
+3.  Editar a **descrição** de cada curso.
+4.  Editar o **valor** de cada curso.
+5.  Deixar o botão "Ver Detalhes" pronto para, no futuro, você adicionar o link da Hotmart (por enquanto, ele continuará apontando para as seções de detalhe internas como `#course-detail-web`, etc.).
+
+Vou pegar o último arquivo `index.html` que você me enviou (o com `contentFetchId` terminando em `c952e355a7852` e que você indicou ser o mais atual) e fazer essas alterações.
+
+Para as imagens, vou usar caminhos genéricos como `images/curso-web-mastery.png`, `images/curso-data-insights.png`, etc. Você precisará criar essas imagens, nomeá-las corretamente (ou ajustar os nomes no HTML) e colocá-las na sua pasta `images/`.
+
+Para os títulos, descrições e valores, vou manter os atuais como exemplo, mas vou destacar no código onde você pode alterá-los facilmente.
+
+---
+
+Aqui está o código `index.html` completo com as modificações na seção "Nossos Cursos Mais Populares":
+
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -218,7 +236,7 @@
                         <img src="images/Foto-Perfil.jpg" alt="Foto de Bruno" class="w-48 h-48 object-cover rounded-full mx-auto mb-6 border-4 border-accent-indigo-primary">
                         <h3 class="text-xl font-bold mb-2 text-light-primary">Bruno</h3>
                         <p class="text-accent-indigo-primary font-semibold mb-4">Programador / Vendedor</p>
-                        <p class="text-light-tertiary mb-6">Estou no penúltimo semestre da minha faculdade e este site é um dos meus projetos iniciais, feito com muito esforço. Ele ainda é um embrião e não está perfeito, por isso, sua compreensão é muito valiosa. Obrigado!</p>
+                        <p class="text-light-tertiary mb-6">Cursando o penúltimo semestre da faculdade, este é um projeto embrionário em desenvolvimento. Agradeço sua compreensão enquanto ele evolui!</p>
                         <div class="flex justify-center space-x-4">
                             <a href="https://www.linkedin.com/in/bruno-passos-380552223/" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in glow-icon"></i></a>
                             <a href="https://github.com/5223Bruno" target="_blank" rel="noopener noreferrer"><i class="fab fa-github glow-icon"></i></a>
@@ -249,7 +267,7 @@
                 <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Nossos Cursos Mais Populares</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="https://placehold.co/600x400/3498db/ffffff?text=Web+Mastery" alt="Imagem do Curso de Desenvolvimento Web" class="w-full h-48 object-cover lazy-load">
+                        <img src="images/curso-web-mastery.png" alt="Imagem do Curso Web Mastery: Do Zero ao Full Stack Pro" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
                             <h3 class="text-xl font-semibold mb-2 text-light-primary">Web Mastery: Do Zero ao Full Stack Pro</h3>
                             <p class="text-light-tertiary mb-4 text-sm flex-grow">Torne-se um mestre da web! Domine HTML, CSS, JavaScript, React e Node.js para construir aplicações robustas e dinâmicas que impressionam.</p>
@@ -263,8 +281,9 @@
                             <a href="#course-detail-web" class="mt-auto block w-full text-center bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
+
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="https://placehold.co/600x400/2ecc71/ffffff?text=Data+Insights" alt="Imagem do Curso de Ciência de Dados" class="w-full h-48 object-cover lazy-load">
+                        <img src="images/curso-data-insights.png" alt="Imagem do Curso Data Insights com Python: Decifre o Futuro" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
                             <h3 class="text-xl font-semibold mb-2 text-light-primary">Data Insights com Python: Decifre o Futuro</h3>
                             <p class="text-light-tertiary mb-4 text-sm flex-grow">Mergulhe no universo dos dados! Aprenda Python para análise, Machine Learning e visualizações que transformam números em decisões estratégicas.</p>
@@ -278,8 +297,9 @@
                             <a href="#course-detail-data" class="mt-auto block w-full text-center bg-accent-emerald-primary hover:bg-accent-emerald-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
+
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="https://placehold.co/600x400/e74c3c/ffffff?text=Digital+Boost" alt="Imagem do Curso de Marketing Digital" class="w-full h-48 object-cover lazy-load">
+                        <img src="images/curso-digital-boost.png" alt="Imagem do Curso Digital Boost: Estratégias de Impacto Online" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
                             <h3 class="text-xl font-semibold mb-2 text-light-primary">Digital Boost: Estratégias de Impacto Online</h3>
                             <p class="text-light-tertiary mb-4 text-sm flex-grow">Turbine negócios no mundo digital! Domine SEO, Mídias Sociais, Ads e Email Marketing para resultados explosivos e crescimento acelerado.</p>
@@ -293,8 +313,9 @@
                             <a href="#course-detail-marketing" class="mt-auto block w-full text-center bg-accent-red-primary hover:bg-accent-red-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
+
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="https://placehold.co/600x400/8b5cf6/ffffff?text=UX%2FUI+Vision" alt="Imagem do Curso de UX/UI Design" class="w-full h-48 object-cover lazy-load">
+                        <img src="images/curso-ux-ui-vision.png" alt="Imagem do Curso UX/UI Vision: Interfaces que Encantam" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
                             <h3 class="text-xl font-semibold mb-2 text-light-primary">UX/UI Vision: Interfaces que Encantam</h3>
                             <p class="text-light-tertiary mb-4 text-sm flex-grow">Transforme ideias em experiências memoráveis! Aprenda a criar interfaces intuitivas e designs centrados no usuário que cativam e convertem.</p>
@@ -308,8 +329,9 @@
                             <a href="#course-detail-uxui" class="mt-auto block w-full text-center bg-accent-purple-primary hover:bg-accent-purple-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
+
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="https://placehold.co/600x400/f59e0b/ffffff?text=Cloud+Ops+Elite" alt="Imagem do Curso de DevOps & Cloud" class="w-full h-48 object-cover lazy-load">
+                        <img src="images/curso-cloud-ops.png" alt="Imagem do Curso Cloud Ops Elite: DevOps e Nuvem na Prática" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
                             <h3 class="text-xl font-semibold mb-2 text-light-primary">Cloud Ops Elite: DevOps e Nuvem na Prática</h3>
                             <p class="text-light-tertiary mb-4 text-sm flex-grow">Automatize e escale com maestria! Domine Docker, Kubernetes, CI/CD e as nuvens AWS e Azure para infraestruturas de alta performance.</p>
@@ -323,8 +345,9 @@
                             <a href="#course-detail-devops" class="mt-auto block w-full text-center bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
+                    
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="https://placehold.co/600x400/ec4899/ffffff?text=App+Impact" alt="Imagem do Curso de Desenvolvimento Mobile" class="w-full h-48 object-cover lazy-load">
+                        <img src="images/curso-app-impact.png" alt="Imagem do Curso App Impact: Criando Apps Multiplataforma" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
                             <h3 class="text-xl font-semibold mb-2 text-light-primary">App Impact: Criando Apps Multiplataforma</h3>
                             <p class="text-light-tertiary mb-4 text-sm flex-grow">Leve suas ideias para o bolso de todos! Desenvolva apps incríveis para Android e iOS com React Native, Flutter ou de forma nativa.</p>
@@ -341,7 +364,6 @@
                 </div>
             </div>
         </section>
-
         <section id="benefits" class="py-16 bg-dark-primary relative">
             <div class="absolute inset-0 opacity-5" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+CjxyZWN0IHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNMzAgMzBtLTI4IDBhMjggMjggMCAxIDAgNTYgMGEyOCAyOCAwIDEgMCAtNTYgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjAuNSIvPgo8L3N2Zz4=');"></div>
             <div class="container mx-auto px-6 relative z-10">
@@ -832,3 +854,5 @@
     </script>
 </body>
 </html>
+}
+O arquivo mais atual, só analise e assimile. (MEU CODIGO QUE EU SUBI NO GITHUB ESTÁ COMO VOCE ME ENVIOU ANTERIORMENTE, COM A FUNÇÃO E AS FOTOS DO BLOG COM O NOME "images/blog-ia.png"...) Só que as imagens do blog não são exibidas no meu site, já a foto da equipe sim...e quando vou no github, na pasta images, e tento abrir as imagens do blog, aparece a imagem de erro, já a foto da equipe abre normal

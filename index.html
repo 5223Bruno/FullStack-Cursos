@@ -166,6 +166,28 @@
         .course-detail-section {
             display: none;
         }
+
+        /* Efeito de máquina de escrever */
+        .typewriter-text {
+            overflow: hidden; /* Garante que o texto não apareça antes da animação */
+            border-right: .15em solid orange; /* Cursor piscando */
+            white-space: nowrap; /* Mantém o conteúdo em uma única linha */
+            letter-spacing: .05em; 
+            animation: 
+                typing 3.5s steps(40, end),
+                blink-caret .75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: orange; }
+        }
+
     </style>
 </head>
 <body class="bg-dark-primary text-light-primary">
@@ -237,14 +259,26 @@
         <section id="home" class="hero-bg text-white py-20 md:py-32 relative overflow-hidden">
             <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDIwIDAgTCAwIDAgTCAwIDIwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIiAvPjwvc3ZnPg==');"></div>
             <div class="container mx-auto px-6 text-center relative z-10">
-                <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight animate-on-scroll">
+                <h1 class="typewriter-text text-4xl md:text-6xl font-bold mb-6 leading-tight animate-on-scroll">
                     <span class="bg-clip-text text-transparent bg-gradient-to-r from-light-primary via-accent-indigo-text to-accent-purple-text">Decole Sua Carreira Tech!</span>
                 </h1>
                 <p class="text-lg md:text-xl mb-10 max-w-2xl mx-auto text-light-secondary animate-on-scroll">Aprenda as habilidades do futuro com cursos práticos e instrutores especialistas. Seu futuro na tecnologia começa agora!</p>
+                
+                <div class="my-10 animate-on-scroll max-w-2xl mx-auto">
+                    <div class="bg-dark-card bg-opacity-70 backdrop-filter backdrop-blur-sm p-6 rounded-lg shadow-lg neon-border">
+                        <div class="flex items-center mb-4">
+                            <img src="images/depoimento.png" alt="Avatar do depoimento" class="w-12 h-12 rounded-full mr-4 border-2 border-accent-purple-secondary">
+                            <div>
+                                <p class="font-semibold text-light-primary">Nome do Aluno Satisfeito</p>
+                                <p class="text-xs text-accent-purple-text">Ex-aluno do Curso X</p>
+                            </div>
+                        </div>
+                        <p class="text-light-secondary italic">"Este curso mudou minha perspectiva sobre programação! O conteúdo é incrível e o suporte fez toda a diferença."</p>
+                    </div>
+                </div>
                 <a href="#courses" class="gradient-cta text-white font-semibold py-3 px-8 rounded-lg text-lg cta-button shadow-lg animate-on-scroll">Ver Cursos</a>
             </div>
         </section>
-
         <section id="courses" class="py-16 bg-dark-secondary">
             <div class="container mx-auto px-6">
                 <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Nossos Cursos Mais Populares</h2>
@@ -353,7 +387,8 @@
             <div class="absolute inset-0 opacity-5" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+CjxyZWN0IHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNMzAgMzBtLTI4IDBhMjggMjggMCAxIDAgNTYgMGEyOCAyOCAwIDEgMCAtNTYgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjAuNSIvPgo8L3N2Zz4=');"></div>
             <div class="container mx-auto px-6 relative z-10">
                 <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Por que escolher a FullStack Cursos?</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center"> <div class="benefit-card text-center p-6 rounded-lg shadow animate-on-scroll">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center">
+                    <div class="benefit-card text-center p-6 rounded-lg shadow animate-on-scroll">
                         <div class="text-accent-emerald-primary mb-4">
                             <i class="fas fa-laptop-code fa-3x glow-icon"></i>
                         </div>
@@ -370,6 +405,7 @@
                 </div>
             </div>
         </section>
+
         <section id="testimonials" class="py-16 bg-dark-secondary">
             <div class="container mx-auto px-6">
                 <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">O que nossos alunos dizem</h2>
@@ -434,46 +470,24 @@
             </div>
         </section>
 
-        <section id="detail-web" class="course-detail-section py-16 bg-dark-primary">
-            <div class="container mx-auto px-6">
-                <a href="#courses" class="text-accent-indigo-primary hover:text-accent-indigo-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
-                <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
-                    <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">Web Mastery: Do Zero ao Full Stack Pro</h1>
-                    <p class="text-light-secondary mb-6">Torne-se um mestre da web! Domine HTML, CSS, JavaScript, React e Node.js para construir aplicações robustas e dinâmicas que impressionam. Ideal para iniciantes e para quem busca se aprofundar nas tecnologias mais demandadas do mercado.</p>
-                    <button onclick="window.location.href='URL_HOTMART_WEB_MASTERY_AQUI'" class="w-full md:w-auto bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Inscreva-se Agora (Hotmart)</button>
-                </div>
-            </div>
-        </section>
-
-        <section id="detail-data" class="course-detail-section py-16 bg-dark-primary">
-            <div class="container mx-auto px-6">
-                <a href="#courses" class="text-accent-emerald-primary hover:text-accent-emerald-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
-                <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
-                    <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">Data Insights com Python: Decifre o Futuro</h1>
-                    <p class="text-light-secondary mb-6">Mergulhe no universo dos dados! Aprenda Python para análise, Machine Learning e visualizações que transformam números em decisões estratégicas.</p>
-                    <button onclick="window.location.href='URL_HOTMART_DATA_INSIGHTS_AQUI'" class="w-full md:w-auto bg-accent-emerald-primary hover:bg-accent-emerald-hover text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Inscreva-se Agora (Hotmart)</button>
-                </div>
-            </div>
-        </section>
-
-        <section id="detail-marketing" class="course-detail-section py-16 bg-dark-primary">
-            <div class="container mx-auto px-6">
-                <a href="#courses" class="text-accent-red-primary hover:text-accent-red-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
-                 <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
-                    <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">Digital Boost: Estratégias de Impacto Online</h1>
-                    <p class="text-light-secondary mb-6">Turbine negócios no mundo digital! Domine SEO, Mídias Sociais, Ads e Email Marketing para resultados explosivos e crescimento acelerado.</p>
-                    <button onclick="window.location.href='URL_HOTMART_DIGITAL_BOOST_AQUI'" class="w-full md:w-auto bg-accent-red-primary hover:bg-accent-red-hover text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Inscreva-se Agora (Hotmart)</button>
-                </div>
-            </div>
-        </section>
-        
         <section id="detail-logica" class="course-detail-section py-16 bg-dark-primary">
             <div class="container mx-auto px-6">
                 <a href="#courses" class="text-accent-indigo-primary hover:text-accent-indigo-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
-                 <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
+                <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
                     <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">Lógica de Programação Essencial</h1>
-                    <p class="text-light-secondary mb-6">Aqui você colocará a descrição completa do seu curso de Lógica de Programação, módulos, o que o aluno vai aprender, pré-requisitos, etc.</p>
-                    <button onclick="window.location.href='URL_HOTMART_LOGICA_AQUI'" class="w-full md:w-auto bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Inscreva-se Agora (Hotmart)</button>
+                    <img src="images/logica.png" alt="Imagem do Curso Lógica de Programação Essencial" class="w-full md:w-1/2 lg:w-1/3 mx-auto h-auto object-cover rounded-lg mb-6 lazy-load">
+                    <p class="text-light-secondary mb-2"><strong>Descrição Detalhada:</strong> Desenvolva o raciocínio lógico fundamental para aprender qualquer linguagem e dar o primeiro passo na programação. Neste curso, você aprenderá os conceitos chave de algoritmos, estruturas de decisão, laços de repetição e muito mais, preparando uma base sólida para sua carreira como desenvolvedor.</p>
+                    <p class="text-light-secondary mb-2"><strong>O que você vai aprender:</strong></p>
+                    <ul class="list-disc list-inside text-light-secondary mb-4">
+                        <li>Introdução a algoritmos e pseudocódigo.</li>
+                        <li>Variáveis, tipos de dados e operadores.</li>
+                        <li>Estruturas condicionais (if/else).</li>
+                        <li>Estruturas de repetição (for/while).</li>
+                        <li>Vetores e matrizes.</li>
+                        <li>Funções e procedimentos.</li>
+                    </ul>
+                    <p class="text-light-secondary mb-6"><strong>Instrutor:</strong> Bruno</p>
+                    <button onclick="window.location.href='SEU_LINK_HOTMART_LOGICA_AQUI'" class="w-full md:w-auto bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Inscreva-se por R$ 97,00 (Hotmart)</button>
                 </div>
             </div>
         </section>
@@ -481,10 +495,19 @@
         <section id="detail-minicurso" class="course-detail-section py-16 bg-dark-primary">
             <div class="container mx-auto px-6">
                 <a href="#courses" class="text-accent-emerald-primary hover:text-accent-emerald-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
-                 <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
+                <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
                     <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">Mini Curso de Programação Gratuito</h1>
-                    <p class="text-light-secondary mb-6">Descreva aqui o conteúdo do seu mini curso gratuito, o que os alunos vão aprender e como isso pode ajudá-los a começar.</p>
-                    <button onclick="window.location.href='URL_HOTMART_MINICURSO_AQUI_OU_PAGINA_DE_CADASTRO'" class="w-full md:w-auto bg-accent-emerald-primary hover:bg-accent-emerald-hover text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Acessar Gratuitamente</button>
+                    <img src="images/minicurso.png" alt="Imagem do Mini Curso de Programação" class="w-full md:w-1/2 lg:w-1/3 mx-auto h-auto object-cover rounded-lg mb-6 lazy-load">
+                    <p class="text-light-secondary mb-2"><strong>Descrição Detalhada:</strong> Dê seus primeiros passos no universo da programação com este mini curso introdutório totalmente gratuito! Ideal para quem nunca teve contato com programação e quer entender os conceitos básicos de forma prática e descomplicada.</p>
+                    <p class="text-light-secondary mb-2"><strong>O que você vai aprender:</strong></p>
+                    <ul class="list-disc list-inside text-light-secondary mb-4">
+                        <li>O que é programação e para que serve.</li>
+                        <li>Introdução a uma linguagem de programação amigável (ex: Scratch ou Python básico).</li>
+                        <li>Como criar seu primeiro pequeno programa.</li>
+                        <li>Próximos passos para continuar aprendendo.</li>
+                    </ul>
+                    <p class="text-light-secondary mb-6"><strong>Instrutor:</strong> Bruno</p>
+                    <button onclick="window.location.href='SEU_LINK_HOTMART_MINICURSO_AQUI_OU_PAGINA_CADASTRO'" class="w-full md:w-auto bg-accent-emerald-primary hover:bg-accent-emerald-hover text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Acessar Gratuitamente</button>
                 </div>
             </div>
         </section>
@@ -492,42 +515,54 @@
         <section id="detail-python" class="course-detail-section py-16 bg-dark-primary">
             <div class="container mx-auto px-6">
                 <a href="#courses" class="text-accent-red-primary hover:text-accent-red-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
-                 <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
+                <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
                     <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">Python Básico para Iniciantes</h1>
-                    <p class="text-light-secondary mb-6">Detalhe aqui o conteúdo do curso de Python Básico: o que será ensinado, projetos práticos, para quem se destina, etc.</p>
-                    <button onclick="window.location.href='URL_HOTMART_PYTHON_AQUI'" class="w-full md:w-auto bg-accent-red-primary hover:bg-accent-red-hover text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Inscreva-se Agora (Hotmart)</button>
+                    <img src="images/python.png" alt="Imagem do Curso Python Básico para Iniciantes" class="w-full md:w-1/2 lg:w-1/3 mx-auto h-auto object-cover rounded-lg mb-6 lazy-load">
+                    <p class="text-light-secondary mb-2"><strong>Descrição Detalhada:</strong> Aprenda os fundamentos da linguagem Python, uma das mais populares e versáteis do mercado. Este curso é ideal para iniciantes e aborda desde a sintaxe básica até a criação de pequenos projetos práticos.</p>
+                    <p class="text-light-secondary mb-2"><strong>O que você vai aprender:</strong></p>
+                    <ul class="list-disc list-inside text-light-secondary mb-4">
+                        <li>Instalação e configuração do ambiente Python.</li>
+                        <li>Variáveis, tipos de dados, operadores.</li>
+                        <li>Estruturas de controle: condicionais e laços.</li>
+                        <li>Funções e módulos.</li>
+                        <li>Manipulação básica de strings e listas.</li>
+                        <li>Introdução a projetos práticos.</li>
+                    </ul>
+                    <p class="text-light-secondary mb-6"><strong>Instrutor:</strong> Bruno</p>
+                    <button onclick="window.location.href='SEU_LINK_HOTMART_PYTHON_AQUI'" class="w-full md:w-auto bg-accent-red-primary hover:bg-accent-red-hover text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Inscreva-se por R$ 147,00 (Hotmart)</button>
                 </div>
             </div>
         </section>
-
+        
         <section id="detail-uxui" class="course-detail-section py-16 bg-dark-primary">
-            <div class="container mx-auto px-6">
+             <div class="container mx-auto px-6">
                 <a href="#courses" class="text-accent-purple-primary hover:text-accent-purple-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
-                 <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
+                <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
                     <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">UX/UI Vision: Interfaces que Encantam</h1>
-                    <p class="text-light-secondary mb-6">Detalhes do curso de UX/UI aqui...</p>
+                    <img src="images/curso-ux-ui-vision.png" alt="Imagem do Curso UX/UI Vision" class="w-full md:w-1/2 lg:w-1/3 mx-auto h-auto object-cover rounded-lg mb-6 lazy-load">
+                    <p class="text-light-secondary mb-6">Detalhes completos do curso UX/UI Vision virão aqui...</p>
                     <button onclick="window.location.href='URL_HOTMART_UXUI_AQUI'" class="w-full md:w-auto bg-accent-purple-primary hover:bg-accent-purple-hover text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Inscreva-se Agora (Hotmart)</button>
                 </div>
             </div>
         </section>
-
         <section id="detail-devops" class="course-detail-section py-16 bg-dark-primary">
-            <div class="container mx-auto px-6">
+             <div class="container mx-auto px-6">
                 <a href="#courses" class="text-amber-500 hover:text-amber-600 mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
-                 <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
+                <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
                     <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">Cloud Ops Elite: DevOps e Nuvem na Prática</h1>
-                    <p class="text-light-secondary mb-6">Detalhes do curso de DevOps aqui...</p>
-                    <button onclick="window.location.href='URL_HOTMART_DEVOPS_AQUI'" class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Inscreva-se Agora (Hotmart)</button>
+                    <img src="images/curso-cloud-ops.png" alt="Imagem do Curso Cloud Ops Elite" class="w-full md:w-1/2 lg:w-1/3 mx-auto h-auto object-cover rounded-lg mb-6 lazy-load">
+                    <p class="text-light-secondary mb-6">Detalhes completos do curso Cloud Ops Elite virão aqui...</p>
+                     <button onclick="window.location.href='URL_HOTMART_DEVOPS_AQUI'" class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Inscreva-se Agora (Hotmart)</button>
                 </div>
             </div>
         </section>
-
         <section id="detail-mobile" class="course-detail-section py-16 bg-dark-primary">
-            <div class="container mx-auto px-6">
+             <div class="container mx-auto px-6">
                 <a href="#courses" class="text-pink-500 hover:text-pink-600 mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
-                 <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
+                <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
                     <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">App Impact: Criando Apps Multiplataforma</h1>
-                    <p class="text-light-secondary mb-6">Detalhes do curso de desenvolvimento mobile aqui...</p>
+                    <img src="images/curso-app-impact.png" alt="Imagem do Curso App Impact" class="w-full md:w-1/2 lg:w-1/3 mx-auto h-auto object-cover rounded-lg mb-6 lazy-load">
+                    <p class="text-light-secondary mb-6">Detalhes completos do curso App Impact virão aqui...</p>
                     <button onclick="window.location.href='URL_HOTMART_MOBILE_AQUI'" class="w-full md:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Inscreva-se Agora (Hotmart)</button>
                 </div>
             </div>
@@ -655,7 +690,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
-            const allCourseDetailSections = document.querySelectorAll('.course-detail-section'); // Seleciona todas as seções de detalhe
+            const allCourseDetailSections = document.querySelectorAll('.course-detail-section'); 
 
             if (mobileMenuButton && mobileMenu) {
                 mobileMenuButton.addEventListener('click', function() {
@@ -668,26 +703,26 @@
                 anchor.addEventListener('click', function (e) {
                     const href = this.getAttribute('href');
                     
-                    // Se for um link para uma seção de detalhe de curso ou login, previna o comportamento padrão.
-                    if (href.startsWith('#detail-') || href === '#login') {
+                    if (href.startsWith('#detail-') || href === '#login' || href.startsWith('#course-detail-')) { // Adicionado #course-detail- para as seções antigas
                         e.preventDefault();
                         
-                        // Esconder todas as seções de detalhe e a de login primeiro
                         allCourseDetailSections.forEach(section => {
                             section.style.display = 'none';
                         });
-                        document.getElementById('login').style.display = 'none';
+                        // A seção de login original é tratada como .course-detail-section, então não precisa de tratamento especial aqui
+                        // se ela tiver a classe .course-detail-section.
+                        // Se não tiver, e você quiser que ela se comporte da mesma forma:
+                        // const loginSection = document.getElementById('login');
+                        // if (loginSection) loginSection.style.display = 'none';
 
 
                         const targetId = href.substring(1);
                         const targetElement = document.getElementById(targetId);
                         
                         if (targetElement) {
-                            targetElement.style.display = 'block'; // Mostrar a seção alvo
+                            targetElement.style.display = 'block'; 
                             
-                            // Scroll suave para a seção alvo
-                            // Ajuste o valor de 'offset' conforme necessário para compensar a altura do header fixo
-                            const headerOffset = 80; // Altura aproximada do seu header
+                            const headerOffset = 80; 
                             const elementPosition = targetElement.getBoundingClientRect().top;
                             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
                             
@@ -696,13 +731,16 @@
                                 behavior: 'smooth'
                             });
                         }
-                    } else if (href.startsWith('#') && href !== '#') { // Para outros links de âncora (seções principais)
+                    } else if (href.startsWith('#') && href !== '#') { 
                         e.preventDefault();
-                        // Esconder todas as seções de detalhe e a de login
                          allCourseDetailSections.forEach(section => {
                             section.style.display = 'none';
                         });
-                        document.getElementById('login').style.display = 'none';
+                        const loginSection = document.getElementById('login');
+                        if (loginSection && !loginSection.classList.contains('course-detail-section')) { // só esconde se não for já tratada
+                           loginSection.style.display = 'none';
+                        }
+
 
                         const targetId = href.substring(1);
                         const targetElement = document.getElementById(targetId);
@@ -717,8 +755,7 @@
                         }
                     }
                     
-                    // Fechar menu mobile se estiver aberto e o link não for o próprio botão do menu
-                    if (mobileMenu && !mobileMenu.classList.contains('hidden') && !this.id.includes('mobile-menu-button')) {
+                    if (mobileMenu && !mobileMenu.classList.contains('hidden') && this.id !== 'mobile-menu-button') { // corrigido: this.id !==
                         mobileMenu.classList.add('hidden');
                         if (mobileMenuButton) {
                             mobileMenuButton.setAttribute('aria-expanded', 'false');

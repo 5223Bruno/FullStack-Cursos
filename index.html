@@ -103,7 +103,7 @@
             transform: translateY(-3px);
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
         }
-        .blog-card { /* Corrigido de .-card para .blog-card */
+        .blog-card {
             background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -162,6 +162,32 @@
             outline: 2px solid #4f46e5;
             outline-offset: 2px;
         }
+        /* Esconder seções de detalhe de curso por padrão */
+        .course-detail-section {
+            display: none;
+        }
+
+        /* Efeito de máquina de escrever */
+        .typewriter-text {
+            overflow: hidden; /* Garante que o texto não apareça antes da animação */
+            border-right: .15em solid orange; /* Cursor piscando */
+            white-space: nowrap; /* Mantém o conteúdo em uma única linha */
+            letter-spacing: .05em; 
+            animation: 
+                typing 3.5s steps(40, end),
+                blink-caret .75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: orange; }
+        }
+
     </style>
 </head>
 <body class="bg-dark-primary text-light-primary">
@@ -215,7 +241,7 @@
                         <img src="images/Foto-Perfil.jpg" alt="Foto de Bruno" class="w-48 h-48 object-cover rounded-full mx-auto mb-6 border-4 border-accent-indigo-primary">
                         <h3 class="text-xl font-bold mb-2 text-light-primary">Bruno</h3>
                         <p class="text-accent-indigo-primary font-semibold mb-4">Programador / Vendedor</p>
-                        <p class="text-light-tertiary mb-6">Um site no estagio inicial, para vender conteudo de qualidade, e transformar voce em um programador Nato.</p>
+                        <p class="text-light-tertiary mb-6">Estou no penúltimo semestre da minha faculdade e este site é um dos meus projetos iniciais, feito com muito esforço. Ele ainda é um embrião e não está perfeito, por isso, sua compreensão é muito valiosa. Obrigado!</p>
                         <div class="flex justify-center space-x-4">
                             <a href="https://www.linkedin.com/in/bruno-passos-380552223/" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in glow-icon"></i></a>
                             <a href="https://github.com/5223Bruno" target="_blank" rel="noopener noreferrer"><i class="fab fa-github glow-icon"></i></a>
@@ -233,65 +259,81 @@
         <section id="home" class="hero-bg text-white py-20 md:py-32 relative overflow-hidden">
             <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDIwIDAgTCAwIDAgTCAwIDIwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIiAvPjwvc3ZnPg==');"></div>
             <div class="container mx-auto px-6 text-center relative z-10">
-                <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight animate-on-scroll">
+                <h1 class="typewriter-text text-4xl md:text-6xl font-bold mb-6 leading-tight animate-on-scroll">
                     <span class="bg-clip-text text-transparent bg-gradient-to-r from-light-primary via-accent-indigo-text to-accent-purple-text">Decole Sua Carreira Tech!</span>
                 </h1>
                 <p class="text-lg md:text-xl mb-10 max-w-2xl mx-auto text-light-secondary animate-on-scroll">Aprenda as habilidades do futuro com cursos práticos e instrutores especialistas. Seu futuro na tecnologia começa agora!</p>
+                
+                <div class="my-10 animate-on-scroll max-w-2xl mx-auto">
+                    <div class="bg-dark-card bg-opacity-70 backdrop-filter backdrop-blur-sm p-6 rounded-lg shadow-lg neon-border">
+                        <div class="flex items-center mb-4">
+                            <img src="images/depoimento.png" alt="Avatar do depoimento" class="w-12 h-12 rounded-full mr-4 border-2 border-accent-purple-secondary">
+                            <div>
+                                <p class="font-semibold text-light-primary">Nome do Aluno Satisfeito</p>
+                                <p class="text-xs text-accent-purple-text">Ex-aluno do Curso X</p>
+                            </div>
+                        </div>
+                        <p class="text-light-secondary italic">"Este curso mudou minha perspectiva sobre programação! O conteúdo é incrível e o suporte fez toda a diferença."</p>
+                    </div>
+                </div>
                 <a href="#courses" class="gradient-cta text-white font-semibold py-3 px-8 rounded-lg text-lg cta-button shadow-lg animate-on-scroll">Ver Cursos</a>
             </div>
         </section>
-
         <section id="courses" class="py-16 bg-dark-secondary">
             <div class="container mx-auto px-6">
                 <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Nossos Cursos Mais Populares</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="https://placehold.co/600x400/3498db/ffffff?text=Web+Mastery" alt="Imagem do Curso de Desenvolvimento Web" class="w-full h-48 object-cover lazy-load">
+                        <img src="images/logica.png" alt="Imagem do Curso Lógica de Programação Essencial" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-semibold mb-2 text-light-primary">Web Mastery: Do Zero ao Full Stack Pro</h3>
-                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Torne-se um mestre da web! Domine HTML, CSS, JavaScript, React e Node.js para construir aplicações robustas e dinâmicas que impressionam.</p>
+                            <h3 class="text-xl font-semibold mb-2 text-light-primary">Lógica de Programação Essencial</h3>
+                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Desenvolva o raciocínio lógico fundamental para aprender qualquer linguagem e dar o primeiro passo na programação.</p>
                             <div class="mb-4">
-                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-accent-indigo-text bg-accent-indigo-primary bg-opacity-20">Mais Vendido</span>
+                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-accent-indigo-text bg-accent-indigo-primary bg-opacity-20">Para Iniciantes</span>
                             </div>
                             <div class="flex justify-between items-center mb-3">
-                                <p class="text-lg font-bold text-accent-indigo-primary">R$ 499,90</p>
-                                <span class="text-sm text-light-tertiary"><i class="fas fa-users mr-1 glow-icon"></i> 1250 Alunos</span>
+                                <p class="text-lg font-bold text-accent-indigo-primary">R$ 97,00</p>
+                                <span class="text-sm text-light-tertiary"><i class="fas fa-users mr-1 glow-icon"></i> (Novo)</span>
                             </div>
-                            <a href="#course-detail-web" class="mt-auto block w-full text-center bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
+                            <a href="#detail-logica" class="mt-auto block w-full text-center bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
+
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="https://placehold.co/600x400/2ecc71/ffffff?text=Data+Insights" alt="Imagem do Curso de Ciência de Dados" class="w-full h-48 object-cover lazy-load">
+                        <img src="images/minicurso.png" alt="Imagem do Mini Curso de Programação" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-semibold mb-2 text-light-primary">Data Insights com Python: Decifre o Futuro</h3>
-                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Mergulhe no universo dos dados! Aprenda Python para análise, Machine Learning e visualizações que transformam números em decisões estratégicas.</p>
+                            <h3 class="text-xl font-semibold mb-2 text-light-primary">Mini Curso de Programação Gratuito</h3>
+                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Dê seus primeiros passos no universo da programação com este mini curso introdutório totalmente gratuito!</p>
                              <div class="mb-4">
-                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-accent-emerald-text bg-accent-emerald-primary bg-opacity-20">Nova Turma</span>
+                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-accent-emerald-text bg-accent-emerald-primary bg-opacity-20">GRÁTIS</span>
                             </div>
                             <div class="flex justify-between items-center mb-3">
-                                <p class="text-lg font-bold text-accent-emerald-primary">R$ 599,90</p>
-                                <span class="text-sm text-light-tertiary"><i class="fas fa-users mr-1 glow-icon"></i> 870 Alunos</span>
+                                <p class="text-lg font-bold text-accent-emerald-primary">Grátis</p>
+                                <span class="text-sm text-light-tertiary"><i class="fas fa-users mr-1 glow-icon"></i> (Inicie Aqui)</span>
                             </div>
-                            <a href="#course-detail-data" class="mt-auto block w-full text-center bg-accent-emerald-primary hover:bg-accent-emerald-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
+                            <a href="#detail-minicurso" class="mt-auto block w-full text-center bg-accent-emerald-primary hover:bg-accent-emerald-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
+
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="https://placehold.co/600x400/e74c3c/ffffff?text=Digital+Boost" alt="Imagem do Curso de Marketing Digital" class="w-full h-48 object-cover lazy-load">
+                        <img src="images/python.png" alt="Imagem do Curso Python Básico para Iniciantes" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-semibold mb-2 text-light-primary">Digital Boost: Estratégias de Impacto Online</h3>
-                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Turbine negócios no mundo digital! Domine SEO, Mídias Sociais, Ads e Email Marketing para resultados explosivos e crescimento acelerado.</p>
+                            <h3 class="text-xl font-semibold mb-2 text-light-primary">Python Básico para Iniciantes</h3>
+                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Aprenda os fundamentos da linguagem Python, uma das mais populares e versáteis do mercado, e crie seus primeiros scripts.</p>
                              <div class="mb-4">
-                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-accent-red-text bg-accent-red-primary bg-opacity-20">Em Alta</span>
+                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-accent-red-text bg-accent-red-primary bg-opacity-20">Mais Popular</span>
                             </div>
                             <div class="flex justify-between items-center mb-3">
-                                <p class="text-lg font-bold text-accent-red-primary">R$ 399,90</p>
-                                <span class="text-sm text-light-tertiary"><i class="fas fa-users mr-1 glow-icon"></i> 1500+ Alunos</span>
+                                <p class="text-lg font-bold text-accent-red-primary">R$ 147,00</p>
+                                <span class="text-sm text-light-tertiary"><i class="fas fa-users mr-1 glow-icon"></i> (Em breve)</span>
                             </div>
-                            <a href="#course-detail-marketing" class="mt-auto block w-full text-center bg-accent-red-primary hover:bg-accent-red-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
+                            <a href="#detail-python" class="mt-auto block w-full text-center bg-accent-red-primary hover:bg-accent-red-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
+
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="https://placehold.co/600x400/8b5cf6/ffffff?text=UX%2FUI+Vision" alt="Imagem do Curso de UX/UI Design" class="w-full h-48 object-cover lazy-load">
+                        <img src="images/curso-ux-ui-vision.png" alt="Imagem do Curso UX/UI Vision: Interfaces que Encantam" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
                             <h3 class="text-xl font-semibold mb-2 text-light-primary">UX/UI Vision: Interfaces que Encantam</h3>
                             <p class="text-light-tertiary mb-4 text-sm flex-grow">Transforme ideias em experiências memoráveis! Aprenda a criar interfaces intuitivas e designs centrados no usuário que cativam e convertem.</p>
@@ -302,11 +344,12 @@
                                 <p class="text-lg font-bold text-accent-purple-primary">R$ 449,90</p>
                                 <span class="text-sm text-light-tertiary"><i class="fas fa-users mr-1 glow-icon"></i> 720 Alunos</span>
                             </div>
-                            <a href="#course-detail-uxui" class="mt-auto block w-full text-center bg-accent-purple-primary hover:bg-accent-purple-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
+                            <a href="#detail-uxui" class="mt-auto block w-full text-center bg-accent-purple-primary hover:bg-accent-purple-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
+
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="https://placehold.co/600x400/f59e0b/ffffff?text=Cloud+Ops+Elite" alt="Imagem do Curso de DevOps & Cloud" class="w-full h-48 object-cover lazy-load">
+                        <img src="images/curso-cloud-ops.png" alt="Imagem do Curso Cloud Ops Elite: DevOps e Nuvem na Prática" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
                             <h3 class="text-xl font-semibold mb-2 text-light-primary">Cloud Ops Elite: DevOps e Nuvem na Prática</h3>
                             <p class="text-light-tertiary mb-4 text-sm flex-grow">Automatize e escale com maestria! Domine Docker, Kubernetes, CI/CD e as nuvens AWS e Azure para infraestruturas de alta performance.</p>
@@ -317,11 +360,12 @@
                                 <p class="text-lg font-bold text-amber-500">R$ 649,90</p>
                                 <span class="text-sm text-light-tertiary"><i class="fas fa-users mr-1 glow-icon"></i> 650 Alunos</span>
                             </div>
-                            <a href="#course-detail-devops" class="mt-auto block w-full text-center bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
+                            <a href="#detail-devops" class="mt-auto block w-full text-center bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
+                    
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="https://placehold.co/600x400/ec4899/ffffff?text=App+Impact" alt="Imagem do Curso de Desenvolvimento Mobile" class="w-full h-48 object-cover lazy-load">
+                        <img src="images/curso-app-impact.png" alt="Imagem do Curso App Impact: Criando Apps Multiplataforma" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
                             <h3 class="text-xl font-semibold mb-2 text-light-primary">App Impact: Criando Apps Multiplataforma</h3>
                             <p class="text-light-tertiary mb-4 text-sm flex-grow">Leve suas ideias para o bolso de todos! Desenvolva apps incríveis para Android e iOS com React Native, Flutter ou de forma nativa.</p>
@@ -332,7 +376,7 @@
                                 <p class="text-lg font-bold text-pink-500">R$ 549,90</p>
                                 <span class="text-sm text-light-tertiary"><i class="fas fa-users mr-1 glow-icon"></i> 530 Alunos</span>
                             </div>
-                            <a href="#course-detail-mobile" class="mt-auto block w-full text-center bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
+                            <a href="#detail-mobile" class="mt-auto block w-full text-center bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
                 </div>
@@ -343,14 +387,7 @@
             <div class="absolute inset-0 opacity-5" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+CjxyZWN0IHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNMzAgMzBtLTI4IDBhMjggMjggMCAxIDAgNTYgMGEyOCAyOCAwIDEgMCAtNTYgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjAuNSIvPgo8L3N2Zz4=');"></div>
             <div class="container mx-auto px-6 relative z-10">
                 <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Por que escolher a FullStack Cursos?</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="benefit-card text-center p-6 rounded-lg shadow animate-on-scroll">
-                        <div class="text-accent-indigo-primary mb-4">
-                            <i class="fas fa-briefcase fa-3x glow-icon"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold mb-2 text-light-primary">Empregabilidade</h3>
-                        <p class="text-light-tertiary text-sm">Cursos focados nas demandas do mercado para você conquistar as melhores vagas.</p>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center">
                     <div class="benefit-card text-center p-6 rounded-lg shadow animate-on-scroll">
                         <div class="text-accent-emerald-primary mb-4">
                             <i class="fas fa-laptop-code fa-3x glow-icon"></i>
@@ -364,13 +401,6 @@
                         </div>
                         <h3 class="text-xl font-semibold mb-2 text-light-primary">Flexibilidade</h3>
                         <p class="text-light-tertiary text-sm">Estude no seu ritmo, quando e onde quiser, com acesso vitalício ao material.</p>
-                    </div>
-                    <div class="benefit-card text-center p-6 rounded-lg shadow animate-on-scroll">
-                        <div class="text-accent-purple-primary mb-4">
-                            <i class="fas fa-users-cog fa-3x glow-icon"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold mb-2 text-light-primary">Comunidade e Suporte</h3>
-                        <p class="text-light-tertiary text-sm">Faça parte de uma comunidade engajada e conte com suporte especializado.</p>
                     </div>
                 </div>
             </div>
@@ -410,27 +440,27 @@
                 <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Fique por Dentro das Novidades Tech</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <div class="blog-card rounded-lg shadow-md overflow-hidden animate-on-scroll">
-                        <img src="https://placehold.co/600x350/9b59b6/ffffff?text=Artigo+Blog+1" alt="Imagem do Artigo de Blog 1" class="w-full h-40 object-cover lazy-load">
-                        <div class="p-6">
-                            <h3 class="text-lg font-semibold mb-2 text-light-primary">Como começar a programar do zero em 2025?</h3>
-                            <p class="text-light-tertiary text-sm mb-4">Um guia completo para iniciantes que desejam entrar no mundo da programação...</p>
-                            <a href="#" class="text-accent-indigo-primary hover:text-accent-indigo-secondary font-semibold transition-colors">Leia mais <i class="fas fa-arrow-right ml-1"></i></a>
-                        </div>
-                    </div>
-                    <div class="blog-card rounded-lg shadow-md overflow-hidden animate-on-scroll">
-                        <img src="https://placehold.co/600x350/1abc9c/ffffff?text=Artigo+Blog+2" alt="Imagem do Artigo de Blog 2" class="w-full h-40 object-cover lazy-load">
+                        <img src="images/blog-ia.png" alt="Imagem conceitual sobre Inteligência Artificial e o futuro da tecnologia" class="w-full h-40 object-cover lazy-load">
                         <div class="p-6">
                             <h3 class="text-lg font-semibold mb-2 text-light-primary">Inteligência Artificial: O que esperar nos próximos anos</h3>
-                            <p class="text-light-tertiary text-sm mb-4">As tendências e avanços em IA que estão moldando o futuro da tecnologia...</p>
-                            <a href="#" class="text-accent-emerald-primary hover:text-accent-emerald-secondary font-semibold transition-colors">Leia mais <i class="fas fa-arrow-right ml-1"></i></a>
+                            <p class="text-light-tertiary text-sm mb-4">Explore as tendências e avanços da Inteligência Artificial e como ela está moldando o futuro da tecnologia e da sociedade.</p>
+                            <a href="https://valor.globo.com/patrocinado/dino/noticia/2025/04/30/tendencias-da-inteligencia-artificial-moldam-2025.ghtml" target="_blank" rel="noopener noreferrer" class="text-accent-indigo-primary hover:text-accent-indigo-secondary font-semibold transition-colors">Leia mais <i class="fas fa-arrow-right ml-1"></i></a>
                         </div>
                     </div>
                     <div class="blog-card rounded-lg shadow-md overflow-hidden animate-on-scroll">
-                        <img src="https://placehold.co/600x350/e74c3c/ffffff?text=Artigo+Blog+3" alt="Imagem do Artigo de Blog 3" class="w-full h-40 object-cover lazy-load">
+                        <img src="images/blog-metaverso.png" alt="Imagem conceitual sobre o Metaverso e experiências de realidade virtual" class="w-full h-40 object-cover lazy-load">
                         <div class="p-6">
-                            <h3 class="text-lg font-semibold mb-2 text-light-primary">5 Habilidades essenciais para profissionais tech em 2025</h3>
-                            <p class="text-light-tertiary text-sm mb-4">Descubra quais competências são mais valorizadas no mercado atual...</p>
-                            <a href="#" class="text-accent-red-primary hover:text-accent-red-secondary font-semibold transition-colors">Leia mais <i class="fas fa-arrow-right ml-1"></i></a>
+                            <h3 class="text-lg font-semibold mb-2 text-light-primary">Metaverso</h3>
+                            <p class="text-light-tertiary text-sm mb-4">Descubra o que é o Metaverso, seu potencial impacto em diversas áreas e os desafios para sua consolidação no cenário tecnológico atual.</p>
+                            <a href="https://www.fortunebusinessinsights.com/pt/industrial-metaverse-market-112420" target="_blank" rel="noopener noreferrer" class="text-accent-emerald-primary hover:text-accent-emerald-secondary font-semibold transition-colors">Leia mais <i class="fas fa-arrow-right ml-1"></i></a>
+                        </div>
+                    </div>
+                    <div class="blog-card rounded-lg shadow-md overflow-hidden animate-on-scroll">
+                        <img src="images/blog-sora.png" alt="Imagem conceitual sobre Sora, a IA da OpenAI para geração de vídeos" class="w-full h-40 object-cover lazy-load">
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold mb-2 text-light-primary">Sora: o gerador de vídeos com IA que está movimentando o mercado</h3>
+                            <p class="text-light-tertiary text-sm mb-4">Conheça Sora, a IA da OpenAI capaz de criar vídeos realistas a partir de texto, e suas implicações para a indústria criativa.</p>
+                            <a href="https://www.techtudo.com.br/guia/2025/05/sora-no-chatgpt-como-criar-imagens-gratuitamente-com-inteligencia-artificial-edsoftwares.ghtml" target="_blank" rel="noopener noreferrer" class="text-accent-red-primary hover:text-accent-red-secondary font-semibold transition-colors">Leia mais <i class="fas fa-arrow-right ml-1"></i></a>
                         </div>
                     </div>
                 </div>
@@ -440,144 +470,104 @@
             </div>
         </section>
 
-        <section id="course-detail-web" class="py-16 bg-dark-secondary hidden">
+        <section id="detail-logica" class="course-detail-section py-16 bg-dark-primary">
             <div class="container mx-auto px-6">
                 <a href="#courses" class="text-accent-indigo-primary hover:text-accent-indigo-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
                 <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div class="md:col-span-2">
-                            <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">Web Mastery: Do Zero ao Full Stack Pro</h1>
-                            <p class="text-light-secondary mb-6">Torne-se um mestre da web! Domine HTML, CSS, JavaScript, React e Node.js para construir aplicações robustas e dinâmicas que impressionam. Ideal para iniciantes e para quem busca se aprofundar nas tecnologias mais demandadas do mercado.</p>
-                            
-                            <div class="mb-8">
-                                <h2 class="text-xl font-semibold mb-3 text-light-primary">O que você vai dominar:</h2>
-                                <ul class="grid grid-cols-1 md:grid-cols-2 gap-3 text-light-secondary">
-                                    <li class="flex items-start">
-                                        <i class="fas fa-check-circle text-accent-indigo-primary mt-1 mr-2"></i>
-                                        <span>Fundamentos sólidos de HTML5 e CSS3 para estruturas e designs impactantes.</span>
-                                    </li>
-                                    <li class="flex items-start">
-                                        <i class="fas fa-check-circle text-accent-indigo-primary mt-1 mr-2"></i>
-                                        <span>JavaScript moderno (ES6+) para interatividade e lógica front-end.</span>
-                                    </li>
-                                    <li class="flex items-start">
-                                        <i class="fas fa-check-circle text-accent-indigo-primary mt-1 mr-2"></i>
-                                        <span>Desenvolvimento de SPAs (Single Page Applications) com React.js.</span>
-                                    </li>
-                                    <li class="flex items-start">
-                                        <i class="fas fa-check-circle text-accent-indigo-primary mt-1 mr-2"></i>
-                                        <span>Construção de APIs RESTful robustas com Node.js e Express.</span>
-                                    </li>
-                                    <li class="flex items-start">
-                                        <i class="fas fa-check-circle text-accent-indigo-primary mt-1 mr-2"></i>
-                                        <span>Integração com bancos de dados SQL e NoSQL.</span>
-                                    </li>
-                                    <li class="flex items-start">
-                                        <i class="fas fa-check-circle text-accent-indigo-primary mt-1 mr-2"></i>
-                                        <span>Autenticação, segurança e boas práticas de desenvolvimento.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                            
-                            <div class="mb-8">
-                                <h2 class="text-xl font-semibold mb-3 text-light-primary">Projetos Reais para seu Portfólio:</h2>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div class="bg-dark-tertiary p-4 rounded-lg">
-                                        <h3 class="font-semibold text-light-primary mb-1">Landing Page Profissional e Responsiva</h3>
-                                        <p class="text-sm text-light-tertiary">HTML, CSS, Tailwind CSS</p>
-                                    </div>
-                                    <div class="bg-dark-tertiary p-4 rounded-lg">
-                                        <h3 class="font-semibold text-light-primary mb-1">Blog Interativo com API Externa</h3>
-                                        <p class="text-sm text-light-tertiary">React, JavaScript, APIs</p>
-                                    </div>
-                                    <div class="bg-dark-tertiary p-4 rounded-lg">
-                                        <h3 class="font-semibold text-light-primary mb-1">Sistema de Gerenciamento de Tarefas (Full Stack)</h3>
-                                        <p class="text-sm text-light-tertiary">MERN Stack (MongoDB, Express, React, Node)</p>
-                                    </div>
-                                    <div class="bg-dark-tertiary p-4 rounded-lg">
-                                        <h3 class="font-semibold text-light-primary mb-1">Clone de Rede Social Simplificado</h3>
-                                        <p class="text-sm text-light-tertiary">React, Node.js, Firebase</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <h2 class="text-xl font-semibold mb-3 text-light-primary">Seus Mentores na Jornada:</h2>
-                                <div class="flex items-center mb-4">
-                                    <div class="w-12 h-12 bg-accent-indigo-primary rounded-full flex items-center justify-center text-white font-bold mr-4">
-                                        MS
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-light-primary">Marcos Silva</p>
-                                        <p class="text-sm text-light-tertiary">Engenheiro de Software Sênior, especialista em arquiteturas escaláveis.</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <div class="w-12 h-12 bg-accent-purple-primary rounded-full flex items-center justify-center text-white font-bold mr-4">
-                                        JR
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-light-primary">Juliana Ribeiro</p>
-                                        <p class="text-sm text-light-tertiary">Desenvolvedora Front-end apaixonada por UX e interfaces intuitivas.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-dark-tertiary p-6 rounded-xl shadow-lg">
-                            <div class="mb-6">
-                                <img src="https://placehold.co/600x400/3498db/ffffff?text=Web+Mastery" alt="Imagem do Curso de Desenvolvimento Web" class="w-full h-48 object-cover rounded-lg mb-4">
-                                <div class="flex items-center justify-between mb-2">
-                                    <div class="flex items-center">
-                                        <i class="fas fa-star text-yellow-400 mr-1"></i>
-                                        <i class="fas fa-star text-yellow-400 mr-1"></i>
-                                        <i class="fas fa-star text-yellow-400 mr-1"></i>
-                                        <i class="fas fa-star text-yellow-400 mr-1"></i>
-                                        <i class="fas fa-star-half-alt text-yellow-400"></i>
-                                    </div>
-                                    <span class="text-light-tertiary text-sm">4.8 (350 avaliações)</span>
-                                </div>
-                            </div>
-                            
-                            <div class="border-t border-gray-700 pt-6 mb-6">
-                                <p class="text-3xl font-bold text-accent-indigo-primary mb-4">R$ 499,90</p>
-                                <p class="text-sm text-light-tertiary mb-1"><del>R$ 999,80</del> (50% de desconto)</p>
-                                <button onclick="showCustomAlert('Inscrição realizada com sucesso!', 'success')" class="w-full bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-bold py-3 px-4 rounded-lg cta-button text-lg mb-3">Inscreva-se Agora</button>
-                                <ul class="text-sm text-light-secondary space-y-2">
-                                    <li><i class="fas fa-video mr-2 text-accent-indigo-primary glow-icon"></i> 80+ horas de vídeo</li>
-                                    <li><i class="fas fa-file-alt mr-2 text-accent-indigo-primary glow-icon"></i> Artigos e recursos</li>
-                                    <li><i class="fas fa-mobile-alt mr-2 text-accent-indigo-primary glow-icon"></i> Acesso em mobile e desktop</li>
-                                    <li><i class="fas fa-infinity mr-2 text-accent-indigo-primary glow-icon"></i> Acesso vitalício</li>
-                                    <li><i class="fas fa-certificate mr-2 text-accent-indigo-primary glow-icon"></i> Certificado de conclusão</li>
-                                </ul>
-                                <button onclick="showCustomAlert('Curso adicionado ao carrinho!', 'success')" class="mt-4 w-full bg-dark-primary hover:bg-opacity-80 text-light-primary font-semibold py-2 px-4 rounded-lg cta-button neon-border">Adicionar ao Carrinho</button>
-                            </div>
-                        </div>
-                    </div>
+                    <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">Lógica de Programação Essencial</h1>
+                    <img src="images/logica.png" alt="Imagem do Curso Lógica de Programação Essencial" class="w-full md:w-1/2 lg:w-1/3 mx-auto h-auto object-cover rounded-lg mb-6 lazy-load">
+                    <p class="text-light-secondary mb-2"><strong>Descrição Detalhada:</strong> Desenvolva o raciocínio lógico fundamental para aprender qualquer linguagem e dar o primeiro passo na programação. Neste curso, você aprenderá os conceitos chave de algoritmos, estruturas de decisão, laços de repetição e muito mais, preparando uma base sólida para sua carreira como desenvolvedor.</p>
+                    <p class="text-light-secondary mb-2"><strong>O que você vai aprender:</strong></p>
+                    <ul class="list-disc list-inside text-light-secondary mb-4">
+                        <li>Introdução a algoritmos e pseudocódigo.</li>
+                        <li>Variáveis, tipos de dados e operadores.</li>
+                        <li>Estruturas condicionais (if/else).</li>
+                        <li>Estruturas de repetição (for/while).</li>
+                        <li>Vetores e matrizes.</li>
+                        <li>Funções e procedimentos.</li>
+                    </ul>
+                    <p class="text-light-secondary mb-6"><strong>Instrutor:</strong> Bruno</p>
+                    <button onclick="window.location.href='SEU_LINK_HOTMART_LOGICA_AQUI'" class="w-full md:w-auto bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Inscreva-se por R$ 97,00 (Hotmart)</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="detail-minicurso" class="course-detail-section py-16 bg-dark-primary">
+            <div class="container mx-auto px-6">
+                <a href="#courses" class="text-accent-emerald-primary hover:text-accent-emerald-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
+                <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">Mini Curso de Programação Gratuito</h1>
+                    <img src="images/minicurso.png" alt="Imagem do Mini Curso de Programação" class="w-full md:w-1/2 lg:w-1/3 mx-auto h-auto object-cover rounded-lg mb-6 lazy-load">
+                    <p class="text-light-secondary mb-2"><strong>Descrição Detalhada:</strong> Dê seus primeiros passos no universo da programação com este mini curso introdutório totalmente gratuito! Ideal para quem nunca teve contato com programação e quer entender os conceitos básicos de forma prática e descomplicada.</p>
+                    <p class="text-light-secondary mb-2"><strong>O que você vai aprender:</strong></p>
+                    <ul class="list-disc list-inside text-light-secondary mb-4">
+                        <li>O que é programação e para que serve.</li>
+                        <li>Introdução a uma linguagem de programação amigável (ex: Scratch ou Python básico).</li>
+                        <li>Como criar seu primeiro pequeno programa.</li>
+                        <li>Próximos passos para continuar aprendendo.</li>
+                    </ul>
+                    <p class="text-light-secondary mb-6"><strong>Instrutor:</strong> Bruno</p>
+                    <button onclick="window.location.href='SEU_LINK_HOTMART_MINICURSO_AQUI_OU_PAGINA_CADASTRO'" class="w-full md:w-auto bg-accent-emerald-primary hover:bg-accent-emerald-hover text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Acessar Gratuitamente</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="detail-python" class="course-detail-section py-16 bg-dark-primary">
+            <div class="container mx-auto px-6">
+                <a href="#courses" class="text-accent-red-primary hover:text-accent-red-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
+                <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">Python Básico para Iniciantes</h1>
+                    <img src="images/python.png" alt="Imagem do Curso Python Básico para Iniciantes" class="w-full md:w-1/2 lg:w-1/3 mx-auto h-auto object-cover rounded-lg mb-6 lazy-load">
+                    <p class="text-light-secondary mb-2"><strong>Descrição Detalhada:</strong> Aprenda os fundamentos da linguagem Python, uma das mais populares e versáteis do mercado. Este curso é ideal para iniciantes e aborda desde a sintaxe básica até a criação de pequenos projetos práticos.</p>
+                    <p class="text-light-secondary mb-2"><strong>O que você vai aprender:</strong></p>
+                    <ul class="list-disc list-inside text-light-secondary mb-4">
+                        <li>Instalação e configuração do ambiente Python.</li>
+                        <li>Variáveis, tipos de dados, operadores.</li>
+                        <li>Estruturas de controle: condicionais e laços.</li>
+                        <li>Funções e módulos.</li>
+                        <li>Manipulação básica de strings e listas.</li>
+                        <li>Introdução a projetos práticos.</li>
+                    </ul>
+                    <p class="text-light-secondary mb-6"><strong>Instrutor:</strong> Bruno</p>
+                    <button onclick="window.location.href='SEU_LINK_HOTMART_PYTHON_AQUI'" class="w-full md:w-auto bg-accent-red-primary hover:bg-accent-red-hover text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Inscreva-se por R$ 147,00 (Hotmart)</button>
                 </div>
             </div>
         </section>
         
-        <section id="course-detail-data" class="py-16 bg-dark-secondary hidden">
-            <div class="container mx-auto px-6 text-center">
-                <h2 class="text-2xl font-bold text-light-primary">Detalhes do Curso de Data Insights com Python</h2>
-                <p class="text-light-secondary">Conteúdo específico do curso de Ciência de Dados viria aqui.</p>
-                <button onclick="showCustomAlert('Inscrição no curso de Dados em breve!', 'success')" class="mt-4 bg-accent-emerald-primary hover:bg-accent-emerald-hover text-white font-bold py-2 px-4 rounded-lg cta-button">Inscrever</button>
-                <a href="#courses" class="text-accent-emerald-primary hover:text-accent-emerald-secondary mt-4 inline-block">Voltar</a>
+        <section id="detail-uxui" class="course-detail-section py-16 bg-dark-primary">
+             <div class="container mx-auto px-6">
+                <a href="#courses" class="text-accent-purple-primary hover:text-accent-purple-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
+                <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">UX/UI Vision: Interfaces que Encantam</h1>
+                    <img src="images/curso-ux-ui-vision.png" alt="Imagem do Curso UX/UI Vision" class="w-full md:w-1/2 lg:w-1/3 mx-auto h-auto object-cover rounded-lg mb-6 lazy-load">
+                    <p class="text-light-secondary mb-6">Detalhes completos do curso UX/UI Vision virão aqui...</p>
+                    <button onclick="window.location.href='URL_HOTMART_UXUI_AQUI'" class="w-full md:w-auto bg-accent-purple-primary hover:bg-accent-purple-hover text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Inscreva-se Agora (Hotmart)</button>
+                </div>
             </div>
         </section>
-        
-        <section id="course-detail-marketing" class="py-16 bg-dark-secondary hidden">
-            <div class="container mx-auto px-6 text-center">
-                <h2 class="text-2xl font-bold text-light-primary">Detalhes do Curso de Digital Boost</h2>
-                <p class="text-light-secondary">Conteúdo específico do curso de Marketing Digital viria aqui.</p>
-                <button onclick="showCustomAlert('Inscrição no curso de Marketing em breve!', 'success')" class="mt-4 bg-accent-red-primary hover:bg-accent-red-hover text-white font-bold py-2 px-4 rounded-lg cta-button">Inscrever</button>
-                <a href="#courses" class="text-accent-red-primary hover:text-accent-red-secondary mt-4 inline-block">Voltar</a>
+        <section id="detail-devops" class="course-detail-section py-16 bg-dark-primary">
+             <div class="container mx-auto px-6">
+                <a href="#courses" class="text-amber-500 hover:text-amber-600 mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
+                <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">Cloud Ops Elite: DevOps e Nuvem na Prática</h1>
+                    <img src="images/curso-cloud-ops.png" alt="Imagem do Curso Cloud Ops Elite" class="w-full md:w-1/2 lg:w-1/3 mx-auto h-auto object-cover rounded-lg mb-6 lazy-load">
+                    <p class="text-light-secondary mb-6">Detalhes completos do curso Cloud Ops Elite virão aqui...</p>
+                     <button onclick="window.location.href='URL_HOTMART_DEVOPS_AQUI'" class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Inscreva-se Agora (Hotmart)</button>
+                </div>
             </div>
         </section>
-
-        <section id="login" class="py-16 bg-dark-secondary hidden">
-            <div class="container mx-auto px-6">
+        <section id="detail-mobile" class="course-detail-section py-16 bg-dark-primary">
+             <div class="container mx-auto px-6">
+                <a href="#courses" class="text-pink-500 hover:text-pink-600 mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
+                <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">App Impact: Criando Apps Multiplataforma</h1>
+                    <img src="images/curso-app-impact.png" alt="Imagem do Curso App Impact" class="w-full md:w-1/2 lg:w-1/3 mx-auto h-auto object-cover rounded-lg mb-6 lazy-load">
+                    <p class="text-light-secondary mb-6">Detalhes completos do curso App Impact virão aqui...</p>
+                    <button onclick="window.location.href='URL_HOTMART_MOBILE_AQUI'" class="w-full md:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-lg cta-button text-lg mt-6">Inscreva-se Agora (Hotmart)</button>
+                </div>
+            </div>
+        </section>
+        <section id="login" class="py-16 bg-dark-secondary course-detail-section"> <div class="container mx-auto px-6">
                 <div class="max-w-md mx-auto bg-dark-card p-8 rounded-xl shadow-lg neon-border">
                     <h2 class="text-2xl font-bold mb-6 text-light-primary text-center">Acesse sua conta</h2>
                     <form id="login-form" class="space-y-4">
@@ -697,11 +687,11 @@
     <script src="backend_completo.js"></script>
 
     <script>
-        // Menu mobile toggle
         document.addEventListener('DOMContentLoaded', function() {
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
-            
+            const allCourseDetailSections = document.querySelectorAll('.course-detail-section'); 
+
             if (mobileMenuButton && mobileMenu) {
                 mobileMenuButton.addEventListener('click', function() {
                     mobileMenu.classList.toggle('hidden');
@@ -709,73 +699,96 @@
                 });
             }
 
-            // Navegação por âncoras com scroll suave
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
+                    const href = this.getAttribute('href');
                     
-                    // Esconder todas as seções ocultas primeiro
-                    document.querySelectorAll('section[id^="course-detail-"], #all-courses, #login').forEach(section => {
-                        if(section) section.classList.add('hidden'); // Adicionado verificação se a seção existe
-                    });
-                    
-                    const targetId = this.getAttribute('href').substring(1);
-                    const targetElement = document.getElementById(targetId);
-                    
-                    if (targetElement) {
-                        // Mostrar a seção alvo se for uma das seções ocultas
-                         if(targetElement.matches('section[id^="course-detail-"], #login')) { // Condição para mostrar apenas seções de detalhe ou login
-                            targetElement.classList.remove('hidden');
-                        } else if (targetId === 'courses' || targetId === 'home' || targetId === 'benefits' || targetId === 'testimonials' || targetId === 'blog' || targetId === 'team') {
-                            // Se for uma seção principal, apenas role até ela, não tente remover 'hidden'
-                            // pois elas já devem estar visíveis ou seu estado 'hidden' é gerenciado de outra forma
-                        }
+                    if (href.startsWith('#detail-') || href === '#login' || href.startsWith('#course-detail-')) { // Adicionado #course-detail- para as seções antigas
+                        e.preventDefault();
                         
-                        // Scroll suave
-                        window.scrollTo({
-                            top: targetElement.offsetTop,
-                            behavior: 'smooth'
+                        allCourseDetailSections.forEach(section => {
+                            section.style.display = 'none';
                         });
+                        // A seção de login original é tratada como .course-detail-section, então não precisa de tratamento especial aqui
+                        // se ela tiver a classe .course-detail-section.
+                        // Se não tiver, e você quiser que ela se comporte da mesma forma:
+                        // const loginSection = document.getElementById('login');
+                        // if (loginSection) loginSection.style.display = 'none';
+
+
+                        const targetId = href.substring(1);
+                        const targetElement = document.getElementById(targetId);
                         
-                        // Fechar menu mobile se estiver aberto
-                        if (mobileMenu && !mobileMenu.classList.contains('hidden')) { // Verifica se o menu está aberto
-                            mobileMenu.classList.add('hidden');
-                            if (mobileMenuButton) {
-                                mobileMenuButton.setAttribute('aria-expanded', 'false');
-                            }
+                        if (targetElement) {
+                            targetElement.style.display = 'block'; 
+                            
+                            const headerOffset = 80; 
+                            const elementPosition = targetElement.getBoundingClientRect().top;
+                            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                            
+                            window.scrollTo({
+                                top: offsetPosition,
+                                behavior: 'smooth'
+                            });
+                        }
+                    } else if (href.startsWith('#') && href !== '#') { 
+                        e.preventDefault();
+                         allCourseDetailSections.forEach(section => {
+                            section.style.display = 'none';
+                        });
+                        const loginSection = document.getElementById('login');
+                        if (loginSection && !loginSection.classList.contains('course-detail-section')) { // só esconde se não for já tratada
+                           loginSection.style.display = 'none';
+                        }
+
+
+                        const targetId = href.substring(1);
+                        const targetElement = document.getElementById(targetId);
+                        if (targetElement) {
+                             const headerOffset = 80; 
+                             const elementPosition = targetElement.getBoundingClientRect().top;
+                             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                            window.scrollTo({
+                                top: offsetPosition,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                    
+                    if (mobileMenu && !mobileMenu.classList.contains('hidden') && this.id !== 'mobile-menu-button') { // corrigido: this.id !==
+                        mobileMenu.classList.add('hidden');
+                        if (mobileMenuButton) {
+                            mobileMenuButton.setAttribute('aria-expanded', 'false');
                         }
                     }
                 });
             });
 
-            // Inicializar lazy loading e animações
             initLazyLoading();
             initScrollAnimations();
         });
 
-        // Função para mostrar alerta customizado
         function showCustomAlert(message, type) {
             const alert = document.getElementById('custom-alert');
             const alertMessage = document.getElementById('alert-message');
             
             if (alert && alertMessage) {
-                alert.className = 'custom-alert'; // Reseta classes
+                alert.className = 'custom-alert'; 
                 alert.classList.add(type === 'success' ? 'custom-alert-success' : 'custom-alert-error');
                 
                 alertMessage.textContent = message;
                 alert.style.display = 'block';
-                alert.style.opacity = '1'; // Garante que esteja visível ao aparecer
+                alert.style.opacity = '1'; 
                 
                 setTimeout(() => {
                     alert.style.opacity = '0';
                     setTimeout(() => {
                         alert.style.display = 'none';
-                    }, 300); // Tempo para a transição de opacidade
-                }, 3000); // Tempo que o alerta fica visível
+                    }, 300); 
+                }, 3000); 
             }
         }
 
-        // Lazy loading para imagens
         function initLazyLoading() {
             const lazyImages = document.querySelectorAll('.lazy-load');
             
@@ -784,7 +797,7 @@
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             const img = entry.target;
-                            img.src = img.dataset.src || img.src; // Se estiver usando data-src para lazy-load real
+                            img.src = img.dataset.src || img.src; 
                             img.classList.add('loaded');
                             imageObserver.unobserve(img);
                         }
@@ -795,7 +808,6 @@
                     imageObserver.observe(img);
                 });
             } else {
-                // Fallback para navegadores que não suportam IntersectionObserver
                 lazyImages.forEach(img => {
                     img.src = img.dataset.src || img.src;
                     img.classList.add('loaded');
@@ -803,7 +815,6 @@
             }
         }
 
-        // Animação ao scroll
         function initScrollAnimations() {
             const animatedElements = document.querySelectorAll('.animate-on-scroll');
             
@@ -812,7 +823,7 @@
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             entry.target.classList.add('visible');
-                            observer.unobserve(entry.target); // Opcional: Desobservar após animar uma vez
+                            observer.unobserve(entry.target); 
                         }
                     });
                 }, { threshold: 0.1 });
@@ -821,7 +832,6 @@
                     animationObserver.observe(element);
                 });
             } else {
-                // Fallback para navegadores que não suportam IntersectionObserver
                 animatedElements.forEach(element => {
                     element.classList.add('visible');
                 });
@@ -830,4 +840,3 @@
     </script>
 </body>
 </html>
-}

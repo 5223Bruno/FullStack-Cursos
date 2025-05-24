@@ -87,12 +87,19 @@
             box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
             background: linear-gradient(to bottom, rgba(30, 41, 59, 0.9), rgba(26, 31, 46, 0.8));
         }
-        .testimonial-card {
+        .testimonial-card { /* Para os depoimentos na seção #testimonials */
             min-height: 200px;
             background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+        /* Estilo para os cards de depoimento da nova seção horizontal */
+        .horizontal-testimonial-card {
+            background: rgba(26, 31, 46, 0.8); /* Mesmo que .course-card ou .bg-dark-card */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         .benefit-card {
             background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(10px);
@@ -205,6 +212,7 @@
                 <a href="#testimonials" class="text-light-secondary hover:text-light-primary hover:text-glow transition-all">Depoimentos</a>
                 <a href="#blog" class="text-light-secondary hover:text-light-primary hover:text-glow transition-all">Blog</a>
                 <a href="#team" class="text-light-secondary hover:text-light-primary hover:text-glow transition-all">Equipe</a>
+                 <a href="#alunos-destaque" class="text-light-secondary hover:text-light-primary hover:text-glow transition-all">Alunos</a>
                 <a href="https://wa.me/5511943035778?text=Olá!%20Tenho%20interesse%20nos%20cursos%20da%20FullStack%20Cursos.%20Poderia%20me%20ajudar?" target="_blank" class="text-light-secondary hover:text-green-400 hover:text-glow transition-all flex items-center">
                     <i class="fab fa-whatsapp text-green-400 mr-1 glow-icon"></i>
                     <span>WhatsApp</span>
@@ -224,6 +232,7 @@
             <a href="#testimonials" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">Depoimentos</a>
             <a href="#blog" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">Blog</a>
             <a href="#team" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">Equipe</a>
+            <a href="#alunos-destaque" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">Alunos</a>
             <a href="https://wa.me/5511943035778?text=Olá!%20Tenho%20interesse%20nos%20cursos%20da%20FullStack%20Cursos.%20Poderia%20me%20ajudar?" target="_blank" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-green-400">
                 <i class="fab fa-whatsapp text-green-400 mr-1"></i>
                 WhatsApp
@@ -233,18 +242,36 @@
     </header>
 
     <main>
-        <section id="home" class="hero-bg text-white py-20 md:py-32 relative overflow-hidden">
-            <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDIwIDAgTCAwIDAgTCAwIDIwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIiAvPjwvc3ZnPg==');"></div>
-            <div class="container mx-auto px-6 text-center relative z-10">
-                <h1 class="typewriter-text text-4xl md:text-6xl font-bold mb-6 leading-tight animate-on-scroll">
-                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-light-primary via-accent-indigo-text to-accent-purple-text">Decole Sua Carreira Tech!</span>
-                </h1>
-                <p class="text-lg md:text-xl mb-10 max-w-2xl mx-auto text-light-secondary animate-on-scroll">Aprenda as habilidades do futuro com cursos práticos e instrutores especialistas. Seu futuro na tecnologia começa agora!</p>
+        <section id="team" class="py-16 bg-dark-primary">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Nossa Equipe</h2>
+                <div class="flex flex-wrap justify-center">
+                    <div class="w-full md:w-1/2 lg:w-1/3 px-4 mb-12 animate-on-scroll">
+                        <div class="bg-dark-card rounded-xl overflow-hidden shadow-lg neon-border">
+                            <div class="p-6 text-center">
+                                <img src="images/Foto-Perfil.jpg" alt="Foto de Bruno" class="w-48 h-48 object-cover rounded-full mx-auto mb-6 border-4 border-accent-indigo-primary">
+                                <h3 class="text-xl font-bold mb-2 text-light-primary">Bruno</h3>
+                                <p class="text-accent-indigo-primary font-semibold mb-4">Programador / Vendedor</p>
+                                <p class="text-light-tertiary mb-6">Estou no penúltimo semestre da minha faculdade e este site é um dos meus projetos iniciais, feito com muito esforço. Ele ainda é um embrião e não está perfeito, por isso, sua compreensão é muito valiosa. Obrigado!</p>
+                                <div class="flex justify-center space-x-4">
+                                    <a href="https://www.linkedin.com/in/bruno-passos-380552223/" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in glow-icon"></i></a>
+                                    <a href="https://github.com/5223Bruno" target="_blank" rel="noopener noreferrer"><i class="fab fa-github glow-icon"></i></a>
+                                    <a href="https://x.com/BrunoPasso50909/with_replies" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter glow-icon"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-                <div class="my-10 animate-on-scroll max-w-full md:max-w-4xl lg:max-w-5xl mx-auto">
+        <section id="alunos-destaque" class="py-16 bg-dark-secondary">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Alunos Satisfeitos em Destaque</h2>
+                <div class="animate-on-scroll max-w-full md:max-w-4xl lg:max-w-5xl mx-auto">
                     <div class="flex overflow-x-auto space-x-6 py-4">
 
-                        <div class="bg-dark-card bg-opacity-70 backdrop-filter backdrop-blur-sm p-6 rounded-lg shadow-lg neon-border min-w-[300px] md:min-w-[320px] flex-shrink-0">
+                        <div class="horizontal-testimonial-card p-6 rounded-lg shadow-lg neon-border min-w-[300px] md:min-w-[320px] flex-shrink-0">
                             <div class="flex items-center mb-4">
                                 <img src="images/depoimento1.png" alt="Avatar do Aluno 1" class="w-12 h-12 rounded-full mr-4 border-2 border-accent-purple-secondary">
                                 <div>
@@ -255,7 +282,7 @@
                             <p class="text-light-secondary italic">"Adorei o curso de Python! A didática é excelente e os projetos práticos me ajudaram a fixar o conteúdo. Recomendo muito!"</p>
                         </div>
 
-                        <div class="bg-dark-card bg-opacity-70 backdrop-filter backdrop-blur-sm p-6 rounded-lg shadow-lg neon-border min-w-[300px] md:min-w-[320px] flex-shrink-0">
+                        <div class="horizontal-testimonial-card p-6 rounded-lg shadow-lg neon-border min-w-[300px] md:min-w-[320px] flex-shrink-0">
                             <div class="flex items-center mb-4">
                                 <img src="images/depoimento2.png" alt="Avatar do Aluno 2" class="w-12 h-12 rounded-full mr-4 border-2 border-accent-emerald-secondary">
                                 <div>
@@ -266,7 +293,7 @@
                             <p class="text-light-secondary italic">"O mini curso gratuito foi um ótimo pontapé inicial. Consegui entender o básico de programação e me motivou a seguir na área."</p>
                         </div>
 
-                        <div class="bg-dark-card bg-opacity-70 backdrop-filter backdrop-blur-sm p-6 rounded-lg shadow-lg neon-border min-w-[300px] md:min-w-[320px] flex-shrink-0">
+                        <div class="horizontal-testimonial-card p-6 rounded-lg shadow-lg neon-border min-w-[300px] md:min-w-[320px] flex-shrink-0">
                             <div class="flex items-center mb-4">
                                 <img src="images/depoimento3.png" alt="Avatar do Aluno 3" class="w-12 h-12 rounded-full mr-4 border-2 border-accent-indigo-secondary">
                                 <div>
@@ -277,7 +304,7 @@
                             <p class="text-light-secondary italic">"Achei que nunca entenderia lógica de programação, mas este curso tornou tudo claro e acessível. Obrigada FullStack Cursos!"</p>
                         </div>
 
-                        <div class="bg-dark-card bg-opacity-70 backdrop-filter backdrop-blur-sm p-6 rounded-lg shadow-lg neon-border min-w-[300px] md:min-w-[320px] flex-shrink-0">
+                        <div class="horizontal-testimonial-card p-6 rounded-lg shadow-lg neon-border min-w-[300px] md:min-w-[320px] flex-shrink-0">
                             <div class="flex items-center mb-4">
                                 <img src="images/depoimento4.png" alt="Avatar do Aluno 4" class="w-12 h-12 rounded-full mr-4 border-2 border-accent-red-secondary">
                                 <div>
@@ -288,7 +315,7 @@
                             <p class="text-light-secondary italic">"O curso de UX/UI abriu meus olhos para a importância do design centrado no usuário. As aulas são dinâmicas e o conteúdo é super atual."</p>
                         </div>
 
-                        <div class="bg-dark-card bg-opacity-70 backdrop-filter backdrop-blur-sm p-6 rounded-lg shadow-lg neon-border min-w-[300px] md:min-w-[320px] flex-shrink-0">
+                        <div class="horizontal-testimonial-card p-6 rounded-lg shadow-lg neon-border min-w-[300px] md:min-w-[320px] flex-shrink-0">
                             <div class="flex items-center mb-4">
                                 <img src="images/depoimento5.png" alt="Avatar do Aluno 5" class="w-12 h-12 rounded-full mr-4 border-2 border-accent-purple-secondary">
                                 <div>
@@ -300,9 +327,20 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <section id="home" class="hero-bg text-white py-20 md:py-32 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDIwIDAgTCAwIDAgTCAwIDIwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIiAvPjwvc3ZnPg==');"></div>
+            <div class="container mx-auto px-6 text-center relative z-10">
+                <h1 class="typewriter-text text-4xl md:text-6xl font-bold mb-6 leading-tight animate-on-scroll">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-light-primary via-accent-indigo-text to-accent-purple-text">Decole Sua Carreira Tech!</span>
+                </h1>
+                <p class="text-lg md:text-xl mb-10 max-w-2xl mx-auto text-light-secondary animate-on-scroll">Aprenda as habilidades do futuro com cursos práticos e instrutores especialistas. Seu futuro na tecnologia começa agora!</p>
                 <a href="#courses" class="gradient-cta text-white font-semibold py-3 px-8 rounded-lg text-lg cta-button shadow-lg animate-on-scroll">Ver Cursos</a>
             </div>
         </section>
+
         <section id="courses" class="py-16 bg-dark-secondary">
             <div class="container mx-auto px-6">
                 <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Nossos Cursos Mais Populares</h2>
@@ -432,8 +470,7 @@
 
         <section id="testimonials" class="py-16 bg-dark-secondary">
             <div class="container mx-auto px-6">
-                <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">O que nossos alunos dizem</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">O que nossos outros alunos dizem</h2> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <div class="testimonial-card p-8 rounded-xl shadow-lg flex flex-col justify-between animate-on-scroll">
                         <p class="text-light-secondary mb-6 italic">"A plataforma superou minhas expectativas! Consegui meu primeiro emprego como dev front-end graças ao curso de Desenvolvimento Web."</p>
                         <div>
@@ -490,30 +527,6 @@
                 </div>
                 <div class="text-center mt-10">
                     <a href="#" class="text-accent-indigo-primary hover:text-accent-indigo-secondary font-semibold transition-colors">Ver todos os artigos <i class="fas fa-arrow-right ml-1"></i></a>
-                </div>
-            </div>
-        </section>
-
-        <section id="team" class="py-16 bg-dark-primary">
-            <div class="container mx-auto px-6">
-                <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Nossa Equipe</h2>
-                <div class="flex flex-wrap justify-center">
-                    <div class="w-full md:w-1/2 lg:w-1/3 px-4 mb-12 animate-on-scroll">
-                        <div class="bg-dark-card rounded-xl overflow-hidden shadow-lg neon-border">
-                            <div class="p-6 text-center">
-                                <img src="images/Foto-Perfil.jpg" alt="Foto de Bruno" class="w-48 h-48 object-cover rounded-full mx-auto mb-6 border-4 border-accent-indigo-primary">
-                                <h3 class="text-xl font-bold mb-2 text-light-primary">Bruno</h3>
-                                <p class="text-accent-indigo-primary font-semibold mb-4">Programador / Vendedor</p>
-                                <p class="text-light-tertiary mb-6">Estou no penúltimo semestre da minha faculdade e este site é um dos meus projetos iniciais, feito com muito esforço. Ele ainda é um embrião e não está perfeito, por isso, sua compreensão é muito valiosa. Obrigado!</p>
-                                <div class="flex justify-center space-x-4">
-                                    <a href="https://www.linkedin.com/in/bruno-passos-380552223/" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in glow-icon"></i></a>
-                                    <a href="https://github.com/5223Bruno" target="_blank" rel="noopener noreferrer"><i class="fab fa-github glow-icon"></i></a>
-                                    <a href="https://x.com/BrunoPasso50909/with_replies" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter glow-icon"></i></a>
-                                </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>
@@ -751,53 +764,48 @@
                 anchor.addEventListener('click', function (e) {
                     const href = this.getAttribute('href');
 
-                    if (href.startsWith('#detail-') || href === '#login' || href.startsWith('#course-detail-')) { // Adicionado #course-detail- para as seções antigas
+                    // Ocultar todas as seções de detalhes de curso e login primeiro
+                    allCourseDetailSections.forEach(section => {
+                        section.style.display = 'none';
+                    });
+                    // Tratar a seção de login especificamente se ela não tiver a classe 'course-detail-section'
+                    const loginSectionEl = document.getElementById('login');
+                    if (loginSectionEl && !loginSectionEl.classList.contains('course-detail-section')) {
+                        loginSectionEl.style.display = 'none';
+                    }
+
+
+                    if (href.startsWith('#detail-') || href === '#login' || href.startsWith('#course-detail-')) {
                         e.preventDefault();
-
-                        allCourseDetailSections.forEach(section => {
-                            section.style.display = 'none';
-                        });
-
                         const targetId = href.substring(1);
                         const targetElement = document.getElementById(targetId);
 
                         if (targetElement) {
                             targetElement.style.display = 'block';
-
                             const headerOffset = 80;
                             const elementPosition = targetElement.getBoundingClientRect().top;
                             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-                            window.scrollTo({
-                                top: offsetPosition,
-                                behavior: 'smooth'
-                            });
+                            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                         }
                     } else if (href.startsWith('#') && href !== '#') {
                         e.preventDefault();
-                         allCourseDetailSections.forEach(section => {
-                            section.style.display = 'none';
-                        });
-                        const loginSection = document.getElementById('login');
-                        if (loginSection && !loginSection.classList.contains('course-detail-section')) { 
-                           loginSection.style.display = 'none';
-                        }
-
-
                         const targetId = href.substring(1);
                         const targetElement = document.getElementById(targetId);
                         if (targetElement) {
-                             const headerOffset = 80;
-                             const elementPosition = targetElement.getBoundingClientRect().top;
-                             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                            window.scrollTo({
-                                top: offsetPosition,
-                                behavior: 'smooth'
-                            });
+                             // Se for um link para uma seção principal (ex: #home, #courses, #team, #alunos-destaque),
+                             // garanta que ela seja exibida se por acaso tiver `display: none` (não é o caso padrão para estas).
+                             // E mais importante, role para ela.
+                            if(targetElement.style.display === 'none' && !targetElement.classList.contains('course-detail-section')) {
+                                targetElement.style.display = ''; // ou 'block' se for o caso
+                            }
+                            const headerOffset = 80;
+                            const elementPosition = targetElement.getBoundingClientRect().top;
+                            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                         }
                     }
 
-                    if (mobileMenu && !mobileMenu.classList.contains('hidden') && this.id !== 'mobile-menu-button') { 
+                    if (mobileMenu && !mobileMenu.classList.contains('hidden') && (!mobileMenuButton || this.id !== 'mobile-menu-button')) {
                         mobileMenu.classList.add('hidden');
                         if (mobileMenuButton) {
                             mobileMenuButton.setAttribute('aria-expanded', 'false');

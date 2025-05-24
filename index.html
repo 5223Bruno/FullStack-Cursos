@@ -172,8 +172,8 @@
             overflow: hidden; /* Garante que o texto não apareça antes da animação */
             border-right: .15em solid orange; /* Cursor piscando */
             white-space: nowrap; /* Mantém o conteúdo em uma única linha */
-            letter-spacing: .05em; 
-            animation: 
+            letter-spacing: .05em;
+            animation:
                 typing 3.5s steps(40, end),
                 blink-caret .75s step-end infinite;
         }
@@ -231,29 +231,6 @@
             <a href="#login" class="block px-6 py-3 gradient-cta text-white text-center rounded-b-lg">Login</a>
         </div>
     </header>
-<section id="team" class="py-16 bg-dark-primary">
-    <div class="container mx-auto px-6">
-        <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Nossa Equipe</h2>
-        <div class="flex flex-wrap justify-center">
-            <div class="w-full md:w-1/2 lg:w-1/3 px-4 mb-12 animate-on-scroll">
-                <div class="bg-dark-card rounded-xl overflow-hidden shadow-lg neon-border">
-                    <div class="p-6 text-center">
-                        <img src="images/Foto-Perfil.jpg" alt="Foto de Bruno" class="w-48 h-48 object-cover rounded-full mx-auto mb-6 border-4 border-accent-indigo-primary">
-                        <h3 class="text-xl font-bold mb-2 text-light-primary">Bruno</h3>
-                        <p class="text-accent-indigo-primary font-semibold mb-4">Programador / Vendedor</p>
-                        <p class="text-light-tertiary mb-6">Estou no penúltimo semestre da minha faculdade e este site é um dos meus projetos iniciais, feito com muito esforço. Ele ainda é um embrião e não está perfeito, por isso, sua compreensão é muito valiosa. Obrigado!</p>
-                        <div class="flex justify-center space-x-4">
-                            <a href="https://www.linkedin.com/in/bruno-passos-380552223/" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in glow-icon"></i></a>
-                            <a href="https://github.com/5223Bruno" target="_blank" rel="noopener noreferrer"><i class="fab fa-github glow-icon"></i></a>
-                            <a href="https://x.com/BrunoPasso50909/with_replies" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter glow-icon"></i></a>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
     <main>
         <section id="home" class="hero-bg text-white py-20 md:py-32 relative overflow-hidden">
@@ -263,18 +240,64 @@
                     <span class="bg-clip-text text-transparent bg-gradient-to-r from-light-primary via-accent-indigo-text to-accent-purple-text">Decole Sua Carreira Tech!</span>
                 </h1>
                 <p class="text-lg md:text-xl mb-10 max-w-2xl mx-auto text-light-secondary animate-on-scroll">Aprenda as habilidades do futuro com cursos práticos e instrutores especialistas. Seu futuro na tecnologia começa agora!</p>
-                
-                <div class="my-10 animate-on-scroll max-w-2xl mx-auto">
+
+                <div class="space-y-8 my-10 animate-on-scroll max-w-2xl mx-auto">
+
                     <div class="bg-dark-card bg-opacity-70 backdrop-filter backdrop-blur-sm p-6 rounded-lg shadow-lg neon-border">
                         <div class="flex items-center mb-4">
-                            <img src="images/depoimento.png" alt="Avatar do depoimento" class="w-12 h-12 rounded-full mr-4 border-2 border-accent-purple-secondary">
+                            <img src="images/depoimento1.png" alt="Avatar do Aluno 1" class="w-12 h-12 rounded-full mr-4 border-2 border-accent-purple-secondary">
                             <div>
-                                <p class="font-semibold text-light-primary">Nome do Aluno Satisfeito</p>
-                                <p class="text-xs text-accent-purple-text">Ex-aluno do Curso X</p>
+                                <p class="font-semibold text-light-primary">Mariana Lima</p>
+                                <p class="text-xs text-accent-purple-text">Ex-aluna do Curso de Python</p>
                             </div>
                         </div>
-                        <p class="text-light-secondary italic">"Este curso mudou minha perspectiva sobre programação! O conteúdo é incrível e o suporte fez toda a diferença."</p>
+                        <p class="text-light-secondary italic">"Adorei o curso de Python! A didática é excelente e os projetos práticos me ajudaram a fixar o conteúdo. Recomendo muito!"</p>
                     </div>
+
+                    <div class="bg-dark-card bg-opacity-70 backdrop-filter backdrop-blur-sm p-6 rounded-lg shadow-lg neon-border">
+                        <div class="flex items-center mb-4">
+                            <img src="images/depoimento2.png" alt="Avatar do Aluno 2" class="w-12 h-12 rounded-full mr-4 border-2 border-accent-emerald-secondary">
+                            <div>
+                                <p class="font-semibold text-light-primary">Rafael Oliveira</p>
+                                <p class="text-xs text-accent-emerald-text">Ex-aluno do Mini Curso Gratuito</p>
+                            </div>
+                        </div>
+                        <p class="text-light-secondary italic">"O mini curso gratuito foi um ótimo pontapé inicial. Consegui entender o básico de programação e me motivou a seguir na área."</p>
+                    </div>
+
+                    <div class="bg-dark-card bg-opacity-70 backdrop-filter backdrop-blur-sm p-6 rounded-lg shadow-lg neon-border">
+                        <div class="flex items-center mb-4">
+                            <img src="images/depoimento3.png" alt="Avatar do Aluno 3" class="w-12 h-12 rounded-full mr-4 border-2 border-accent-indigo-secondary">
+                            <div>
+                                <p class="font-semibold text-light-primary">Beatriz Costa</p>
+                                <p class="text-xs text-accent-indigo-text">Ex-aluna de Lógica de Programação</p>
+                            </div>
+                        </div>
+                        <p class="text-light-secondary italic">"Achei que nunca entenderia lógica de programação, mas este curso tornou tudo claro e acessível. Obrigada FullStack Cursos!"</p>
+                    </div>
+
+                    <div class="bg-dark-card bg-opacity-70 backdrop-filter backdrop-blur-sm p-6 rounded-lg shadow-lg neon-border">
+                        <div class="flex items-center mb-4">
+                            <img src="images/depoimento4.png" alt="Avatar do Aluno 4" class="w-12 h-12 rounded-full mr-4 border-2 border-accent-red-secondary">
+                            <div>
+                                <p class="font-semibold text-light-primary">Lucas Almeida</p>
+                                <p class="text-xs text-accent-red-text">Ex-aluno do Curso UX/UI Vision</p>
+                            </div>
+                        </div>
+                        <p class="text-light-secondary italic">"O curso de UX/UI abriu meus olhos para a importância do design centrado no usuário. As aulas são dinâmicas e o conteúdo é super atual."</p>
+                    </div>
+
+                    <div class="bg-dark-card bg-opacity-70 backdrop-filter backdrop-blur-sm p-6 rounded-lg shadow-lg neon-border">
+                        <div class="flex items-center mb-4">
+                            <img src="images/depoimento5.png" alt="Avatar do Aluno 5" class="w-12 h-12 rounded-full mr-4 border-2 border-accent-purple-secondary">
+                            <div>
+                                <p class="font-semibold text-light-primary">Gabriela Santos</p>
+                                <p class="text-xs text-accent-purple-text">Ex-aluna do Cloud Ops Elite</p>
+                            </div>
+                        </div>
+                        <p class="text-light-secondary italic">"Finalmente um curso prático sobre DevOps e nuvem! Aprendi muito e já estou aplicando os conhecimentos no meu trabalho."</p>
+                    </div>
+
                 </div>
                 <a href="#courses" class="gradient-cta text-white font-semibold py-3 px-8 rounded-lg text-lg cta-button shadow-lg animate-on-scroll">Ver Cursos</a>
             </div>
@@ -283,7 +306,7 @@
             <div class="container mx-auto px-6">
                 <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Nossos Cursos Mais Populares</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    
+
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
                         <img src="images/logica.png" alt="Imagem do Curso Lógica de Programação Essencial" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
@@ -363,7 +386,7 @@
                             <a href="#detail-devops" class="mt-auto block w-full text-center bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
-                    
+
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
                         <img src="images/curso-app-impact.png" alt="Imagem do Curso App Impact: Criando Apps Multiplataforma" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
@@ -470,6 +493,30 @@
             </div>
         </section>
 
+        <section id="team" class="py-16 bg-dark-primary">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Nossa Equipe</h2>
+                <div class="flex flex-wrap justify-center">
+                    <div class="w-full md:w-1/2 lg:w-1/3 px-4 mb-12 animate-on-scroll">
+                        <div class="bg-dark-card rounded-xl overflow-hidden shadow-lg neon-border">
+                            <div class="p-6 text-center">
+                                <img src="images/Foto-Perfil.jpg" alt="Foto de Bruno" class="w-48 h-48 object-cover rounded-full mx-auto mb-6 border-4 border-accent-indigo-primary">
+                                <h3 class="text-xl font-bold mb-2 text-light-primary">Bruno</h3>
+                                <p class="text-accent-indigo-primary font-semibold mb-4">Programador / Vendedor</p>
+                                <p class="text-light-tertiary mb-6">Estou no penúltimo semestre da minha faculdade e este site é um dos meus projetos iniciais, feito com muito esforço. Ele ainda é um embrião e não está perfeito, por isso, sua compreensão é muito valiosa. Obrigado!</p>
+                                <div class="flex justify-center space-x-4">
+                                    <a href="https://www.linkedin.com/in/bruno-passos-380552223/" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in glow-icon"></i></a>
+                                    <a href="https://github.com/5223Bruno" target="_blank" rel="noopener noreferrer"><i class="fab fa-github glow-icon"></i></a>
+                                    <a href="https://x.com/BrunoPasso50909/with_replies" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter glow-icon"></i></a>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="detail-logica" class="course-detail-section py-16 bg-dark-primary">
             <div class="container mx-auto px-6">
                 <a href="#courses" class="text-accent-indigo-primary hover:text-accent-indigo-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
@@ -533,7 +580,7 @@
                 </div>
             </div>
         </section>
-        
+
         <section id="detail-uxui" class="course-detail-section py-16 bg-dark-primary">
              <div class="container mx-auto px-6">
                 <a href="#courses" class="text-accent-purple-primary hover:text-accent-purple-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
@@ -681,16 +728,16 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-functions-compat.js"></script>
-    
+
     <script src="https://js.stripe.com/v3/"></script>
-    
+
     <script src="backend_completo.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
-            const allCourseDetailSections = document.querySelectorAll('.course-detail-section'); 
+            const allCourseDetailSections = document.querySelectorAll('.course-detail-section');
 
             if (mobileMenuButton && mobileMenu) {
                 mobileMenuButton.addEventListener('click', function() {
@@ -702,10 +749,10 @@
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
                     const href = this.getAttribute('href');
-                    
+
                     if (href.startsWith('#detail-') || href === '#login' || href.startsWith('#course-detail-')) { // Adicionado #course-detail- para as seções antigas
                         e.preventDefault();
-                        
+
                         allCourseDetailSections.forEach(section => {
                             section.style.display = 'none';
                         });
@@ -718,20 +765,20 @@
 
                         const targetId = href.substring(1);
                         const targetElement = document.getElementById(targetId);
-                        
+
                         if (targetElement) {
-                            targetElement.style.display = 'block'; 
-                            
-                            const headerOffset = 80; 
+                            targetElement.style.display = 'block';
+
+                            const headerOffset = 80;
                             const elementPosition = targetElement.getBoundingClientRect().top;
                             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                            
+
                             window.scrollTo({
                                 top: offsetPosition,
                                 behavior: 'smooth'
                             });
                         }
-                    } else if (href.startsWith('#') && href !== '#') { 
+                    } else if (href.startsWith('#') && href !== '#') {
                         e.preventDefault();
                          allCourseDetailSections.forEach(section => {
                             section.style.display = 'none';
@@ -745,7 +792,7 @@
                         const targetId = href.substring(1);
                         const targetElement = document.getElementById(targetId);
                         if (targetElement) {
-                             const headerOffset = 80; 
+                             const headerOffset = 80;
                              const elementPosition = targetElement.getBoundingClientRect().top;
                              const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
                             window.scrollTo({
@@ -754,7 +801,7 @@
                             });
                         }
                     }
-                    
+
                     if (mobileMenu && !mobileMenu.classList.contains('hidden') && this.id !== 'mobile-menu-button') { // corrigido: this.id !==
                         mobileMenu.classList.add('hidden');
                         if (mobileMenuButton) {
@@ -771,39 +818,39 @@
         function showCustomAlert(message, type) {
             const alert = document.getElementById('custom-alert');
             const alertMessage = document.getElementById('alert-message');
-            
+
             if (alert && alertMessage) {
-                alert.className = 'custom-alert'; 
+                alert.className = 'custom-alert';
                 alert.classList.add(type === 'success' ? 'custom-alert-success' : 'custom-alert-error');
-                
+
                 alertMessage.textContent = message;
                 alert.style.display = 'block';
-                alert.style.opacity = '1'; 
-                
+                alert.style.opacity = '1';
+
                 setTimeout(() => {
                     alert.style.opacity = '0';
                     setTimeout(() => {
                         alert.style.display = 'none';
-                    }, 300); 
-                }, 3000); 
+                    }, 300);
+                }, 3000);
             }
         }
 
         function initLazyLoading() {
             const lazyImages = document.querySelectorAll('.lazy-load');
-            
+
             if ('IntersectionObserver' in window) {
                 const imageObserver = new IntersectionObserver((entries, observer) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             const img = entry.target;
-                            img.src = img.dataset.src || img.src; 
+                            img.src = img.dataset.src || img.src;
                             img.classList.add('loaded');
                             imageObserver.unobserve(img);
                         }
                     });
                 });
-                
+
                 lazyImages.forEach(img => {
                     imageObserver.observe(img);
                 });
@@ -817,17 +864,17 @@
 
         function initScrollAnimations() {
             const animatedElements = document.querySelectorAll('.animate-on-scroll');
-            
+
             if ('IntersectionObserver' in window) {
                 const animationObserver = new IntersectionObserver((entries, observer) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             entry.target.classList.add('visible');
-                            observer.unobserve(entry.target); 
+                            observer.unobserve(entry.target);
                         }
                     });
                 }, { threshold: 0.1 });
-                
+
                 animatedElements.forEach(element => {
                     animationObserver.observe(element);
                 });

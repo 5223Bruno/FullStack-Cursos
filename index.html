@@ -265,7 +265,9 @@
                     <i class="fab fa-whatsapp text-green-400 mr-1 glow-icon"></i>
                     <span>WhatsApp</span>
                 </a>
-                <a href="#login" class="gradient-cta text-white px-4 py-2 rounded-lg cta-button">Login</a>
+                <div id="user-auth-section-desktop">
+                    <a href="#login" class="gradient-cta text-white px-4 py-2 rounded-lg cta-button">Login</a>
+                </div>
             </div>
             <div class="md:hidden">
                 <button id="mobile-menu-button" class="text-light-primary focus:outline-none" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu">
@@ -285,7 +287,9 @@
                 <i class="fab fa-whatsapp text-green-400 mr-1"></i>
                 WhatsApp
             </a>
-            <a href="#login" class="block px-6 py-3 gradient-cta text-white text-center rounded-b-lg">Login</a>
+            <div id="user-auth-section-mobile">
+                <a href="#login" class="block px-6 py-3 gradient-cta text-white text-center rounded-b-lg">Login</a>
+            </div>
         </div>
     </header>
 
@@ -715,8 +719,7 @@
                 <div class="user-section-container neon-border">
                     <h2 class="text-3xl font-bold mb-8 text-light-primary">Configurações</h2>
                     <div id="user-settings-content" class="space-y-6">
-                        <p class="text-light-secondary">Carregando configurações...</p>
-                        <div>
+                        <p class="text-light-secondary">Carregando configurações...</p> <div>
                             <h3 class="text-xl font-semibold text-light-primary mb-2">Preferências de Notificação</h3>
                             <label class="flex items-center space-x-3 mb-3">
                                 <input type="checkbox" class="form-checkbox h-5 w-5 text-accent-indigo-primary accent-accent-indigo-primary bg-dark-tertiary border-gray-600 rounded">
@@ -725,7 +728,7 @@
                         </div>
                         <div>
                             <h3 class="text-xl font-semibold text-light-primary mb-2">Gerenciamento da Conta</h3>
-                            <button class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg cta-button">
+                            <button id="delete-account-btn" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg cta-button">
                                 Excluir Minha Conta
                             </button>
                             <p class="text-xs text-light-tertiary mt-1">Atenção: Esta ação é irreversível.</p>
@@ -870,8 +873,11 @@
                 anchor.addEventListener('click', function (e) {
                     const href = this.getAttribute('href');
                     
-                    // Esconder todas as seções de detalhe/usuário antes de mostrar a nova
-                    hideAllDetailSections();
+                    // Esconder todas as seções de detalhe/usuário antes de mostrar a nova (exceto links internos da mesma página como abas)
+                    if (!this.closest('.user-section-container') && !this.closest('.course-detail-section')) { // Não esconder se o clique for dentro de uma seção já ativa (para navegação interna)
+                        hideAllDetailSections();
+                    }
+
 
                     if (href.startsWith('#detail-') || href === '#login' || 
                         href === '#profile' || href === '#my-courses' || href === '#settings' || href === '#dashboard') {
@@ -880,6 +886,9 @@
                         const targetElement = document.getElementById(targetId);
 
                         if (targetElement) {
+                            // Primeiro, garantir que todas as outras seções de detalhe/usuário estejam escondidas
+                            allDetailSections.forEach(s => { if(s.id !== targetId) s.style.display = 'none';});
+                            
                             targetElement.style.display = 'block';
                             const headerOffset = 80; 
                             const elementPosition = targetElement.getBoundingClientRect().top;
@@ -900,13 +909,11 @@
                         }
                     } else if (href.startsWith('#') && href !== '#') { // Links para seções principais
                         e.preventDefault();
+                        hideAllDetailSections(); // Esconder seções de detalhe/usuário ao navegar para seções principais
                         const targetId = href.substring(1);
                         const targetElement = document.getElementById(targetId);
                         if (targetElement) {
-                            // Garantir que seções principais (não .user-section ou .course-detail-section) sejam exibidas corretamente.
-                            // Elas geralmente não têm display:none por padrão no CSS, a menos que sejam dinamicamente alteradas.
-                            // Esta lógica assume que as seções principais estão sempre visíveis ou seu estado é gerenciado por outras lógicas.
-                            targetElement.style.display = ''; // Garante que está visível se foi escondida por engano
+                            targetElement.style.display = ''; // Garante que está visível (seções principais geralmente não têm display:none)
                             
                             const headerOffset = 80; 
                             const elementPosition = targetElement.getBoundingClientRect().top;
@@ -929,7 +936,7 @@
                 const targetLink = document.querySelector(`a[href="${window.location.hash}"]`);
                 if (targetLink) {
                     // Atrasar um pouco para garantir que o DOM e o JS do backend estejam prontos
-                    setTimeout(() => targetLink.click(), 100);
+                    setTimeout(() => targetLink.click(), 200); // Aumentado ligeiramente o timeout
                 } else {
                     // Se o link não existir, mas a seção existir (ex: #dashboard), tentar mostrá-la.
                     const targetIdFromHash = window.location.hash.substring(1);
@@ -943,7 +950,7 @@
                            else if (targetIdFromHash === 'profile' && typeof displayUserProfile === 'function') displayUserProfile();
                            else if (targetIdFromHash === 'settings' && typeof displayUserSettings === 'function') displayUserSettings();
                            else if (targetIdFromHash === 'dashboard' && typeof displayUserDashboard === 'function') displayUserDashboard();
-                       }, 100);
+                       }, 200); // Aumentado ligeiramente o timeout
                     }
                 }
             }

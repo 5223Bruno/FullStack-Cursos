@@ -265,7 +265,21 @@
                     <i class="fab fa-whatsapp text-green-400 mr-1 glow-icon"></i>
                     <span>WhatsApp</span>
                 </a>
-                <a href="#login" class="gradient-cta text-white px-4 py-2 rounded-lg cta-button">Login</a>
+                <!-- User Menu (Hidden by default, shown when logged in) -->
+                <div id="user-menu-container" class="relative hidden">
+                    <button id="user-menu-button" class="flex items-center text-light-secondary hover:text-light-primary focus:outline-none">
+                        <span id="user-name-display" class="mr-2">Usuário</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="user-dropdown-menu" class="absolute right-0 mt-2 w-48 bg-dark-tertiary rounded-md shadow-lg py-1 z-50 hidden">
+                        <a href="#profile" class="block px-4 py-2 text-sm text-light-secondary hover:bg-dark-secondary hover:text-light-primary">Meu Perfil</a>
+                        <a href="#my-courses" class="block px-4 py-2 text-sm text-light-secondary hover:bg-dark-secondary hover:text-light-primary">Meus Cursos</a>
+                        <button id="logout-button-dropdown" class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-dark-secondary hover:text-red-300">Logout</button>
+                    </div>
+                </div>
+                <!-- Login Button (Shown by default, hidden when logged in) -->
+                <a href="#login" id="login-button" class="gradient-cta text-white px-4 py-2 rounded-lg cta-button">Login</a>
             </div>
             <div class="md:hidden">
                 <button id="mobile-menu-button" class="text-light-primary focus:outline-none" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu">
@@ -285,7 +299,16 @@
                 <i class="fab fa-whatsapp text-green-400 mr-1"></i>
                 WhatsApp
             </a>
-            <a href="#login" class="block px-6 py-3 gradient-cta text-white text-center rounded-b-lg">Login</a>
+            <!-- Mobile User Links (Hidden by default) -->
+            <div id="mobile-menu-user-links" class="hidden">
+                <a href="#dashboard" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">Dashboard</a>
+                <a href="#profile" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">Meu Perfil</a>
+                <a href="#my-courses" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">Meus Cursos</a>
+                <a href="#settings" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">Configurações</a>
+                <button id="logout-button-mobile" class="block w-full text-left px-6 py-3 text-red-400 hover:bg-dark-secondary hover:text-red-300">Logout</button>
+            </div>
+            <!-- Mobile Login Link (Shown by default) -->
+            <a href="#login" id="mobile-login-link" class="block px-6 py-3 gradient-cta text-white text-center rounded-b-lg">Login</a>
         </div>
     </header>
 

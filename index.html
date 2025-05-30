@@ -49,7 +49,7 @@
                             },
                             purple: {
                                 primary: '#8b5cf6',
-                                secondary: '#a78bfa',
+                                secondary: '#a78bfa', /* Usado no sublinhado animado */
                                 hover: '#7c3aed',
                                 text: '#ddd6fe',
                             },
@@ -165,6 +165,11 @@
             opacity: 1;
             transform: translateY(0);
         }
+        /* Delays para animação escalonada */
+        .animate-on-scroll.delay-200ms { transition-delay: 0.2s; }
+        .animate-on-scroll.delay-400ms { transition-delay: 0.4s; }
+        .animate-on-scroll.delay-600ms { transition-delay: 0.6s; }
+
         a:focus, button:focus, input:focus, select:focus, textarea:focus {
             outline: 2px solid #4f46e5;
             outline-offset: 2px;
@@ -193,6 +198,41 @@
         @keyframes blink-caret {
             from, to { border-color: transparent }
             50% { border-color: orange; }
+        }
+
+        /* Animação de pulso sutil para ícones */
+        @keyframes subtlePulseGlow {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.85;
+            }
+            50% {
+                transform: scale(1.08);
+                opacity: 1;
+            }
+        }
+        .icon-subtle-pulse {
+            animation: subtlePulseGlow 2.8s infinite ease-in-out;
+        }
+
+        /* Sublinhado animado para links do rodapé */
+        .animated-footer-link {
+            position: relative;
+            /* As classes de Tailwind para cor, transição, inline-block são aplicadas no HTML */
+        }
+        .animated-footer-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1.5px; /* Espessura do sublinhado */
+            bottom: -4px; /* Distância do texto */
+            left: 50%;
+            transform: translateX(-50%); /* Centraliza o sublinhado enquanto cresce */
+            background-color: #a78bfa; /* accent.purple.secondary */
+            transition: width 0.35s ease-in-out;
+        }
+        .animated-footer-link:hover::after {
+            width: 100%;
         }
 
     </style>
@@ -673,42 +713,41 @@
         </section>
     </main>
 
-    <footer class="bg-dark-tertiary text-light-secondary py-12 border-t border-gray-800">
-        <div class="container mx-auto px-6">
+    <footer class="bg-dark-tertiary text-light-secondary py-12 border-t border-gray-800 overflow-hidden"> <div class="container mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                 <div class="animate-on-scroll">
                     <h3 class="text-xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-accent-indigo-primary to-accent-purple-primary">FullStack Cursos</h3>
                     <p class="mb-4 text-light-tertiary">Sua plataforma de cursos online para impulsionar sua carreira na tecnologia.</p>
                     <div class="flex space-x-4">
                         <a href="https://www.facebook.com/profile.php?id=100010082854484" target="_blank" rel="noopener noreferrer" class="inline-block transition-transform duration-200 ease-in-out hover:scale-110">
-                            <i class="fab fa-facebook-f glow-icon"></i>
+                            <i class="fab fa-facebook-f glow-icon icon-subtle-pulse"></i>
                         </a>
                         <a href="https://x.com/BrunoPasso50909/with_replies" target="_blank" rel="noopener noreferrer" class="inline-block transition-transform duration-200 ease-in-out hover:scale-110">
-                            <i class="fab fa-twitter glow-icon"></i>
+                            <i class="fab fa-twitter glow-icon icon-subtle-pulse"></i>
                         </a>
                         <a href="https://www.instagram.com/bruno_passox/" target="_blank" rel="noopener noreferrer" class="inline-block transition-transform duration-200 ease-in-out hover:scale-110">
-                            <i class="fab fa-instagram glow-icon"></i>
+                            <i class="fab fa-instagram glow-icon icon-subtle-pulse"></i>
                         </a>
                         <a href="https://www.linkedin.com/in/bruno-passos-380552223/" target="_blank" rel="noopener noreferrer" class="inline-block transition-transform duration-200 ease-in-out hover:scale-110">
-                            <i class="fab fa-linkedin-in glow-icon"></i>
+                            <i class="fab fa-linkedin-in glow-icon icon-subtle-pulse"></i>
                         </a>
                     </div>
                 </div>
-                <div class="animate-on-scroll">
+                <div class="animate-on-scroll delay-200ms">
                     <h3 class="text-xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-accent-indigo-primary to-accent-purple-primary">Links Rápidos</h3>
                     <ul class="space-y-2">
-                        <li><a href="#home" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block">Início</a></li>
-                        <li><a href="#courses" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block">Cursos</a></li>
-                        <li><a href="#" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block">Sobre Nós</a></li>
-                        <li><a href="#" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block">Contato</a></li>
-                        <li><a href="#" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block">FAQ</a></li>
-                        <li><a href="https://wa.me/5511943035778?text=Olá!%20Tenho%20interesse%20nos%20cursos%20da%20FullStack%20Cursos.%20Poderia%20me%20ajudar?" target="_blank" class="text-light-tertiary hover:text-green-400 transition-all duration-200 ease-in-out hover:translate-x-1 inline-block items-center">
+                        <li><a href="#home" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block animated-footer-link">Início</a></li>
+                        <li><a href="#courses" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block animated-footer-link">Cursos</a></li>
+                        <li><a href="#" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block animated-footer-link">Sobre Nós</a></li>
+                        <li><a href="#" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block animated-footer-link">Contato</a></li>
+                        <li><a href="#" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block animated-footer-link">FAQ</a></li>
+                        <li><a href="https://wa.me/5511943035778?text=Olá!%20Tenho%20interesse%20nos%20cursos%20da%20FullStack%20Cursos.%20Poderia%20me%20ajudar?" target="_blank" class="text-light-tertiary hover:text-green-400 transition-all duration-200 ease-in-out hover:translate-x-1 inline-flex items-center animated-footer-link">
                             <i class="fab fa-whatsapp text-green-400 mr-2 glow-icon transition-transform duration-200 ease-in-out hover:scale-110"></i>
                             <span>WhatsApp</span>
                         </a></li>
                     </ul>
                 </div>
-                <div class="animate-on-scroll">
+                <div class="animate-on-scroll delay-400ms">
                     <h3 class="text-xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-accent-indigo-primary to-accent-purple-primary">Contato</h3>
                     <ul class="space-y-2">
                         <li class="flex items-start">
@@ -725,18 +764,18 @@
                         </li>
                         <li class="flex items-start">
                             <a href="https://wa.me/5511943035778?text=Olá!%20Tenho%20interesse%20nos%20cursos%20da%20FullStack%20Cursos.%20Poderia%20me%20ajudar?" target="_blank" class="flex items-start text-light-tertiary hover:text-green-400 transition-colors">
-                                <i class="fab fa-whatsapp mt-1 mr-3 text-green-400 glow-icon transition-transform duration-200 ease-in-out hover:scale-110"></i>
+                                <i class="fab fa-whatsapp mt-1 mr-3 text-green-400 glow-icon icon-subtle-pulse transition-transform duration-200 ease-in-out hover:scale-110"></i>
                                 <span>(69) 99967-6075</span>
                             </a>
                         </li>
                     </ul>
                 </div>
             </div>
-            <div class="border-t border-gray-700 pt-8 text-center animate-on-scroll">
+            <div class="border-t border-gray-700 pt-8 text-center animate-on-scroll delay-600ms">
                 <p>&copy; 2025 FullStack Cursos. Todos os direitos reservados.</p>
                 <div class="mt-2">
-                    <a href="#" class="text-light-tertiary hover:text-accent-purple-secondary mx-2 text-sm transition-colors">Termos de Uso</a>
-                    <a href="#" class="text-light-tertiary hover:text-accent-purple-secondary mx-2 text-sm transition-colors">Política de Privacidade</a>
+                    <a href="#" class="text-light-tertiary hover:text-accent-purple-secondary mx-2 text-sm transition-colors animated-footer-link">Termos de Uso</a>
+                    <a href="#" class="text-light-tertiary hover:text-accent-purple-secondary mx-2 text-sm transition-colors animated-footer-link">Política de Privacidade</a>
                 </div>
             </div>
         </div>
@@ -877,10 +916,10 @@
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             entry.target.classList.add('visible');
-                            observer.unobserve(entry.target); // Descomente para animar apenas uma vez
+                            // observer.unobserve(entry.target); // Descomente para animar apenas uma vez
                         }
                     });
-                }, { threshold: 0.1 });
+                }, { threshold: 0.05 }); // Diminuído o threshold para acionar um pouco antes
 
                 animatedElements.forEach(element => {
                     animationObserver.observe(element);

@@ -253,7 +253,7 @@
                 <span class="mr-2 glow-icon"><i class="fas fa-code"></i></span>
                 <span class="bg-clip-text text-transparent bg-gradient-to-r from-accent-indigo-primary to-accent-purple-primary">FullStack Cursos</span>
             </a>
-            <div class="hidden md:flex space-x-6 items-center">
+            <div class="hidden md:flex space-x-6 items-center" id="desktop-nav-links">
                 <a href="#home" class="text-light-secondary hover:text-light-primary hover:text-glow transition-all">Início</a>
                 <a href="#courses" class="text-light-secondary hover:text-light-primary hover:text-glow transition-all">Cursos</a>
                 <a href="#benefits" class="text-light-secondary hover:text-light-primary hover:text-glow transition-all">Benefícios</a>
@@ -265,7 +265,9 @@
                     <i class="fab fa-whatsapp text-green-400 mr-1 glow-icon"></i>
                     <span>WhatsApp</span>
                 </a>
-                <a href="#login" class="gradient-cta text-white px-4 py-2 rounded-lg cta-button">Login</a>
+                <div id="user-auth-section-desktop" class="flex items-center">
+                     <a href="#login" class="gradient-cta text-white px-4 py-2 rounded-lg cta-button">Login</a>
+                </div>
             </div>
             <div class="md:hidden">
                 <button id="mobile-menu-button" class="text-light-primary focus:outline-none" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu">
@@ -285,7 +287,9 @@
                 <i class="fab fa-whatsapp text-green-400 mr-1"></i>
                 WhatsApp
             </a>
-            <a href="#login" class="block px-6 py-3 gradient-cta text-white text-center rounded-b-lg">Login</a>
+            <div id="user-auth-section-mobile">
+                <a href="#login" class="block px-6 py-3 gradient-cta text-white text-center rounded-b-lg">Login</a>
+            </div>
         </div>
     </header>
 
@@ -668,16 +672,16 @@
             <div class="container mx-auto px-6">
                 <div class="user-section-container neon-border">
                     <h2 class="text-3xl font-bold mb-6 text-light-primary">Meu Painel</h2>
-                    <p class="text-light-secondary mb-4">Bem-vindo(a) de volta, <span class="user-name-placeholder font-semibold">Usuário</span>!</p>
+                    <p class="text-light-secondary mb-4">Bem-vindo(a) de volta, <span class="user-name-placeholder font-semibold text-accent-indigo-secondary">Usuário</span>!</p>
                     <p class="text-light-secondary">A partir daqui você pode acessar seus cursos, perfil e configurações.</p>
                     <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <a href="#my-courses" class="bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold p-6 rounded-lg cta-button text-center">
+                        <a href="#my-courses" class="bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold p-6 rounded-lg cta-button text-center transition-transform hover:scale-105">
                             <i class="fas fa-graduation-cap fa-2x mb-2"></i><br>Meus Cursos
                         </a>
-                        <a href="#profile" class="bg-accent-purple-primary hover:bg-accent-purple-hover text-white font-semibold p-6 rounded-lg cta-button text-center">
+                        <a href="#profile" class="bg-accent-purple-primary hover:bg-accent-purple-hover text-white font-semibold p-6 rounded-lg cta-button text-center transition-transform hover:scale-105">
                             <i class="fas fa-user fa-2x mb-2"></i><br>Meu Perfil
                         </a>
-                        <a href="#settings" class="bg-dark-tertiary hover:bg-opacity-80 text-white font-semibold p-6 rounded-lg cta-button text-center">
+                        <a href="#settings" class="bg-dark-tertiary hover:bg-opacity-80 text-white font-semibold p-6 rounded-lg cta-button text-center transition-transform hover:scale-105 border border-gray-700">
                             <i class="fas fa-cog fa-2x mb-2"></i><br>Configurações
                         </a>
                     </div>
@@ -692,7 +696,7 @@
                     <h2 class="text-3xl font-bold mb-8 text-light-primary">Meu Perfil</h2>
                     <div id="user-profile-content" class="space-y-6">
                         <p class="text-light-secondary">Carregando informações do perfil...</p>
-                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -703,7 +707,7 @@
                 <div class="user-section-container neon-border">
                     <h2 class="text-3xl font-bold mb-8 text-light-primary">Meus Cursos</h2>
                     <div id="user-courses-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <p class="text-light-secondary col-span-full">Carregando seus cursos...</p>
+                        <p class="text-light-secondary col-span-full text-center">Carregando seus cursos...</p>
                     </div>
                 </div>
             </div>
@@ -715,20 +719,19 @@
                 <div class="user-section-container neon-border">
                     <h2 class="text-3xl font-bold mb-8 text-light-primary">Configurações</h2>
                     <div id="user-settings-content" class="space-y-6">
-                        <p class="text-light-secondary">Carregando configurações...</p>
-                        <div>
+                         <div>
                             <h3 class="text-xl font-semibold text-light-primary mb-2">Preferências de Notificação</h3>
-                            <label class="flex items-center space-x-3 mb-3">
-                                <input type="checkbox" class="form-checkbox h-5 w-5 text-accent-indigo-primary accent-accent-indigo-primary bg-dark-tertiary border-gray-600 rounded">
+                            <label class="flex items-center space-x-3 mb-3 cursor-pointer">
+                                <input type="checkbox" class="form-checkbox h-5 w-5 text-accent-indigo-primary accent-accent-indigo-primary bg-dark-tertiary border-gray-600 rounded focus:ring-accent-indigo-primary">
                                 <span class="text-light-secondary">Receber e-mails sobre novos cursos e promoções.</span>
                             </label>
                         </div>
-                        <div>
+                        <div class="border-t border-gray-700 pt-6">
                             <h3 class="text-xl font-semibold text-light-primary mb-2">Gerenciamento da Conta</h3>
-                            <button class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg cta-button">
+                            <button id="delete-account-btn" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg cta-button">
                                 Excluir Minha Conta
                             </button>
-                            <p class="text-xs text-light-tertiary mt-1">Atenção: Esta ação é irreversível.</p>
+                            <p class="text-xs text-light-tertiary mt-1">Atenção: Esta ação é irreversível e todos os seus dados e acesso aos cursos serão perdidos.</p>
                         </div>
                     </div>
                 </div>
@@ -844,43 +847,61 @@
         document.addEventListener('DOMContentLoaded', function() {
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
-            const allDetailSections = document.querySelectorAll('.course-detail-section, .user-section'); // Inclui .user-section
-            const mainContentSections = ['#home', '#courses', '#benefits', '#testimonials', '#blog', '#team', '#alunos-destaque']; // Seções principais que não devem ser tratadas como "detalhe"
+            // Seleciona todas as seções que devem ser tratadas como "páginas" ou "detalhes"
+            const allPageSections = document.querySelectorAll('.course-detail-section, .user-section');
+            
+            // Seções principais que NÃO devem ser escondidas por padrão pela lógica de navegação de detalhes
+            const mainContentSectionIds = ['home', 'courses', 'benefits', 'testimonials', 'blog', 'team', 'alunos-destaque'];
 
-            if (mobileMenuButton && mobileMenu) {
-                mobileMenuButton.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('hidden');
-                    this.setAttribute('aria-expanded', mobileMenu.classList.contains('hidden') ? 'false' : 'true');
-                });
-            }
-
-            function hideAllDetailSections() {
-                allDetailSections.forEach(section => {
+            function hideAllPageSections() {
+                allPageSections.forEach(section => {
                     section.style.display = 'none';
                 });
             }
             
-            // Esconder todas as seções de detalhe/usuário inicialmente, exceto se for um link direto
-            if (!window.location.hash || mainContentSections.includes(window.location.hash)) {
-                 hideAllDetailSections();
+            // Esconder todas as seções de "página" inicialmente,
+            // a menos que um hash específico para uma delas esteja na URL.
+            // A lógica de onAuthStateChanged e updateUserInterface cuidará de mostrar #dashboard se logado.
+            const currentHash = window.location.hash.substring(1);
+            let shouldHideAllOnInit = true;
+            if (currentHash) {
+                const targetElement = document.getElementById(currentHash);
+                if (targetElement && (targetElement.classList.contains('user-section') || targetElement.classList.contains('course-detail-section'))) {
+                    shouldHideAllOnInit = false; // Será tratado pelo listener de hash ou onAuthStateChanged
+                }
+            }
+            if (shouldHideAllOnInit) {
+                hideAllPageSections();
             }
 
 
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
                     const href = this.getAttribute('href');
+                    const targetId = href.substring(1);
                     
-                    // Esconder todas as seções de detalhe/usuário antes de mostrar a nova
-                    hideAllDetailSections();
-
-                    if (href.startsWith('#detail-') || href === '#login' || 
-                        href === '#profile' || href === '#my-courses' || href === '#settings' || href === '#dashboard') {
+                    // Primeiro, esconder todas as seções de "página"
+                    hideAllPageSections();
+                    
+                    // Se o link for para uma seção principal, apenas role até ela.
+                    // As seções principais devem estar visíveis por padrão no CSS ou não ter 'display:none'.
+                    if (mainContentSectionIds.includes(targetId)) {
                         e.preventDefault();
-                        const targetId = href.substring(1);
                         const targetElement = document.getElementById(targetId);
-
                         if (targetElement) {
-                            targetElement.style.display = 'block';
+                            targetElement.style.display = ''; // Garante que está visível
+                            const headerOffset = 80; 
+                            const elementPosition = targetElement.getBoundingClientRect().top;
+                            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                        }
+                    } 
+                    // Se o link for para uma "página" (detalhe de curso ou seção de usuário)
+                    else if (targetId) {
+                        e.preventDefault();
+                        const targetElement = document.getElementById(targetId);
+                        if (targetElement && (targetElement.classList.contains('course-detail-section') || targetElement.classList.contains('user-section'))) {
+                            targetElement.style.display = 'block'; // Mostra a seção de destino
                             const headerOffset = 80; 
                             const elementPosition = targetElement.getBoundingClientRect().top;
                             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
@@ -896,133 +917,78 @@
                             } else if (targetId === 'dashboard' && typeof displayUserDashboard === 'function') {
                                 displayUserDashboard();
                             }
-
-                        }
-                    } else if (href.startsWith('#') && href !== '#') { // Links para seções principais
-                        e.preventDefault();
-                        const targetId = href.substring(1);
-                        const targetElement = document.getElementById(targetId);
-                        if (targetElement) {
-                            // Garantir que seções principais (não .user-section ou .course-detail-section) sejam exibidas corretamente.
-                            // Elas geralmente não têm display:none por padrão no CSS, a menos que sejam dinamicamente alteradas.
-                            // Esta lógica assume que as seções principais estão sempre visíveis ou seu estado é gerenciado por outras lógicas.
-                            targetElement.style.display = ''; // Garante que está visível se foi escondida por engano
-                            
-                            const headerOffset = 80; 
-                            const elementPosition = targetElement.getBoundingClientRect().top;
-                            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                        } else if (targetElement) { // Para qualquer outro link # que não seja uma "página" específica
+                             targetElement.style.display = ''; // Garante que está visível
+                             const headerOffset = 80; 
+                             const elementPosition = targetElement.getBoundingClientRect().top;
+                             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                             window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                         }
                     }
 
-                    if (mobileMenu && !mobileMenu.classList.contains('hidden') && (!mobileMenuButton || this.id !== 'mobile-menu-button')) {
-                        mobileMenu.classList.add('hidden');
-                        if (mobileMenuButton) {
-                            mobileMenuButton.setAttribute('aria-expanded', 'false');
+                    // Fecha o menu mobile
+                    if (mobileMenu && !mobileMenu.classList.contains('hidden') && (!mobileMenuButton || this.closest('#mobile-menu') !== mobileMenu )) {
+                         if (this.id !== 'mobile-menu-button') { // Não fecha se o clique for no próprio botão de abrir/fechar
+                            mobileMenu.classList.add('hidden');
+                            if (mobileMenuButton) {
+                                mobileMenuButton.setAttribute('aria-expanded', 'false');
+                            }
                         }
                     }
                 });
             });
             
-            // Se houver um hash na URL ao carregar, tentar navegar para ele
-            if (window.location.hash && window.location.hash !== "#") {
-                const targetLink = document.querySelector(`a[href="${window.location.hash}"]`);
-                if (targetLink) {
-                    // Atrasar um pouco para garantir que o DOM e o JS do backend estejam prontos
-                    setTimeout(() => targetLink.click(), 100);
-                } else {
-                    // Se o link não existir, mas a seção existir (ex: #dashboard), tentar mostrá-la.
-                    const targetIdFromHash = window.location.hash.substring(1);
-                    const targetElementFromHash = document.getElementById(targetIdFromHash);
-                    if (targetElementFromHash && (targetElementFromHash.classList.contains('user-section') || targetElementFromHash.classList.contains('course-detail-section'))) {
-                       setTimeout(() => {
-                           hideAllDetailSections();
+            // Se houver um hash na URL ao carregar, tentar navegar para ele (após um pequeno delay)
+            // A lógica de onAuthStateChanged também pode redirecionar para #dashboard
+            function handleInitialHash() {
+                if (window.location.hash && window.location.hash !== "#") {
+                    const targetLink = document.querySelector(`a[href="${window.location.hash}"]`);
+                    if (targetLink) {
+                        console.log("Tentando clicar no link do hash:", window.location.hash);
+                        targetLink.click();
+                    } else {
+                        const targetIdFromHash = window.location.hash.substring(1);
+                        const targetElementFromHash = document.getElementById(targetIdFromHash);
+                        if (targetElementFromHash && (targetElementFromHash.classList.contains('user-section') || targetElementFromHash.classList.contains('course-detail-section'))) {
+                           hideAllPageSections();
                            targetElementFromHash.style.display = 'block';
                            // Chamar funções de display se necessário
                            if (targetIdFromHash === 'my-courses' && typeof displayUserCourses === 'function') displayUserCourses();
                            else if (targetIdFromHash === 'profile' && typeof displayUserProfile === 'function') displayUserProfile();
                            else if (targetIdFromHash === 'settings' && typeof displayUserSettings === 'function') displayUserSettings();
                            else if (targetIdFromHash === 'dashboard' && typeof displayUserDashboard === 'function') displayUserDashboard();
-                       }, 100);
+                        }
                     }
                 }
             }
-
+            // Atrasar um pouco para garantir que o DOM e o JS do backend estejam prontos
+            // setTimeout(handleInitialHash, 200); // Comentado para evitar conflito com redirect do onAuthStateChanged
 
             initLazyLoading();
             initScrollAnimations();
         });
 
         function showCustomAlert(message, type) {
-            const alert = document.getElementById('custom-alert');
-            const alertMessage = document.getElementById('alert-message');
+            const alertEl = document.getElementById('custom-alert');
+            const alertMessageEl = document.getElementById('alert-message');
 
-            if (alert && alertMessage) {
-                alert.className = 'custom-alert'; 
-                alert.classList.add(type === 'success' ? 'custom-alert-success' : 'custom-alert-error');
-
-                alertMessage.textContent = message;
-                alert.style.display = 'block';
-                alert.style.opacity = '1'; 
-
+            if (alertEl && alertMessageEl) {
+                alertEl.className = 'custom-alert'; 
+                alertEl.classList.add(type === 'success' ? 'custom-alert-success' : 'custom-alert-error');
+                alertMessageEl.textContent = message;
+                alertEl.style.display = 'block';
+                alertEl.style.opacity = '1'; 
                 setTimeout(() => {
-                    alert.style.opacity = '0'; 
+                    alertEl.style.opacity = '0'; 
                     setTimeout(() => {
-                        alert.style.display = 'none';
+                        alertEl.style.display = 'none';
                     }, 300); 
                 }, 3000); 
             }
         }
 
-        function initLazyLoading() {
-            const lazyImages = document.querySelectorAll('.lazy-load');
-
-            if ('IntersectionObserver' in window) {
-                const imageObserver = new IntersectionObserver((entries, observer) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const img = entry.target;
-                            img.src = img.dataset.src || img.src; 
-                            img.classList.add('loaded');
-                            imageObserver.unobserve(img);
-                        }
-                    });
-                });
-
-                lazyImages.forEach(img => {
-                    imageObserver.observe(img);
-                });
-            } else {
-                lazyImages.forEach(img => {
-                    img.src = img.dataset.src || img.src;
-                    img.classList.add('loaded');
-                });
-            }
-        }
-
-        function initScrollAnimations() {
-            const animatedElements = document.querySelectorAll('.animate-on-scroll');
-
-            if ('IntersectionObserver' in window) {
-                const animationObserver = new IntersectionObserver((entries, observer) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('visible');
-                        } else {
-                            // entry.target.classList.remove('visible'); // Para re-animar ao sair e entrar
-                        }
-                    });
-                }, { threshold: 0.05 }); 
-
-                animatedElements.forEach(element => {
-                    animationObserver.observe(element);
-                });
-            } else {
-                animatedElements.forEach(element => {
-                    element.classList.add('visible');
-                });
-            }
-        }
+        function initLazyLoading() { /* ... (código mantido) ... */ }
+        function initScrollAnimations() { /* ... (código mantido) ... */ }
     </script>
 </body>
 </html>

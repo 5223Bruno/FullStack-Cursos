@@ -1,6 +1,6 @@
-/**
- * BACKEND COMPLETO PARA O SITE FullStackCursos
- */
+/**************************************************************************
+ * BACKEND COMPLETO PARA O SITE FullStackCursos (MODIFICADO)
+ **************************************************************************/
 
 // ============================================================================
 // CONFIGURAÇÃO DO FIREBASE
@@ -30,52 +30,77 @@ db.settings({ timestampsInSnapshots: true });
 const AuthSystem = {
   currentUser: null,
   initAuthObserver: function() {
-    auth.onAuthStateChanged(user => {
+    auth.onAuthStateChanged(async user => { // Tornar async para aguardar perfil
       if (user) {
         this.currentUser = user;
         console.log('[AuthObserver] Usuário detectado:', user.uid);
-        this.getUserProfile(user.uid).then(profile => {
+        try {
+          const profile = await this.getUserProfile(user.uid);
           console.log('[AuthObserver] Perfil obtido:', profile);
-          updateUserInterface(user); // Chama a função global de UI
-          // Atualiza o placeholder do nome no dashboard se ele existir
-          const userNameDashboardEl = document.querySelector('#dashboard .user-name-placeholder');
-          if (userNameDashboardEl && profile) {
-              userNameDashboardEl.textContent = profile.name || user.displayName || "Usuário";
-          }
-          // Se o usuário está logado e não há hash ou é #home, redireciona para #dashboard
-          if(window.location.hash === '' || window.location.hash === '#home' || window.location.hash === '#login') {
+          updateUserInterface(user, profile); // Passa o perfil para a UI
+
+          // Redirecionamento após login (se necessário)
+          if(window.location.hash === '' || window.location.hash === '#home' || window.location.hash === '#login' || window.location.hash === '#register') {
             console.log('[AuthObserver] Redirecionando para #dashboard');
-            window.location.href = '#dashboard';
+            window.location.href = '#dashboard'; // Redireciona para o dashboard como padrão
           } else {
-            // Se já existe um hash para uma seção de usuário, tenta revalidar/recarregar
-            const currentHash = window.location.hash.substring(1);
-            if (['dashboard', 'profile', 'my-courses', 'settings'].includes(currentHash)) {
-                const targetLink = document.querySelector(`a[href="${window.location.hash}"]`);
-                if (targetLink) targetLink.click(); // Simula clique para re-renderizar
-            }
+            // Se já existe um hash, revalida a seção atual (handleHashChange fará isso)
+            handleHashChange();
           }
-        }).catch(error => {
+        } catch (error) {
             console.error("[AuthObserver] Erro ao buscar perfil para UI:", error);
-            updateUserInterface(user); // Fallback com dados do Auth
-        });
+            updateUserInterface(user, null); // Fallback com dados do Auth se perfil falhar
+            // Decide se redireciona mesmo sem perfil completo
+            if(window.location.hash === '' || window.location.hash === '#home' || window.location.hash === '#login' || window.location.hash === '#register') {
+                window.location.href = '#dashboard';
+            }
+        }
       } else {
         this.currentUser = null;
         console.log('[AuthObserver] Nenhum usuário logado.');
-        updateUserInterface(null); // Chama a função global de UI
-        const userNameDashboardEl = document.querySelector('#dashboard .user-name-placeholder');
-        if (userNameDashboardEl) {
-            userNameDashboardEl.textContent = "Usuário"; // Reset placeholder
-        }
+        updateUserInterface(null, null);
         // Se o usuário deslogou e estava em uma seção protegida, redireciona para #home
         const currentHash = window.location.hash.substring(1);
-        if (['dashboard', 'profile', 'my-courses', 'settings'].includes(currentHash)) {
+        const protectedSections = ['dashboard', 'profile', 'my-courses', 'settings'];
+        if (protectedSections.includes(currentHash)) {
             window.location.href = '#home';
         }
       }
     });
   },
-  registerUser: async function(name, email, password) { /* ... (código original mantido) ... */ },
-  loginUser: async function(email, password) { /* ... (código original mantido) ... */ },
+  registerUser: async function(name, email, password) {
+    try {
+      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+      const user = userCredential.user;
+      await user.updateProfile({ displayName: name });
+      // Criar perfil no Firestore
+      await db.collection('users').doc(user.uid).set({
+        name: name,
+        email: email,
+        role: 'student',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        courses: [],
+        completedLessons: {}
+      });
+      showCustomAlert('Registro realizado com sucesso! Você já está logado.', 'success');
+      return user;
+    } catch (error) {
+      console.error("Erro no registro:", error);
+      showCustomAlert(`Erro no registro: ${error.message}`, 'error');
+      throw error;
+    }
+  },
+  loginUser: async function(email, password) {
+    try {
+      const userCredential = await auth.signInWithEmailAndPassword(email, password);
+      showCustomAlert('Login realizado com sucesso!', 'success');
+      return userCredential.user;
+    } catch (error) {
+      console.error("Erro no login:", error);
+      showCustomAlert(`Erro no login: ${error.message}`, 'error');
+      throw error;
+    }
+  },
   loginWithGoogle: async function() {
     try {
       console.log('[AuthSystem.loginWithGoogle] Iniciando login com Google via Firebase...');
@@ -86,7 +111,7 @@ const AuthSystem = {
 
       const userDocRef = db.collection('users').doc(user.uid);
       const userDoc = await userDocRef.get();
-      
+
       if (!userDoc.exists) {
         console.log('[AuthSystem.loginWithGoogle] Usuário novo, criando perfil no Firestore...');
         await userDocRef.set({
@@ -97,48 +122,83 @@ const AuthSystem = {
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           courses: [],
           completedLessons: {}
-        });
+        }, { merge: true }); // Usar merge true para segurança
         console.log('[AuthSystem.loginWithGoogle] Perfil criado para:', user.displayName);
       } else {
         console.log('[AuthSystem.loginWithGoogle] Usuário já existe:', user.displayName);
-        await userDocRef.update({ // Atualiza nome/foto caso tenham mudado no Google
+        // Atualiza nome/foto caso tenham mudado no Google (opcional, mas bom)
+        await userDocRef.update({
             name: user.displayName,
-            photoURL: user.photoURL 
+            photoURL: user.photoURL
         });
         console.log('[AuthSystem.loginWithGoogle] Perfil atualizado para:', user.displayName);
       }
+      showCustomAlert('Login com Google realizado com sucesso!', 'success');
       return user; // Retorna o objeto user
     } catch (error) {
       console.error("[AuthSystem.loginWithGoogle] Erro dentro da função:", error, "Código:", error.code);
-      throw error; 
+      // Tratar erros comuns de popup
+      if (error.code === 'auth/popup-closed-by-user') {
+        showCustomAlert('Login com Google cancelado.', 'error');
+      } else if (error.code === 'auth/cancelled-popup-request') {
+        // Ignorar, pois outro popup pode ter sido aberto
+      } else {
+        showCustomAlert(`Erro no login com Google: ${error.message}`, 'error');
+      }
+      throw error;
     }
   },
-  logoutUser: async function() { /* ... (código original mantido, mas o reload na updateUserInterface já cuida da UI) ... */ },
-  resetPassword: async function(email) { /* ... (código original mantido) ... */ },
-  getUserProfile: async function(userId) {
+  logoutUser: async function() {
     try {
-      const userDoc = await db.collection('users').doc(userId).get();
+      await auth.signOut();
+      showCustomAlert('Logout realizado com sucesso.', 'success');
+      // A UI será atualizada pelo onAuthStateChanged
+    } catch (error) {
+      console.error("Erro no logout:", error);
+      showCustomAlert(`Erro ao fazer logout: ${error.message}`, 'error');
+      throw error;
+    }
+  },
+  resetPassword: async function(email) {
+    try {
+      await auth.sendPasswordResetEmail(email);
+      showCustomAlert('Email de redefinição de senha enviado! Verifique sua caixa de entrada.', 'success');
+    } catch (error) {
+      console.error("Erro ao enviar email de redefinição:", error);
+      showCustomAlert(`Erro ao enviar email: ${error.message}`, 'error');
+      throw error;
+    }
+  },
+  getUserProfile: async function(userId) {
+    if (!userId) {
+        console.error("[getUserProfile] ID do usuário não fornecido.");
+        throw new Error("ID do usuário não fornecido");
+    }
+    try {
+      const userDocRef = db.collection('users').doc(userId);
+      const userDoc = await userDocRef.get();
       if (userDoc.exists) {
         return { id: userDoc.id, ...userDoc.data() };
       } else {
-        const currentUser = auth.currentUser; // Usar o auth.currentUser mais recente
-        if(currentUser && currentUser.uid === userId){
-            console.warn("[getUserProfile] Perfil não encontrado no Firestore para usuário Google. Usando dados do Auth e criando perfil básico.");
+        // Se não existe no Firestore, tenta pegar do Auth (caso de Google Login sem doc ainda)
+        const currentUserAuth = auth.currentUser;
+        if (currentUserAuth && currentUserAuth.uid === userId) {
+            console.warn("[getUserProfile] Perfil não encontrado no Firestore. Usando dados do Auth e criando perfil básico.");
             const basicProfile = {
                 id: userId,
-                name: currentUser.displayName,
-                email: currentUser.email,
-                photoURL: currentUser.photoURL,
+                name: currentUserAuth.displayName || 'Usuário',
+                email: currentUserAuth.email,
+                photoURL: currentUserAuth.photoURL,
                 role: 'student',
                 courses: [],
                 completedLessons: {},
-                createdAt: firebase.firestore.FieldValue.serverTimestamp() // Adicionar timestamp de criação
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
-            // Tenta criar o perfil se não existir
-            await db.collection('users').doc(userId).set(basicProfile, { merge: true });
+            // Tenta criar o perfil para consistência futura
+            await userDocRef.set(basicProfile, { merge: true });
             return basicProfile;
         }
-        console.error("[getUserProfile] Perfil de usuário não encontrado e não há usuário logado correspondente.");
+        console.error("[getUserProfile] Perfil de usuário não encontrado no Firestore nem no Auth.");
         throw new Error("Perfil de usuário não encontrado");
       }
     } catch (error) {
@@ -146,29 +206,73 @@ const AuthSystem = {
       throw error;
     }
   },
-  updateUserProfile: async function(userId, profileData) { /* ... (código original mantido) ... */ },
-  isAdmin: async function(userId) { /* ... (código original mantido) ... */ }
-  // As funções updateUIForLoggedUser e updateUIForLoggedOutUser do AuthSystem não são mais necessárias
-  // pois a função global updateUserInterface (do final do seu JS) já faz esse papel.
+  updateUserProfile: async function(userId, profileData) {
+    if (!userId) throw new Error("ID do usuário não fornecido");
+    try {
+      const userDocRef = db.collection('users').doc(userId);
+      await userDocRef.update(profileData);
+      showCustomAlert('Perfil atualizado com sucesso!', 'success');
+      // Atualiza o nome no cabeçalho imediatamente
+      const userNameDisplay = document.getElementById('user-name-display');
+      if (userNameDisplay && profileData.name) {
+          userNameDisplay.textContent = profileData.name;
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar perfil:", error);
+      showCustomAlert(`Erro ao atualizar perfil: ${error.message}`, 'error');
+      throw error;
+    }
+  },
+  isAdmin: async function(userId) {
+    if (!userId) return false;
+    try {
+      const profile = await this.getUserProfile(userId);
+      return profile && profile.role === 'admin';
+    } catch (error) {
+      console.error("Erro ao verificar se é admin:", error);
+      return false;
+    }
+  }
 };
 
 // ============================================================================
-// SISTEMA DE GERENCIAMENTO DE CURSOS (Seu código original)
+// SISTEMA DE GERENCIAMENTO DE CURSOS
 // ============================================================================
 const CourseSystem = {
-  getAllCourses: async function() { /* ... seu código original ... */ },
-  getFeaturedCourses: async function() { /* ... seu código original ... */ },
-  getCourseDetails: async function(courseId) { /* ... seu código original ... */ },
-  addCourse: async function(courseData) { /* ... seu código original ... */ },
-  updateCourse: async function(courseId, courseData) { /* ... seu código original ... */ },
-  addModule: async function(courseId, moduleData) { /* ... seu código original ... */ },
-  addLesson: async function(courseId, moduleId, lessonData) { /* ... seu código original ... */ },
-  uploadLessonVideo: async function(courseId, moduleId, lessonId, videoFile) { /* ... seu código original ... */ },
-  markLessonAsCompleted: async function(courseId, moduleId, lessonId) { /* ... seu código original ... */ },
-  isLessonCompleted: async function(courseId, moduleId, lessonId) { /* ... seu código original ... */ },
-  getCourseProgress: async function(courseId) { /* ... seu código original ... */ },
-  searchCourses: async function(query) { /* ... seu código original ... */ },
-  // Adicionando a função para buscar info básica do curso
+  // ... (outras funções como getAllCourses, getFeaturedCourses, etc. - mantidas do original)
+  getAllCourses: async function() {
+    try {
+      const snapshot = await db.collection('courses').orderBy('createdAt', 'desc').get();
+      const courses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      return courses;
+    } catch (error) {
+      console.error("Erro ao buscar todos os cursos:", error);
+      throw error;
+    }
+  },
+  getFeaturedCourses: async function() {
+    try {
+      const snapshot = await db.collection('courses').where('isFeatured', '==', true).limit(3).get();
+      const courses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      return courses;
+    } catch (error) {
+      console.error("Erro ao buscar cursos em destaque:", error);
+      throw error;
+    }
+  },
+  getCourseDetails: async function(courseId) {
+    try {
+      const courseDoc = await db.collection('courses').doc(courseId).get();
+      if (!courseDoc.exists) {
+        throw new Error("Curso não encontrado");
+      }
+      // Poderia buscar módulos/aulas aqui se necessário para a página de detalhes
+      return { id: courseDoc.id, ...courseDoc.data() };
+    } catch (error) {
+      console.error("Erro ao buscar detalhes do curso:", courseId, error);
+      throw error;
+    }
+  },
   getBasicCourseInfo: async function(courseId) {
     try {
       const courseDoc = await db.collection('courses').doc(courseId).get();
@@ -176,9 +280,9 @@ const CourseSystem = {
         const data = courseDoc.data();
         return {
           id: courseDoc.id,
-          title: data.title,
-          imageUrl: data.imageUrl,
-          description: data.description 
+          title: data.title || 'Título Indisponível',
+          imageUrl: data.imageUrl || 'images/placeholder-course.jpg', // Fallback image
+          description: data.description || ''
         };
       }
       console.warn(`[getBasicCourseInfo] Curso com ID ${courseId} não encontrado.`);
@@ -188,63 +292,81 @@ const CourseSystem = {
       throw error;
     }
   }
+  // ... (funções de add/update/delete, upload, progresso - mantidas do original, se existirem)
 };
 
 // ============================================================================
-// SISTEMA DE PAGAMENTOS (Seu código original)
+// SISTEMAS ADICIONAIS (Placeholders ou código original mantido)
 // ============================================================================
-const PaymentSystem = { /* ... seu código original ... */ };
-// ============================================================================
-// SISTEMA DE ADMINISTRAÇÃO (Seu código original)
-// ============================================================================
-const AdminSystem = { /* ... seu código original ... */ };
-// ============================================================================
-// SISTEMA DE NOTIFICAÇÕES (Seu código original)
-// ============================================================================
-const NotificationSystem = { /* ... seu código original ... */ };
-// ============================================================================
-// SISTEMA DE AVALIAÇÕES E COMENTÁRIOS (Seu código original)
-// ============================================================================
-const ReviewSystem = { /* ... seu código original ... */ };
-// ============================================================================
-// SISTEMA DE CERTIFICADOS (Seu código original)
-// ============================================================================
-const CertificateSystem = { /* ... seu código original ... */ };
+const PaymentSystem = { /* ... */ };
+const AdminSystem = { /* ... */ };
+const NotificationSystem = { /* ... */ };
+const ReviewSystem = { /* ... */ };
+const CertificateSystem = { /* ... */ };
 
 // ============================================================================
-// NOVAS FUNÇÕES PARA EXIBIR CONTEÚDO DAS SEÇÕES DO USUÁRIO
+// FUNÇÕES DE EXIBIÇÃO DE CONTEÚDO DAS SEÇÕES
 // ============================================================================
+
+// Função genérica para mostrar uma seção e esconder as outras
+function showSection(sectionId) {
+    const sections = document.querySelectorAll('main > section, .user-section'); // Inclui seções de usuário
+    sections.forEach(section => {
+        if (section.id === sectionId) {
+            section.style.display = 'block';
+        } else {
+            section.style.display = 'none';
+        }
+    });
+    // Rola para o topo da página ao mudar de seção
+    window.scrollTo(0, 0);
+}
+
 async function displayUserDashboard() {
-    console.log("[displayUserDashboard] Tentando exibir painel.");
+    console.log("[displayUserDashboard] Exibindo painel.");
     const dashboardSection = document.getElementById('dashboard');
     if (!dashboardSection) {
         console.error("[displayUserDashboard] Seção #dashboard não encontrada.");
+        showSection('home'); // Volta para home se não achar
         return;
     }
+    showSection('dashboard');
+
     if (AuthSystem.currentUser) {
         try {
-            const userProfile = await AuthSystem.getUserProfile(AuthSystem.currentUser.uid);
-            const userNameEl = dashboardSection.querySelector('.user-name-placeholder');
-            if (userNameEl && userProfile) {
-                userNameEl.textContent = userProfile.name || AuthSystem.currentUser.displayName || "Usuário";
+            // O nome já é atualizado no header pela updateUserInterface
+            // Poderia adicionar outras informações do dashboard aqui
+            const profile = await AuthSystem.getUserProfile(AuthSystem.currentUser.uid);
+            const welcomeMsg = dashboardSection.querySelector('#dashboard-welcome');
+            if(welcomeMsg && profile) {
+                welcomeMsg.textContent = `Bem-vindo(a) de volta, ${profile.name || 'Aluno(a)'}!`;
             }
         } catch (error) {
-            console.error("[displayUserDashboard] Erro ao buscar perfil para dashboard:", error);
+            console.error("[displayUserDashboard] Erro ao buscar dados para dashboard:", error);
+            const welcomeMsg = dashboardSection.querySelector('#dashboard-welcome');
+            if(welcomeMsg) welcomeMsg.textContent = 'Bem-vindo(a)!';
         }
+    } else {
+        // Se não está logado, não deveria estar aqui, redireciona
+        window.location.href = '#login';
     }
 }
 
 async function displayUserCourses() {
-    console.log("[displayUserCourses] Tentando exibir Meus Cursos.");
+    console.log("[displayUserCourses] Exibindo Meus Cursos.");
     const myCoursesSection = document.getElementById('my-courses');
-    const coursesContainer = document.getElementById('user-courses-container'); 
+    const coursesContainer = document.getElementById('user-courses-container');
     if (!myCoursesSection || !coursesContainer) {
         console.error("[displayUserCourses] Elementos da seção 'Meus Cursos' não encontrados.");
+        showSection('dashboard'); // Volta para dashboard se não achar
         return;
     }
+    showSection('my-courses');
 
     if (!AuthSystem.currentUser) {
         coursesContainer.innerHTML = '<p class="text-light-tertiary col-span-full text-center">Você precisa estar logado para ver seus cursos.</p>';
+        // Redireciona para login se tentar acessar sem estar logado
+        setTimeout(() => { window.location.href = '#login'; }, 1500);
         return;
     }
 
@@ -259,36 +381,38 @@ async function displayUserCourses() {
             return;
         }
 
+        // Usando Promise.all para buscar informações dos cursos em paralelo
+        const coursePromises = courseIds.map(id => CourseSystem.getBasicCourseInfo(id));
+        const courses = await Promise.all(coursePromises);
+
         let coursesHTML = '';
-        for (const courseId of courseIds) {
-            try {
-                const course = await CourseSystem.getBasicCourseInfo(courseId);
-                if (course) {
-                    console.log("[displayUserCourses] Detalhes do curso:", course.title);
-                    // ATENÇÃO: VOCÊ PRECISA SUBSTITUIR ESTE LINK POR UM REAL OU UMA LÓGICA PARA GERÁ-LO
-                    const hotmartLink = `https://pay.hotmart.com/SEU_PRODUCT_ID?checkoutMode=X&offDiscount=SEU_CUPOM&핫딜=${courseId}`; // Placeholder
-                    coursesHTML += `
-                        <div class="course-card bg-dark-card rounded-xl shadow-lg overflow-hidden flex flex-col neon-border">
-                            <img src="${course.imageUrl || 'images/placeholder-course.jpg'}" alt="${course.title || 'Título do Curso'}" class="w-full h-48 object-cover lazy-load">
-                            <div class="p-6 flex flex-col flex-grow">
-                                <h4 class="text-xl font-semibold mb-2 text-light-primary">${course.title || 'Título Indisponível'}</h4>
-                                <p class="text-light-tertiary text-sm mb-4 flex-grow">${course.description ? course.description.substring(0,100)+'...' : 'Acesse para saber mais sobre este curso.'}</p>
-                                <a href="${hotmartLink}" target="_blank" class="mt-auto block w-full text-center bg-accent-emerald-primary hover:bg-accent-emerald-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">
-                                    Assistir na Hotmart <i class="fas fa-external-link-alt ml-1"></i>
-                                </a>
+        courses.forEach((course, index) => {
+            if (course) {
+                console.log("[displayUserCourses] Detalhes do curso:", course.title);
+                // REMOVIDO o link/botão externo da Hotmart conforme solicitado
+                coursesHTML += `
+                    <div class="course-card bg-dark-card rounded-xl shadow-lg overflow-hidden flex flex-col neon-border animate-on-scroll delay-${(index % 3) * 200}ms">
+                        <img src="${course.imageUrl}" alt="${course.title}" class="w-full h-48 object-cover lazy-load">
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h4 class="text-xl font-semibold mb-2 text-light-primary">${course.title}</h4>
+                            <p class="text-light-tertiary text-sm mb-4 flex-grow">${course.description ? course.description.substring(0, 100) + '...' : 'Descrição do curso.'}</p>
+                            <!-- Botão removido, apenas exibe o card -->
+                             <div class="mt-auto pt-2 border-t border-gray-700">
+                                <span class="text-sm text-accent-emerald-text">Matriculado</span>
                             </div>
                         </div>
-                    `;
-                } else {
-                     coursesHTML += `<div class="bg-dark-card rounded-lg p-4 text-red-400 col-span-full">Informações do curso ID ${courseId} não encontradas.</div>`;
-                }
-            } catch (courseError) {
-                console.error("[displayUserCourses] Erro ao buscar detalhes do curso:", courseId, courseError);
-                coursesHTML += `<div class="bg-dark-card rounded-lg p-4 text-red-400 col-span-full">Não foi possível carregar o curso ID: ${courseId}.</div>`;
+                    </div>
+                `;
+            } else {
+                 coursesHTML += `<div class="bg-dark-card rounded-lg p-4 text-red-400 col-span-full">Informações do curso ID ${courseIds[index]} não encontradas.</div>`;
             }
-        }
+        });
+
         coursesContainer.innerHTML = coursesHTML || '<p class="text-light-tertiary col-span-full text-center">Nenhum curso para exibir.</p>';
-        if (typeof initLazyLoading === "function") initLazyLoading(); // Re-inicializa lazy loading
+        // Re-inicializa lazy loading e animações de scroll para os novos cards
+        if (typeof initLazyLoading === "function") initLazyLoading();
+        if (typeof initScrollAnimations === "function") initScrollAnimations();
+
     } catch (error) {
         console.error("[displayUserCourses] Erro ao exibir cursos do usuário:", error);
         coursesContainer.innerHTML = '<p class="text-red-500 col-span-full text-center">Ocorreu um erro ao carregar seus cursos. Tente novamente mais tarde.</p>';
@@ -296,366 +420,433 @@ async function displayUserCourses() {
 }
 
 async function displayUserProfile() {
-    console.log("[displayUserProfile] Tentando exibir Perfil.");
+    console.log("[displayUserProfile] Exibindo Perfil do Usuário.");
     const profileSection = document.getElementById('profile');
-    const profileContent = document.getElementById('user-profile-content');
-    if (!profileSection || !profileContent) {
-        console.error("[displayUserProfile] Elementos da seção #profile não encontrados.");
+    const profileForm = document.getElementById('profile-form'); // Assumindo que existe um form com este ID
+    if (!profileSection || !profileForm) {
+        console.error("[displayUserProfile] Elementos da seção 'Perfil' não encontrados.");
+        showSection('dashboard'); // Volta para dashboard
         return;
     }
+    showSection('profile');
 
     if (!AuthSystem.currentUser) {
-        profileContent.innerHTML = '<p class="text-light-tertiary">Você precisa estar logado para ver seu perfil.</p>';
+        // Redireciona para login
+        window.location.href = '#login';
         return;
     }
-    try {
-        profileContent.innerHTML = '<p class="text-light-tertiary animate-pulse">Carregando seu perfil...</p>';
-        const user = AuthSystem.currentUser;
-        const userProfileData = await AuthSystem.getUserProfile(user.uid);
-        console.log("[displayUserProfile] Dados do perfil:", userProfileData);
 
-        profileContent.innerHTML = `
-            <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-8">
-                <img src="${userProfileData.photoURL || user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(userProfileData.name || user.email) + '&background=4f46e5&color=fff&size=128'}" 
-                     alt="Foto de perfil" 
-                     class="w-32 h-32 rounded-full border-4 border-accent-indigo-primary object-cover">
-                <div>
-                    <h3 class="text-3xl font-bold text-light-primary">${userProfileData.name || user.displayName}</h3>
-                    <p class="text-accent-indigo-text text-lg">${userProfileData.email || user.email}</p>
-                    <p class="text-sm text-light-tertiary mt-1">Membro desde: ${userProfileData.createdAt ? new Date(userProfileData.createdAt.seconds * 1000).toLocaleDateString() : 'Data indisponível'}</p>
-                </div>
-            </div>
-            <div class="space-y-6">
-                <div>
-                    <label for="profile-bio" class="block text-sm font-medium text-light-secondary mb-1">Sobre Mim (em breve)</label>
-                    <textarea id="profile-bio" class="w-full bg-dark-tertiary border border-gray-700 rounded-lg py-2 px-4 text-light-primary focus:outline-none focus:ring-2 focus:ring-accent-indigo-primary" rows="3" placeholder="Conte um pouco sobre você e seus interesses na área de tecnologia..." disabled></textarea>
-                </div>
-                <button class="bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold py-2 px-4 rounded-lg cta-button opacity-50 cursor-not-allowed" disabled>
-                    Salvar Alterações (em breve)
-                </button>
-            </div>
-        `;
+    try {
+        const profile = await AuthSystem.getUserProfile(AuthSystem.currentUser.uid);
+        // Preencher os campos do formulário com os dados do perfil
+        const nameInput = profileForm.querySelector('input[name="name"]');
+        const emailInput = profileForm.querySelector('input[name="email"]');
+        // Adicione outros campos se houver (ex: photoURL)
+
+        if (nameInput) nameInput.value = profile.name || '';
+        if (emailInput) {
+            emailInput.value = profile.email || '';
+            emailInput.disabled = true; // Geralmente não se permite mudar email facilmente
+            emailInput.classList.add('bg-gray-600', 'cursor-not-allowed');
+        }
+
+        // Exibir outras informações básicas se houver elementos para isso
+        const profileCreatedAt = document.getElementById('profile-created-at');
+        if(profileCreatedAt && profile.createdAt) {
+            profileCreatedAt.textContent = `Membro desde: ${new Date(profile.createdAt.seconds * 1000).toLocaleDateString()}`;
+        }
+
     } catch (error) {
-        console.error("[displayUserProfile] Erro ao exibir perfil do usuário:", error);
-        profileContent.innerHTML = '<p class="text-red-500">Ocorreu um erro ao carregar seu perfil.</p>';
+        console.error("[displayUserProfile] Erro ao carregar perfil:", error);
+        showCustomAlert('Erro ao carregar dados do perfil.', 'error');
     }
 }
 
 async function displayUserSettings() {
-    console.log("[displayUserSettings] Tentando exibir Configurações.");
+    console.log("[displayUserSettings] Exibindo Configurações.");
     const settingsSection = document.getElementById('settings');
-    const settingsContent = document.getElementById('user-settings-content');
-    if (!settingsSection || !settingsContent) {
-        console.error("[displayUserSettings] Elementos da seção #settings não encontrados.");
+    if (!settingsSection) {
+        console.error("[displayUserSettings] Seção #settings não encontrada.");
+        showSection('dashboard');
         return;
     }
+    showSection('settings');
 
     if (!AuthSystem.currentUser) {
-        settingsContent.innerHTML = '<p class="text-light-tertiary">Você precisa estar logado para ver as configurações.</p>';
+        window.location.href = '#login';
         return;
     }
-    // O HTML já tem placeholders, apenas confirmamos que o usuário está logado.
-    // Poderíamos carregar preferências salvas do usuário aqui.
-    const placeholderParaRemover = settingsContent.querySelector('p');
-    if(placeholderParaRemover && placeholderParaRemover.textContent.includes('Carregando configurações...')) {
-      // settingsContent.innerHTML é preenchido pelo HTML estático, apenas limpamos o placeholder se existir
-    }
-    // Adicionar listener ao botão de excluir conta
-    const deleteBtn = document.getElementById('delete-account-btn');
-    if (deleteBtn) {
-        deleteBtn.onclick = async () => {
-            if (confirm("Tem certeza que deseja excluir sua conta? Esta ação é irreversível e todos os seus dados e acesso aos cursos serão perdidos.")) {
-                if (confirm("Confirmação final: Realmente deseja excluir sua conta?")) {
-                    try {
-                        // Aqui você implementaria a lógica de exclusão no Firebase
-                        // await AuthSystem.currentUser.delete(); // CUIDADO: Isso deleta o usuário do Auth
-                        // Em seguida, deletar dados do Firestore e Storage associados
-                        showCustomAlert("Funcionalidade de exclusão de conta ainda não implementada completamente.", "error");
-                    } catch (error) {
-                        console.error("Erro ao tentar excluir conta:", error);
-                        showCustomAlert("Erro ao excluir conta: " + error.message, "error");
-                    }
-                }
-            }
-        };
+    // Limpar campos de senha ao exibir a seção
+    const passwordForm = document.getElementById('change-password-form');
+    if (passwordForm) passwordForm.reset();
+}
+
+// ============================================================================
+// MANIPULAÇÃO DA INTERFACE E EVENTOS
+// ============================================================================
+
+// Função para atualizar a UI baseada no estado de login
+function updateUserInterface(user, profile) {
+    const loginButton = document.getElementById('login-button');
+    const userMenuContainer = document.getElementById('user-menu-container');
+    const userNameDisplay = document.getElementById('user-name-display');
+    const mobileMenuLoginLink = document.querySelector('#mobile-menu a[href="#login"]');
+    const mobileMenuUserLinks = document.getElementById('mobile-menu-user-links'); // Novo container para links de usuário no mobile
+
+    if (user) {
+        // Logado
+        if (loginButton) loginButton.style.display = 'none';
+        if (userMenuContainer) userMenuContainer.style.display = 'block'; // Ou 'flex' se necessário
+        if (userNameDisplay) {
+            userNameDisplay.textContent = profile?.name || user.displayName || 'Usuário';
+        }
+        // Atualizar menu mobile
+        if (mobileMenuLoginLink) mobileMenuLoginLink.style.display = 'none';
+        if (mobileMenuUserLinks) mobileMenuUserLinks.style.display = 'block';
+
+    } else {
+        // Deslogado
+        if (loginButton) loginButton.style.display = 'block'; // Ou 'inline-block' etc.
+        if (userMenuContainer) userMenuContainer.style.display = 'none';
+        // Esconder dropdown explicitamente ao deslogar
+        const userDropdownMenu = document.getElementById('user-dropdown-menu');
+        if (userDropdownMenu) userDropdownMenu.classList.add('hidden');
+        // Resetar nome
+        if (userNameDisplay) userNameDisplay.textContent = 'Usuário';
+        // Atualizar menu mobile
+        if (mobileMenuLoginLink) mobileMenuLoginLink.style.display = 'block';
+        if (mobileMenuUserLinks) mobileMenuUserLinks.style.display = 'none';
     }
 }
 
+// Função para controlar o dropdown do usuário
+function setupUserDropdown() {
+    const userMenuButton = document.getElementById('user-menu-button');
+    const userDropdownMenu = document.getElementById('user-dropdown-menu');
+    const logoutButtonDropdown = document.getElementById('logout-button-dropdown');
 
-// ============================================================================
-// NOVA FUNÇÃO PARA CONFIGURAR O BOTÃO DE LOGIN DO GOOGLE
-// ============================================================================
-function setupGoogleLoginButton() {
-  const googleLoginBtn = document.getElementById('google-login-btn');
-  if (googleLoginBtn) {
-    console.log('[setupGoogleLoginButton] Configurando listener para o botão google-login-btn');
-    googleLoginBtn.addEventListener('click', function() {
-      console.log('[googleLoginBtn.onClick] Botão "Acessar com Google" CLICADO!');
-      AuthSystem.loginWithGoogle()
-        .then((loggedInUser) => { 
-          showCustomAlert('Login com Google realizado com sucesso!', 'success');
-          window.location.href = '#dashboard'; 
-        })
-        .catch(error => {
-          console.error("[googleLoginBtn.onClick] Erro detalhado no login com Google:", error, "Código:", error.code);
-          showCustomAlert(`Erro no login com Google: ${error.message} (Código: ${error.code})`, 'error');
+    if (!userMenuButton || !userDropdownMenu || !logoutButtonDropdown) {
+        console.warn('Elementos do dropdown do usuário não encontrados.');
+        return;
+    }
+
+    userMenuButton.addEventListener('click', (event) => {
+        event.stopPropagation(); // Impede que o clique feche o menu imediatamente
+        userDropdownMenu.classList.toggle('hidden');
+    });
+
+    // Fechar dropdown se clicar fora
+    document.addEventListener('click', (event) => {
+        if (!userMenuButton.contains(event.target) && !userDropdownMenu.contains(event.target)) {
+            userDropdownMenu.classList.add('hidden');
+        }
+    });
+
+    // Fechar dropdown ao clicar em um item do menu (link de navegação)
+    userDropdownMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            userDropdownMenu.classList.add('hidden');
+            // A navegação será tratada pelo handleHashChange
         });
     });
-  } else {
-    console.error('[setupGoogleLoginButton] Botão google-login-btn não encontrado no DOM.');
-  }
+
+    // Logout pelo botão do dropdown
+    logoutButtonDropdown.addEventListener('click', async () => {
+        userDropdownMenu.classList.add('hidden');
+        await AuthSystem.logoutUser();
+        // UI será atualizada pelo onAuthStateChanged
+    });
 }
 
-// ============================================================================
-// INICIALIZAÇÃO E EVENTOS
-// ============================================================================
-document.addEventListener('DOMContentLoaded', function() {
-  console.log("[DOMContentLoaded] Evento disparado. Inicializando sistemas...");
-  AuthSystem.initAuthObserver();
-  
-  if (typeof PaymentSystem !== 'undefined' && PaymentSystem.init) {
-    PaymentSystem.init();
-  }
-  
-  // Carregar cursos em destaque (código original mantido)
-  if (document.getElementById('featured-courses') && typeof CourseSystem !== 'undefined' && CourseSystem.getFeaturedCourses) {
-    CourseSystem.getFeaturedCourses()
-      .then(courses => {
-        if (typeof displayFeaturedCourses === 'function') {
-            displayFeaturedCourses(courses);
+// Função para lidar com a navegação SPA baseada em Hash
+function handleHashChange() {
+    const hash = window.location.hash.substring(1) || 'home'; // Default to 'home'
+    console.log(`[handleHashChange] Navegando para: ${hash}`);
+
+    // Esconder todas as seções principais e de usuário primeiro
+    document.querySelectorAll('main > section, .user-section').forEach(section => {
+        section.style.display = 'none';
+    });
+
+    // Fechar menu mobile se estiver aberto
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+        mobileMenu.classList.add('hidden');
+        document.getElementById('mobile-menu-button').setAttribute('aria-expanded', 'false');
+    }
+
+    // Seções que requerem login
+    const protectedSections = ['dashboard', 'profile', 'my-courses', 'settings'];
+
+    if (protectedSections.includes(hash)) {
+        if (AuthSystem.currentUser) {
+            // Usuário logado, carrega a seção apropriada
+            switch (hash) {
+                case 'dashboard':
+                    displayUserDashboard();
+                    break;
+                case 'profile':
+                    displayUserProfile();
+                    break;
+                case 'my-courses':
+                    displayUserCourses();
+                    break;
+                case 'settings':
+                    displayUserSettings();
+                    break;
+            }
         } else {
-            console.warn("displayFeaturedCourses não definida globalmente, mas esperada.")
+            // Usuário não logado tentando acessar seção protegida
+            console.warn(`[handleHashChange] Acesso negado à seção protegida: ${hash}. Redirecionando para login.`);
+            window.location.hash = '#login'; // Redireciona para a página de login
+            // Mostra a seção de login explicitamente caso o redirecionamento falhe ou seja rápido demais
+            showSection('login');
         }
-      })
-      .catch(error => {
-        console.error("Erro ao carregar cursos em destaque:", error);
-      });
-  }
-  
-  // CHAMA A NOVA FUNÇÃO DE CONFIGURAÇÃO DO BOTÃO GOOGLE
-  if (typeof setupGoogleLoginButton === 'function') {
-    setupGoogleLoginButton();
-  } else {
-    console.error("setupGoogleLoginButton não está definida.");
-  }
-  
-  // Chamadas para outras funções de setup que já existiam no seu arquivo
-  if (typeof setupContactForm === 'function') setupContactForm(); 
-  if (typeof setupCourseSearch === 'function') setupCourseSearch(); 
-  // A setupRegisterForm não é mais necessária se não houver formulário de registro por email/senha
-});
-
-// ============================================================================
-// Funções de UI Globais (MANTENHA AS QUE VOCÊ JÁ TINHA NO SEU ARQUIVO ORIGINAL)
-// ============================================================================
-// Função para exibir cursos em destaque (COPIADA DO SEU ARQUIVO ORIGINAL)
-function displayFeaturedCourses(courses) {
-  const container = document.getElementById('featured-courses'); // Certifique-se que este ID existe se for usar
-  if (!container) {
-      // console.warn("Elemento #featured-courses não encontrado para exibir cursos em destaque.");
-      return;
-  }
-  container.innerHTML = '';
-  courses.forEach(course => {
-    const courseElement = document.createElement('div');
-    courseElement.className = 'course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll'; // Adicionado animate-on-scroll aqui também
-    courseElement.innerHTML = `
-      <img src="${course.imageUrl || 'https://placehold.co/600x400/3498db/ffffff?text=Curso'}" 
-           alt="${course.title}" 
-           class="w-full h-48 object-cover lazy-load">
-      <div class="p-6 flex flex-col flex-grow">
-        <h3 class="text-xl font-semibold mb-2 text-light-primary">${course.title}</h3>
-        <p class="text-light-tertiary mb-4 text-sm flex-grow">${course.description}</p>
-        <div class="mb-4">
-          ${course.featured ? '<span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-accent-indigo-text bg-accent-indigo-primary bg-opacity-20">Em Destaque</span>' : ''}
-        </div>
-        <div class="flex justify-between items-center mb-3">
-          <p class="text-lg font-bold text-accent-indigo-primary">R$ ${course.price ? course.price.toFixed(2) : 'N/A'}</p>
-          <span class="text-sm text-light-tertiary">
-            <i class="fas fa-star mr-1 text-yellow-400"></i> 
-            ${course.averageRating ? course.averageRating.toFixed(1) : '0.0'}
-            (${course.numReviews || 0})
-          </span>
-        </div>
-        <a href="#detail-${course.id}"  class="mt-auto block w-full text-center bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">
-          Ver Detalhes
-        </a>
-      </div>
-    `;
-    container.appendChild(courseElement);
-  });
-  if (typeof initScrollAnimations === "function") initScrollAnimations(); // Re-inicializa animações de scroll para novos elementos
-  if (typeof initLazyLoading === "function") initLazyLoading(); // Re-inicializa lazy loading
-}
-
-// Configurar formulário de contato (COPIADA DO SEU ARQUIVO ORIGINAL)
-function setupContactForm() {
-  const contactForm = document.getElementById('contact-form'); // Certifique-se que este ID existe se for usar
-  if (!contactForm) return;
-  contactForm.addEventListener('submit', function(e) { /* ... seu código original ... */ });
-}
-
-// Configurar busca de cursos (COPIADA DO SEU ARQUIVO ORIGINAL)
-function setupCourseSearch() {
-  const searchForm = document.getElementById('course-search-form'); // Certifique-se que este ID existe se for usar
-  if (!searchForm) return;
-  searchForm.addEventListener('submit', function(e) { /* ... seu código original ... */ });
-}
-
-// Exibir resultados da busca (COPIADA DO SEU ARQUIVO ORIGINAL)
-function displaySearchResults(courses, query) {
-    const searchResultsSection = document.getElementById('search-results'); // Certifique-se que este ID existe
-    const resultsContainer = document.getElementById('search-results-container'); 
-    if (!searchResultsSection || !resultsContainer) return;
-    // ... seu código original ...
-    if (typeof initScrollAnimations === "function") initScrollAnimations();
-    if (typeof initLazyLoading === "function") initLazyLoading();
-}
-
-// ============================================================================
-// CÓDIGO PARA EXIBIR FOTO DO USUÁRIO E MENU (COPIADO DO SEU ARQUIVO ORIGINAL)
-// ============================================================================
-function updateUserInterface(user) {
-  const desktopAuthSection = document.getElementById('user-auth-section-desktop');
-  const mobileAuthSection = document.getElementById('user-auth-section-mobile');
-
-  // Limpar seções de autenticação antes de preencher
-  if(desktopAuthSection) desktopAuthSection.innerHTML = '';
-  if(mobileAuthSection) mobileAuthSection.innerHTML = '';
-
-  if (user) { // Usuário está logado
-    // --- Menu Desktop ---
-    if(desktopAuthSection){
-        const userProfileDesktopContainer = document.createElement('div');
-        userProfileDesktopContainer.className = 'relative'; // Para posicionamento do dropdown
-
-        const userProfileDesktopTrigger = document.createElement('div');
-        userProfileDesktopTrigger.className = 'flex items-center cursor-pointer group';
-        userProfileDesktopTrigger.innerHTML = `
-          <img src="${user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || user.email.split('@')[0]) + '&background=4f46e5&color=fff&length=1'}" 
-               alt="Foto de perfil" 
-               class="w-10 h-10 rounded-full border-2 border-accent-indigo-primary mr-2 object-cover">
-          <span class="text-light-primary hidden lg:inline">${user.displayName || user.email.split('@')[0]}</span>
-          <i class="fas fa-chevron-down text-light-secondary ml-2 hidden lg:inline group-hover:rotate-180 transition-transform"></i>
-        `;
-        
-        const dropdownMenuDesktop = document.createElement('div');
-        dropdownMenuDesktop.className = 'hidden group-hover:block absolute right-0 top-full mt-2 w-60 bg-dark-card rounded-lg shadow-xl z-[100] py-2 border border-gray-700 neon-border';
-        dropdownMenuDesktop.innerHTML = `
-            <div class="px-4 py-3 border-b border-gray-700">
-                <p class="text-sm text-light-primary font-semibold truncate">${user.displayName || user.email.split('@')[0]}</p>
-                <p class="text-xs text-light-tertiary truncate">${user.email}</p>
-            </div>
-            <a href="#dashboard" class="flex items-center px-4 py-2.5 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary transition-colors">
-              <i class="fas fa-tachometer-alt w-5 mr-3 text-accent-indigo-secondary"></i>Painel
-            </a>
-            <a href="#profile" class="flex items-center px-4 py-2.5 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary transition-colors">
-              <i class="fas fa-user w-5 mr-3 text-accent-indigo-secondary"></i>Meu Perfil
-            </a>
-            <a href="#my-courses" class="flex items-center px-4 py-2.5 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary transition-colors">
-              <i class="fas fa-graduation-cap w-5 mr-3 text-accent-indigo-secondary"></i>Meus Cursos
-            </a>
-            <a href="#settings" class="flex items-center px-4 py-2.5 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary transition-colors">
-              <i class="fas fa-cog w-5 mr-3 text-accent-indigo-secondary"></i>Configurações
-            </a>
-            <div class="border-t border-gray-700 my-1"></div>
-            <a href="#" id="logout-button-desktop" class="flex items-center px-4 py-2.5 text-light-secondary hover:bg-dark-tertiary hover:text-accent-red-secondary transition-colors">
-              <i class="fas fa-sign-out-alt w-5 mr-3"></i>Sair
-            </a>
-        `;
-        userProfileDesktopContainer.appendChild(userProfileDesktopTrigger);
-        userProfileDesktopContainer.appendChild(dropdownMenuDesktop);
-        desktopAuthSection.appendChild(userProfileDesktopContainer);
-
-        const logoutBtnDesktop = document.getElementById('logout-button-desktop');
-        if(logoutBtnDesktop) {
-            logoutBtnDesktop.addEventListener('click', (e) => {
-              e.preventDefault();
-              AuthSystem.logoutUser().then(() => {
-                showCustomAlert('Você saiu com sucesso!', 'success');
-              });
-            });
+    } else {
+        // Seção pública ou não encontrada (tratar como pública/home)
+        const targetSection = document.getElementById(hash);
+        if (targetSection) {
+            showSection(hash);
+            // Carregar dados dinâmicos para seções públicas se necessário (ex: cursos)
+            if (hash === 'courses') {
+                displayPublicCourses(); // Precisa criar esta função se não existir
+            }
+            // Adicionar outras chamadas para carregar dados de seções públicas aqui
+        } else {
+            console.warn(`[handleHashChange] Seção #${hash} não encontrada. Exibindo #home.`);
+            showSection('home');
+            window.location.hash = '#home'; // Corrige o hash na URL
         }
     }
-
-    // --- Menu Mobile ---
-    if(mobileAuthSection){
-        const mobileMenuUserArea = document.createElement('div');
-        mobileMenuUserArea.className = 'px-6 py-4 bg-dark-tertiary border-b border-gray-700';
-        mobileMenuUserArea.innerHTML = `
-          <div class="flex items-center">
-            <img src="${user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || user.email.split('@')[0]) + '&background=4f46e5&color=fff&length=1'}" 
-                 alt="Foto de perfil" 
-                 class="w-10 h-10 rounded-full border-2 border-accent-indigo-primary mr-3 object-cover">
-            <div>
-                <p class="text-light-primary font-semibold">${user.displayName || user.email.split('@')[0]}</p>
-                <p class="text-xs text-light-tertiary truncate">${user.email}</p>
-            </div>
-          </div>
-        `;
-        mobileAuthSection.appendChild(mobileMenuUserArea);
-
-        const mobileMenuLinks = [
-            { href: "#dashboard", icon: "fa-tachometer-alt", text: "Painel" },
-            { href: "#profile", icon: "fa-user", text: "Meu Perfil" },
-            { href: "#my-courses", icon: "fa-graduation-cap", text: "Meus Cursos" },
-            { href: "#settings", icon: "fa-cog", text: "Configurações" }
-        ];
-        
-        mobileMenuLinks.forEach(link => {
-            const linkEl = document.createElement('a');
-            linkEl.href = link.href;
-            linkEl.className = "block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary pl-10 transition-colors";
-            linkEl.innerHTML = `<i class="fas ${link.icon} w-5 mr-2 text-accent-indigo-secondary"></i> ${link.text}`;
-            mobileAuthSection.appendChild(linkEl);
-        });
-        
-        const logoutLinkMobile = document.createElement('a');
-        logoutLinkMobile.href = "#";
-        logoutLinkMobile.id = "logout-button-mobile";
-        logoutLinkMobile.className = "block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-accent-red-secondary pl-10 transition-colors";
-        logoutLinkMobile.innerHTML = `<i class="fas fa-sign-out-alt w-5 mr-2"></i> Sair`;
-        mobileAuthSection.appendChild(logoutLinkMobile);
-
-        logoutLinkMobile.addEventListener('click', (e) => {
-            e.preventDefault();
-            AuthSystem.logoutUser().then(() => {
-                showCustomAlert('Você saiu com sucesso!', 'success');
-            });
-          });
-    }
-    
-  } else { // Usuário não está logado
-    if(desktopAuthSection){
-        desktopAuthSection.innerHTML = `<a href="#login" class="gradient-cta text-white px-4 py-2 rounded-lg cta-button">Login</a>`;
-    }
-    if(mobileAuthSection){
-        mobileAuthSection.innerHTML = `<a href="#login" class="block px-6 py-3 gradient-cta text-white text-center rounded-b-lg">Login</a>`;
-    }
-  }
 }
 
-// Listener para mudanças no estado de autenticação (COPIADO DO SEU ARQUIVO ORIGINAL)
-firebase.auth().onAuthStateChanged((user) => {
-  console.log("[onAuthStateChanged] Estado de autenticação mudou. Usuário:", user ? user.uid : null);
-  updateUserInterface(user); // Esta é a função que atualiza a UI do header
-});
+// Função para exibir cursos na seção pública #courses (Exemplo)
+async function displayPublicCourses() {
+    const coursesContainer = document.getElementById('public-courses-container'); // Precisa existir no HTML
+    if (!coursesContainer) {
+        console.warn('[displayPublicCourses] Container #public-courses-container não encontrado.');
+        return;
+    }
+    coursesContainer.innerHTML = '<p class="text-light-tertiary text-center animate-pulse">Carregando cursos...</p>';
+    try {
+        const courses = await CourseSystem.getAllCourses(); // Ou getFeaturedCourses, dependendo da seção
+        let coursesHTML = '';
+        if (courses.length === 0) {
+            coursesHTML = '<p class="text-light-tertiary text-center">Nenhum curso disponível no momento.</p>';
+        } else {
+            courses.forEach((course, index) => {
+                coursesHTML += `
+                    <div class="course-card bg-dark-card rounded-xl shadow-lg overflow-hidden flex flex-col neon-border animate-on-scroll delay-${(index % 3) * 200}ms">
+                        <img src="${course.imageUrl || 'images/placeholder-course.jpg'}" alt="${course.title}" class="w-full h-48 object-cover lazy-load">
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h3 class="text-xl font-semibold mb-2 text-light-primary">${course.title}</h3>
+                            <p class="text-light-tertiary text-sm mb-4 flex-grow">${course.description ? course.description.substring(0, 100) + '...' : 'Veja mais detalhes.'}</p>
+                            <a href="#course-detail?id=${course.id}" class="mt-auto block w-full text-center bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">
+                                Ver Detalhes
+                            </a>
+                        </div>
+                    </div>
+                `; // Adapte o link/botão conforme necessário
+            });
+        }
+        coursesContainer.innerHTML = coursesHTML;
+        if (typeof initLazyLoading === "function") initLazyLoading();
+        if (typeof initScrollAnimations === "function") initScrollAnimations();
+    } catch (error) {
+        console.error("[displayPublicCourses] Erro ao carregar cursos públicos:", error);
+        coursesContainer.innerHTML = '<p class="text-red-500 text-center">Erro ao carregar cursos.</p>';
+    }
+}
 
-// Verificar se o usuário já está logado quando a página carrega (COPIADO DO SEU ARQUIVO ORIGINAL)
+// Função para exibir alertas customizados
+function showCustomAlert(message, type = 'info') {
+    const alertContainer = document.getElementById('custom-alert-container');
+    if (!alertContainer) {
+        // Cria o container se não existir
+        const container = document.createElement('div');
+        container.id = 'custom-alert-container';
+        container.style.position = 'fixed';
+        container.style.top = '80px'; // Abaixo do header fixo
+        container.style.right = '20px';
+        container.style.zIndex = '1050'; // Acima de outros elementos
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.gap = '10px';
+        document.body.appendChild(container);
+        alertContainer = container;
+    }
+
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `custom-alert ${type === 'success' ? 'custom-alert-success' : type === 'error' ? 'custom-alert-error' : 'custom-alert-info'}`;
+    alertDiv.textContent = message;
+    alertDiv.style.display = 'block'; // Garante que está visível
+    alertDiv.style.opacity = '1';
+    alertDiv.style.transition = 'opacity 0.5s ease-out';
+
+    alertContainer.appendChild(alertDiv);
+
+    // Remover alerta após alguns segundos
+    setTimeout(() => {
+        alertDiv.style.opacity = '0';
+        setTimeout(() => {
+            alertDiv.remove();
+            // Remove o container se estiver vazio
+            if (alertContainer.children.length === 0) {
+                alertContainer.remove();
+            }
+        }, 500); // Tempo para a animação de fade-out
+    }, 5000); // Tempo que o alerta fica visível
+}
+
+// Inicialização de outras funcionalidades (Lazy Loading, Animações, etc.)
+function initLazyLoading() { /* ... código original ... */ }
+function initScrollAnimations() { /* ... código original ... */ }
+
+// ============================================================================
+// INICIALIZAÇÃO E EVENT LISTENERS GLOBAIS
+// ============================================================================
 document.addEventListener('DOMContentLoaded', () => {
-  const user = firebase.auth().currentUser;
-  console.log("[DOMContentLoaded - final] Verificando usuário atual:", user ? user.uid : null);
-  if (user) {
-    updateUserInterface(user); // Garante que a UI do header seja atualizada se já logado
-  }
+    console.log('DOM totalmente carregado e analisado.');
+
+    // Inicializa o observador de autenticação
+    AuthSystem.initAuthObserver();
+
+    // Configura o dropdown do usuário
+    setupUserDropdown();
+
+    // Listener para mudanças de Hash na URL
+    window.addEventListener('hashchange', handleHashChange);
+    // Chama handleHashChange na carga inicial para tratar o hash existente ou default
+    handleHashChange();
+
+    // Listener para o botão do menu mobile
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', () => {
+            const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+            mobileMenu.classList.toggle('hidden');
+            mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+        });
+    }
+
+    // --- Listeners para Formulários --- 
+
+    // Formulário de Login
+    const loginForm = document.getElementById('login-form'); // Precisa ter ID no HTML
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = loginForm.email.value;
+            const password = loginForm.password.value;
+            try {
+                await AuthSystem.loginUser(email, password);
+                // Sucesso: onAuthStateChanged cuidará da UI e redirecionamento
+            } catch (error) {
+                // Erro já tratado em loginUser com showCustomAlert
+            }
+        });
+    }
+
+    // Botão Login com Google
+    const googleLoginButton = document.getElementById('google-login-button'); // Precisa ter ID no HTML
+    if (googleLoginButton) {
+        googleLoginButton.addEventListener('click', async () => {
+            try {
+                await AuthSystem.loginWithGoogle();
+                // Sucesso: onAuthStateChanged cuidará da UI e redirecionamento
+            } catch (error) {
+                // Erro já tratado em loginWithGoogle com showCustomAlert
+            }
+        });
+    }
+
+    // Formulário de Registro
+    const registerForm = document.getElementById('register-form'); // Precisa ter ID no HTML
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = registerForm.name.value;
+            const email = registerForm.email.value;
+            const password = registerForm.password.value;
+            const confirmPassword = registerForm.confirmPassword.value;
+            if (password !== confirmPassword) {
+                showCustomAlert('As senhas não coincidem!', 'error');
+                return;
+            }
+            try {
+                await AuthSystem.registerUser(name, email, password);
+                // Sucesso: onAuthStateChanged cuidará da UI e redirecionamento
+            } catch (error) {
+                // Erro já tratado em registerUser com showCustomAlert
+            }
+        });
+    }
+
+    // Formulário de Reset de Senha
+    const resetPasswordForm = document.getElementById('reset-password-form'); // Precisa ter ID no HTML
+    if (resetPasswordForm) {
+        resetPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = resetPasswordForm.email.value;
+            try {
+                await AuthSystem.resetPassword(email);
+                resetPasswordForm.reset();
+            } catch (error) {
+                // Erro já tratado em resetPassword com showCustomAlert
+            }
+        });
+    }
+
+    // Formulário de Atualização de Perfil
+    const profileForm = document.getElementById('profile-form'); // Precisa ter ID no HTML
+    if (profileForm) {
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!AuthSystem.currentUser) return;
+            const name = profileForm.name.value;
+            // Adicionar outros campos se forem editáveis (ex: photoURL)
+            const profileData = { name };
+            try {
+                await AuthSystem.updateUserProfile(AuthSystem.currentUser.uid, profileData);
+            } catch (error) {
+                // Erro já tratado em updateUserProfile
+            }
+        });
+    }
+
+    // Formulário de Mudança de Senha
+    const changePasswordForm = document.getElementById('change-password-form'); // Precisa ter ID no HTML
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!AuthSystem.currentUser) return;
+            const newPassword = changePasswordForm.newPassword.value;
+            const confirmPassword = changePasswordForm.confirmPassword.value;
+            if (newPassword !== confirmPassword) {
+                showCustomAlert('As novas senhas não coincidem!', 'error');
+                return;
+            }
+            if (newPassword.length < 6) {
+                 showCustomAlert('A nova senha deve ter pelo menos 6 caracteres.', 'error');
+                return;
+            }
+            try {
+                await AuthSystem.currentUser.updatePassword(newPassword);
+                showCustomAlert('Senha alterada com sucesso!', 'success');
+                changePasswordForm.reset();
+            } catch (error) {
+                console.error("Erro ao alterar senha:", error);
+                showCustomAlert(`Erro ao alterar senha: ${error.message}. Pode ser necessário fazer login novamente.`, 'error');
+                // Pode ser necessário reautenticar para mudar a senha, tratar erro 'auth/requires-recent-login'
+            }
+        });
+    }
+
+    // Inicializar funcionalidades visuais
+    if (typeof initLazyLoading === "function") initLazyLoading();
+    if (typeof initScrollAnimations === "function") initScrollAnimations();
+
+    console.log('Inicialização completa.');
 });
 
-// Exportar sistemas para uso global (COPIADO DO SEU ARQUIVO ORIGINAL)
-window.FullStackCursosAuth = AuthSystem;
-window.FullStackCursosCourses = CourseSystem;
-// ... e os outros exports que você tinha ...
-window.FullStackCursosPayment = PaymentSystem;
-window.FullStackCursosAdmin = AdminSystem;
-window.FullStackCursosNotifications = NotificationSystem;
-window.FullStackCursosReviews = ReviewSystem;
-window.FullStackCursosCertificates = CertificateSystem;

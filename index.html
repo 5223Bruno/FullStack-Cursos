@@ -12,6 +12,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -115,26 +121,39 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .custom-alert {
+        /* Container para alertas */
+        #custom-alert-container {
             position: fixed;
-            top: 20px;
+            top: 80px; /* Abaixo do header fixo */
             right: 20px;
-            z-index: 1000;
-            padding: 16px;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            display: none;
+            z-index: 1050;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .custom-alert {
+            padding: 1rem; /* p-4 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 0.5s ease-out;
+            max-width: 350px;
         }
         .custom-alert-success {
-            background-color: rgba(16, 185, 129, 0.8);
+            background-color: rgba(16, 185, 129, 0.85); /* emerald-500 com opacidade */
             color: white;
             border: 1px solid rgba(16, 185, 129, 0.3);
         }
         .custom-alert-error {
-            background-color: rgba(239, 68, 68, 0.8);
+            background-color: rgba(239, 68, 68, 0.85); /* red-500 com opacidade */
             color: white;
             border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .custom-alert-info {
+            background-color: rgba(59, 130, 246, 0.85); /* blue-500 com opacidade */
+            color: white;
+            border: 1px solid rgba(59, 130, 246, 0.3);
         }
         .glow-icon {
             filter: drop-shadow(0 0 5px currentColor);
@@ -223,10 +242,10 @@
             content: '';
             position: absolute;
             width: 0;
-            height: 1.5px; 
-            bottom: -4px; 
+            height: 1.5px;
+            bottom: -4px;
             left: 50%;
-            transform: translateX(-50%); 
+            transform: translateX(-50%);
             background-color: #a78bfa; /* accent.purple.secondary */
             transition: width 0.35s ease-in-out;
         }
@@ -246,6 +265,9 @@
     </style>
 </head>
 <body class="bg-dark-primary text-light-primary">
+
+    <!-- Container para Alertas -->
+    <div id="custom-alert-container"></div>
 
     <header class="bg-dark-secondary shadow-lg sticky top-0 z-50 border-b border-gray-700">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -300,8 +322,8 @@
                 WhatsApp
             </a>
             <!-- Mobile User Links (Hidden by default) -->
-            <div id="mobile-menu-user-links" class="hidden">
-                <a href="#dashboard" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">Dashboard</a>
+            <div id="mobile-menu-user-links" class="hidden border-t border-gray-600 pt-2 mt-2">
+                <a href="#dashboard" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">Meu Painel</a>
                 <a href="#profile" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">Meu Perfil</a>
                 <a href="#my-courses" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">Meus Cursos</a>
                 <a href="#settings" class="block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary">Configurações</a>
@@ -313,7 +335,126 @@
     </header>
 
     <main>
-        <section id="team" class="py-16 bg-dark-primary">
+        <!-- Seções Públicas -->
+        <section id="home" class="hero-bg text-white py-20 md:py-32 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDIwIDAgTCAwIDAgTCAwIDIwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIiAvPjwvc3ZnPg==');"></div>
+            <div class="container mx-auto px-6 text-center relative z-10">
+                <h1 class="typewriter-text text-4xl md:text-6xl font-bold mb-6 leading-tight animate-on-scroll">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-light-primary via-accent-indigo-text to-accent-purple-text">Decole Sua Carreira Tech!</span>
+                </h1>
+                <p class="text-lg md:text-xl mb-10 max-w-2xl mx-auto text-light-secondary animate-on-scroll">Aprenda as habilidades do futuro com cursos práticos e instrutores especialistas. Seu futuro na tecnologia começa agora!</p>
+                <a href="#courses" class="gradient-cta text-white font-semibold py-3 px-8 rounded-lg text-lg cta-button shadow-lg animate-on-scroll">Ver Cursos</a>
+            </div>
+        </section>
+
+        <section id="courses" class="py-16 bg-dark-secondary">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Nossos Cursos Mais Populares</h2>
+                <!-- Container para cursos públicos -->
+                <div id="public-courses-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Cursos serão carregados aqui pelo JS -->
+                    <p class="text-light-tertiary col-span-full text-center animate-pulse">Carregando cursos...</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="benefits" class="py-16 bg-dark-primary">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Por que escolher a FullStack Cursos?</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="benefit-card p-6 rounded-lg text-center animate-on-scroll delay-200ms">
+                        <i class="fas fa-chalkboard-teacher fa-3x mb-4 text-accent-indigo-primary glow-icon icon-subtle-pulse"></i>
+                        <h3 class="text-xl font-semibold mb-2 text-light-primary">Instrutores Especialistas</h3>
+                        <p class="text-light-tertiary">Aprenda com profissionais experientes e atuantes no mercado.</p>
+                    </div>
+                    <div class="benefit-card p-6 rounded-lg text-center animate-on-scroll delay-400ms">
+                        <i class="fas fa-laptop-code fa-3x mb-4 text-accent-emerald-primary glow-icon icon-subtle-pulse"></i>
+                        <h3 class="text-xl font-semibold mb-2 text-light-primary">Conteúdo Prático</h3>
+                        <p class="text-light-tertiary">Foco em projetos reais e desafios que preparam você para o trabalho.</p>
+                    </div>
+                    <div class="benefit-card p-6 rounded-lg text-center animate-on-scroll delay-600ms">
+                        <i class="fas fa-infinity fa-3x mb-4 text-accent-purple-primary glow-icon icon-subtle-pulse"></i>
+                        <h3 class="text-xl font-semibold mb-2 text-light-primary">Acesso Vitalício</h3>
+                        <p class="text-light-tertiary">Estude no seu ritmo e revise o conteúdo sempre que precisar.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="testimonials" class="py-16 bg-dark-secondary">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">O que nossos alunos dizem</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="testimonial-card p-6 rounded-lg shadow-lg flex flex-col justify-between animate-on-scroll">
+                        <p class="text-light-secondary italic mb-4 flex-grow">"O curso de Lógica de Programação abriu minha mente! A didática é excelente e os exemplos práticos ajudaram muito a fixar o conteúdo."</p>
+                        <div class="flex items-center mt-auto">
+                            <img src="images/amor.png" alt="Avatar Aluno 1" class="w-12 h-12 rounded-full mr-4 border-2 border-accent-indigo-secondary">
+                            <div>
+                                <p class="font-semibold text-light-primary">Stheffany</p>
+                                <p class="text-xs text-accent-indigo-text">Aluna de Lógica de Programação</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card p-6 rounded-lg shadow-lg flex flex-col justify-between animate-on-scroll delay-200ms">
+                        <p class="text-light-secondary italic mb-4 flex-grow">"Finalmente consegui meu primeiro emprego como dev Jr. após fazer o curso de Python. O suporte do instrutor foi essencial!"</p>
+                        <div class="flex items-center mt-auto">
+                            <img src="images/elias.png" alt="Avatar Aluno 2" class="w-12 h-12 rounded-full mr-4 border-2 border-accent-emerald-secondary">
+                            <div>
+                                <p class="font-semibold text-light-primary">Elias</p>
+                                <p class="text-xs text-accent-emerald-text">Aluno de Python Básico</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card p-6 rounded-lg shadow-lg flex flex-col justify-between animate-on-scroll delay-400ms">
+                        <p class="text-light-secondary italic mb-4 flex-grow">"Achei que nunca entenderia programação, mas o Minicurso Gratuito me deu a base e a confiança para continuar estudando."</p>
+                        <div class="flex items-center mt-auto">
+                            <img src="images/emily.png" alt="Avatar Aluno 3" class="w-12 h-12 rounded-full mr-4 border-2 border-accent-purple-secondary">
+                            <div>
+                                <p class="font-semibold text-light-primary">Emily</p>
+                                <p class="text-xs text-accent-purple-text">Aluna do Minicurso</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="blog" class="py-16 bg-dark-primary">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Últimas do Blog</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="blog-card rounded-lg shadow-lg overflow-hidden animate-on-scroll">
+                        <img src="images/blog-ia.png" alt="Imagem sobre Inteligência Artificial" class="w-full h-40 object-cover lazy-load">
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold mb-2 text-light-primary">5 Tendências em Inteligência Artificial para 2025</h3>
+                            <p class="text-light-tertiary text-sm mb-4">Descubra o que esperar do futuro da IA e como isso impactará o mercado de tecnologia.</p>
+                            <a href="#" class="text-accent-indigo-primary hover:text-accent-indigo-secondary font-semibold transition-colors">Leia mais <i class="fas fa-arrow-right ml-1"></i></a>
+                        </div>
+                    </div>
+                    <div class="blog-card rounded-lg shadow-lg overflow-hidden animate-on-scroll delay-200ms">
+                        <img src="images/blog-frontend.png" alt="Código frontend em um editor" class="w-full h-40 object-cover lazy-load">
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold mb-2 text-light-primary">Frameworks Frontend: Qual escolher para seu próximo projeto?</h3>
+                            <p class="text-light-tertiary text-sm mb-4">Uma análise comparativa entre React, Vue e Angular para ajudar na sua decisão.</p>
+                            <a href="#" class="text-accent-emerald-primary hover:text-accent-emerald-secondary font-semibold transition-colors">Leia mais <i class="fas fa-arrow-right ml-1"></i></a>
+                        </div>
+                    </div>
+                    <div class="blog-card rounded-lg shadow-lg overflow-hidden animate-on-scroll delay-400ms">
+                        <img src="images/blog-sora.png" alt="Imagem conceitual sobre Sora, a IA da OpenAI para geração de vídeos" class="w-full h-40 object-cover lazy-load">
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold mb-2 text-light-primary">Sora: o gerador de vídeos com IA que está movimentando o mercado</h3>
+                            <p class="text-light-tertiary text-sm mb-4">Conheça Sora, a IA da OpenAI capaz de criar vídeos realistas a partir de texto, e suas implicações.</p>
+                            <a href="https://www.techtudo.com.br/guia/2025/05/sora-no-chatgpt-como-criar-imagens-gratuitamente-com-inteligencia-artificial-edsoftwares.ghtml" target="_blank" rel="noopener noreferrer" class="text-accent-red-primary hover:text-accent-red-secondary font-semibold transition-colors">Leia mais <i class="fas fa-arrow-right ml-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-10">
+                    <a href="#" class="text-accent-indigo-primary hover:text-accent-indigo-secondary font-semibold transition-colors">Ver todos os artigos <i class="fas fa-arrow-right ml-1"></i></a>
+                </div>
+            </div>
+        </section>
+
+        <section id="team" class="py-16 bg-dark-secondary">
             <div class="container mx-auto px-6">
                 <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Nossa Equipe</h2>
                 <div class="flex flex-wrap justify-center">
@@ -336,7 +477,7 @@
             </div>
         </section>
 
-        <section id="alunos-destaque" class="py-16 bg-dark-secondary">
+        <section id="alunos-destaque" class="py-16 bg-dark-primary">
             <div class="container mx-auto px-6">
                 <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Alunos Satisfeitos</h2>
                 <div class="animate-on-scroll max-w-full md:max-w-4xl lg:max-w-5xl mx-auto">
@@ -396,202 +537,7 @@
             </div>
         </section>
 
-        <section id="home" class="hero-bg text-white py-20 md:py-32 relative overflow-hidden">
-            <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDIwIDAgTCAwIDAgTCAwIDIwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIiAvPjwvc3ZnPg==');"></div>
-            <div class="container mx-auto px-6 text-center relative z-10">
-                <h1 class="typewriter-text text-4xl md:text-6xl font-bold mb-6 leading-tight animate-on-scroll">
-                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-light-primary via-accent-indigo-text to-accent-purple-text">Decole Sua Carreira Tech!</span>
-                </h1>
-                <p class="text-lg md:text-xl mb-10 max-w-2xl mx-auto text-light-secondary animate-on-scroll">Aprenda as habilidades do futuro com cursos práticos e instrutores especialistas. Seu futuro na tecnologia começa agora!</p>
-                <a href="#courses" class="gradient-cta text-white font-semibold py-3 px-8 rounded-lg text-lg cta-button shadow-lg animate-on-scroll">Ver Cursos</a>
-            </div>
-        </section>
-
-        <section id="courses" class="py-16 bg-dark-secondary">
-            <div class="container mx-auto px-6">
-                <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Nossos Cursos Mais Populares</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="images/logica.png" alt="Imagem do Curso Lógica de Programação Essencial" class="w-full h-48 object-cover lazy-load">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-semibold mb-2 text-light-primary">Lógica de Programação Avançada</h3>
-                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Desenvolva o raciocínio lógico fundamental para aprender qualquer linguagem e dar o primeiro passo na programação.</p>
-                            <div class="mb-4">
-                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-accent-indigo-text bg-accent-indigo-primary bg-opacity-20">Para Iniciantes</span>
-                            </div>
-                            <div class="flex justify-between items-center mb-3">
-                                <p class="text-lg font-bold text-accent-indigo-primary">R$ 97,00</p>
-                                <span class="text-sm text-light-tertiary"><i class="fas fa-users mr-1 glow-icon"></i> (Novo)</span>
-                            </div>
-                            <a href="#detail-logica" class="mt-auto block w-full text-center bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
-                        </div>
-                    </div>
-                    <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="images/minicurso.png" alt="Imagem do Mini Curso de Programação" class="w-full h-48 object-cover lazy-load">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-semibold mb-2 text-light-primary">Minicurso Programar do Zero </h3>
-                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Dê seus primeiros passos no universo da programação com este mini curso introdutório.!</p>
-                             <div class="mb-4">
-                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-accent-emerald-text bg-accent-emerald-primary bg-opacity-20">Para Iniciantes</span>
-                            </div>
-                            <div class="flex justify-between items-center mb-3">
-                                <p class="text-lg font-bold text-accent-emerald-primary">R$ 120,00</p>
-                                <span class="text-sm text-light-tertiary"><i class="fas fa-users mr-1 glow-icon"></i> (Novo)</span>
-                            </div>
-                            <a href="#detail-minicurso" class="mt-auto block w-full text-center bg-accent-emerald-primary hover:bg-accent-emerald-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
-                        </div>
-                    </div>
-                    <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="images/python.png" alt="Imagem do Curso Python Básico para Iniciantes" class="w-full h-48 object-cover lazy-load">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-semibold mb-2 text-light-primary">Python Básico para Iniciantes</h3>
-                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Aprenda os fundamentos da linguagem Python, uma das mais populares e versáteis do mercado, e crie seus primeiros scripts.</p>
-                             <div class="mb-4">
-                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-accent-red-text bg-accent-red-primary bg-opacity-20">Mais Popular</span>
-                            </div>
-                            <div class="flex justify-between items-center mb-3">
-                                <p class="text-lg font-bold text-accent-red-primary">R$ 97,00</p>
-                                <span class="text-sm text-light-tertiary"><i class="fas fa-users mr-1 glow-icon"></i> (Novo)</span>
-                            </div>
-                            <a href="#detail-python" class="mt-auto block w-full text-center bg-accent-red-primary hover:bg-accent-red-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
-                        </div>
-                    </div>
-                    <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="images/curso-ux-ui-vision.png" alt="Imagem do Curso UX/UI Vision: Interfaces que Encantam" class="w-full h-48 object-cover lazy-load">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-semibold mb-2 text-light-primary">UX/UI Vision: Interfaces que Encantam</h3>
-                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Transforme ideias em experiências memoráveis! Aprenda a criar interfaces intuitivas e designs centrados no usuário que cativam e convertem.</p>
-                             <div class="mb-4">
-                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-accent-purple-text bg-accent-purple-primary bg-opacity-20">Recomendado</span>
-                            </div>
-                            <div class="flex justify-between items-center mb-3">
-                                <p class="text-lg font-bold text-accent-purple-primary">R$ 449,90</p>
-                                <span class="text-sm text-light-tertiary"><i class="fas fa-users mr-1 glow-icon"></i> 720 Alunos</span>
-                            </div>
-                            <a href="#detail-uxui" class="mt-auto block w-full text-center bg-accent-purple-primary hover:bg-accent-purple-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
-                        </div>
-                    </div>
-                    <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="images/curso-cloud-ops.png" alt="Imagem do Curso Cloud Ops Elite: DevOps e Nuvem na Prática" class="w-full h-48 object-cover lazy-load">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-semibold mb-2 text-light-primary">Cloud Ops Elite: DevOps e Nuvem na Prática</h3>
-                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Automatize e escale com maestria! Domine Docker, Kubernetes, CI/CD e as nuvens AWS e Azure para infraestruturas de alta performance.</p>
-                             <div class="mb-4">
-                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-amber-100 bg-amber-500 bg-opacity-20">Alta Demanda</span>
-                            </div>
-                            <div class="flex justify-between items-center mb-3">
-                                <p class="text-lg font-bold text-amber-500">R$ 649,90</p>
-                                <span class="text-sm text-light-tertiary"><i class="fas fa-users mr-1 glow-icon"></i> 650 Alunos</span>
-                            </div>
-                            <a href="#detail-devops" class="mt-auto block w-full text-center bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
-                        </div>
-                    </div>
-                    <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
-                        <img src="images/curso-app-impact.png" alt="Imagem do Curso App Impact: Criando Apps Multiplataforma" class="w-full h-48 object-cover lazy-load">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-semibold mb-2 text-light-primary">App Impact: Criando Apps Multiplataforma</h3>
-                            <p class="text-light-tertiary mb-4 text-sm flex-grow">Leve suas ideias para o bolso de todos! Desenvolva apps incríveis para Android e iOS com React Native, Flutter ou de forma nativa.</p>
-                             <div class="mb-4">
-                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-pink-100 bg-pink-500 bg-opacity-20">Novidade</span>
-                            </div>
-                            <div class="flex justify-between items-center mb-3">
-                                <p class="text-lg font-bold text-pink-500">R$ 549,90</p>
-                                <span class="text-sm text-light-tertiary"><i class="fas fa-users mr-1 glow-icon"></i> 530 Alunos</span>
-                            </div>
-                            <a href="#detail-mobile" class="mt-auto block w-full text-center bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="benefits" class="py-16 bg-dark-primary relative">
-            <div class="absolute inset-0 opacity-5" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+CjxyZWN0IHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNMzAgMzBtLTI4IDBhMjggMjggMCAxIDAgNTYgMGEyOCAyOCAwIDEgMCAtNTYgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjAuNSIvPgo8L3N2Zz4=');"></div>
-            <div class="container mx-auto px-6 relative z-10">
-                <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Por que escolher a FullStack Cursos?</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center">
-                    <div class="benefit-card text-center p-6 rounded-lg shadow animate-on-scroll">
-                        <div class="text-accent-emerald-primary mb-4">
-                            <i class="fas fa-laptop-code fa-3x glow-icon"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold mb-2 text-light-primary">Conteúdo Prático</h3>
-                        <p class="text-light-tertiary text-sm">Aprenda na prática com projetos reais e desafios que simulam o dia a dia profissional.</p>
-                    </div>
-                    <div class="benefit-card text-center p-6 rounded-lg shadow animate-on-scroll">
-                        <div class="text-accent-red-primary mb-4">
-                            <i class="fas fa-clock fa-3x glow-icon"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold mb-2 text-light-primary">Flexibilidade</h3>
-                        <p class="text-light-tertiary text-sm">Estude no seu ritmo, quando e onde quiser, com acesso vitalício ao material.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="testimonials" class="py-16 bg-dark-secondary">
-            <div class="container mx-auto px-6">
-                <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">O que alunos dizeram</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="testimonial-card p-8 rounded-xl shadow-lg flex flex-col justify-between animate-on-scroll">
-                        <p class="text-light-secondary mb-6 italic">A plataforma superou minhas expectativas! Prestando atenção e praticando oque tem nas aulas, eu evolui consideravelmente, quando tentei estruturar meu site sozinho, consegui sem problemas</p>
-                        <div>
-                            <p class="font-semibold text-light-primary">Elias</p>
-                            <p class="text-sm text-accent-indigo-primary">Estudando programação por fora, sem faculdade</p>
-                        </div>
-                    </div>
-                    <div class="testimonial-card p-8 rounded-xl shadow-lg flex flex-col justify-between animate-on-scroll">
-                        <p class="text-light-secondary mb-6 italic">O curso de Lógica de programação Avançada mudou minha visão, tem um mundo antes e depois da lógica de programação, meus códigos são melhores e a estrutura melhorou muito</p>
-                        <div>
-                            <p class="font-semibold text-light-primary">Stheffany</p>
-                            <p class="text-sm text-accent-emerald-primary">1 Semestre de ADS</p>
-                        </div>
-                    </div>
-                    <div class="testimonial-card p-8 rounded-xl shadow-lg flex flex-col justify-between animate-on-scroll">
-                        <p class="text-light-secondary mb-6 italic">Minha maior dificuldade era entender a lógica, para mim não fazia sentido, até que vi esse curso, e mudou meu mundo, lógica de programação me dar um salto enorme para iniciar na programação, agradeço muito ao Bruno pela chance de ver o curso de forma gratuita</p>
-                        <div>
-                            <p class="font-semibold text-light-primary">Emily</p>
-                            <p class="text-sm text-accent-red-primary">1 Mês de Bacharelado em Tecnologia da Informação</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="blog" class="py-16 bg-dark-primary">
-            <div class="container mx-auto px-6">
-                <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Fique por Dentro das Novidades Tech</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="blog-card rounded-lg shadow-md overflow-hidden animate-on-scroll">
-                        <img src="images/blog-ia.png" alt="Imagem conceitual sobre Inteligência Artificial e o futuro da tecnologia" class="w-full h-40 object-cover lazy-load">
-                        <div class="p-6">
-                            <h3 class="text-lg font-semibold mb-2 text-light-primary">Inteligência Artificial: O que esperar nos próximos anos</h3>
-                            <p class="text-light-tertiary text-sm mb-4">Explore as tendências e avanços da Inteligência Artificial e como ela está moldando o futuro da tecnologia e da sociedade.</p>
-                            <a href="https://valor.globo.com/patrocinado/dino/noticia/2025/04/30/tendencias-da-inteligencia-artificial-moldam-2025.ghtml" target="_blank" rel="noopener noreferrer" class="text-accent-indigo-primary hover:text-accent-indigo-secondary font-semibold transition-colors">Leia mais <i class="fas fa-arrow-right ml-1"></i></a>
-                        </div>
-                    </div>
-                    <div class="blog-card rounded-lg shadow-md overflow-hidden animate-on-scroll">
-                        <img src="images/blog-metaverso.png" alt="Imagem conceitual sobre o Metaverso e experiências de realidade virtual" class="w-full h-40 object-cover lazy-load">
-                        <div class="p-6">
-                            <h3 class="text-lg font-semibold mb-2 text-light-primary">Metaverso</h3>
-                            <p class="text-light-tertiary text-sm mb-4">Descubra o que é o Metaverso, seu potencial impacto em diversas áreas e os desafios para sua consolidação no cenário tecnológico atual.</p>
-                            <a href="https://www.fortunebusinessinsights.com/pt/industrial-metaverse-market-112420" target="_blank" rel="noopener noreferrer" class="text-accent-emerald-primary hover:text-accent-emerald-secondary font-semibold transition-colors">Leia mais <i class="fas fa-arrow-right ml-1"></i></a>
-                        </div>
-                    </div>
-                    <div class="blog-card rounded-lg shadow-md overflow-hidden animate-on-scroll">
-                        <img src="images/blog-sora.png" alt="Imagem conceitual sobre Sora, a IA da OpenAI para geração de vídeos" class="w-full h-40 object-cover lazy-load">
-                        <div class="p-6">
-                            <h3 class="text-lg font-semibold mb-2 text-light-primary">Sora: o gerador de vídeos com IA que está movimentando o mercado</h3>
-                            <p class="text-light-tertiary text-sm mb-4">Conheça Sora, a IA da OpenAI capaz de criar vídeos realistas a partir de texto, e suas implicações para a indústria criativa.</p>
-                            <a href="https://www.techtudo.com.br/guia/2025/05/sora-no-chatgpt-como-criar-imagens-gratuitamente-com-inteligencia-artificial-edsoftwares.ghtml" target="_blank" rel="noopener noreferrer" class="text-accent-red-primary hover:text-accent-red-secondary font-semibold transition-colors">Leia mais <i class="fas fa-arrow-right ml-1"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-center mt-10">
-                    <a href="#" class="text-accent-indigo-primary hover:text-accent-indigo-secondary font-semibold transition-colors">Ver todos os artigos <i class="fas fa-arrow-right ml-1"></i></a>
-                </div>
-            </div>
-        </section>
-
+        <!-- Seções de Detalhes de Cursos (Ocultas por padrão) -->
         <section id="detail-logica" class="course-detail-section py-16 bg-dark-primary">
              <div class="container mx-auto px-6">
                 <a href="#courses" class="text-accent-indigo-primary hover:text-accent-indigo-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
@@ -687,11 +633,12 @@
             </div>
         </section>
 
+        <!-- Seções do Usuário (Ocultas por padrão, requerem login) -->
         <section id="dashboard" class="user-section py-16 bg-dark-secondary">
             <div class="container mx-auto px-6">
                 <div class="user-section-container neon-border">
                     <h2 class="text-3xl font-bold mb-6 text-light-primary">Meu Painel</h2>
-                    <p class="text-light-secondary mb-4">Bem-vindo(a) de volta, <span class="user-name-placeholder font-semibold">Usuário</span>!</p>
+                    <p id="dashboard-welcome" class="text-light-secondary mb-4">Bem-vindo(a) de volta!</p>
                     <p class="text-light-secondary">A partir daqui você pode acessar seus cursos, perfil e configurações.</p>
                     <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
                         <a href="#my-courses" class="bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold p-6 rounded-lg cta-button text-center">
@@ -713,9 +660,34 @@
                 <a href="#dashboard" class="text-accent-indigo-primary hover:text-accent-indigo-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar ao Painel</a>
                 <div class="user-section-container neon-border">
                     <h2 class="text-3xl font-bold mb-8 text-light-primary">Meu Perfil</h2>
+                    <!-- Conteúdo do perfil será carregado aqui -->
                     <div id="user-profile-content" class="space-y-6">
-                        <p class="text-light-secondary">Carregando informações do perfil...</p>
+                        <p class="text-light-secondary animate-pulse">Carregando informações do perfil...</p>
+                        <!-- Exemplo de como os dados podem ser exibidos (será preenchido pelo JS) -->
+                        <!--
+                        <div>
+                            <label class="block text-sm font-medium text-light-tertiary">Nome</label>
+                            <p class="mt-1 text-lg text-light-primary">Nome do Usuário</p>
                         </div>
+                        <div>
+                            <label class="block text-sm font-medium text-light-tertiary">Email</label>
+                            <p class="mt-1 text-lg text-light-primary">email@exemplo.com</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-light-tertiary">Membro desde</label>
+                            <p class="mt-1 text-lg text-light-primary">DD/MM/AAAA</p>
+                        </div>
+                        -->
+                    </div>
+                    <!-- Formulário para editar nome (opcional) -->
+                    <form id="profile-form" class="mt-8 border-t border-gray-700 pt-6 space-y-4">
+                         <h3 class="text-xl font-semibold text-light-primary">Editar Nome</h3>
+                         <div>
+                            <label for="profile-name" class="block text-sm font-medium text-light-tertiary">Nome</label>
+                            <input type="text" id="profile-name" name="name" required class="mt-1 block w-full px-3 py-2 bg-dark-tertiary border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-indigo-primary focus:border-accent-indigo-primary sm:text-sm text-light-primary">
+                        </div>
+                        <button type="submit" class="gradient-cta text-white font-semibold py-2 px-4 rounded-lg cta-button">Salvar Nome</button>
+                    </form>
                 </div>
             </div>
         </section>
@@ -725,8 +697,10 @@
                  <a href="#dashboard" class="text-accent-indigo-primary hover:text-accent-indigo-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar ao Painel</a>
                 <div class="user-section-container neon-border">
                     <h2 class="text-3xl font-bold mb-8 text-light-primary">Meus Cursos</h2>
+                    <!-- Container para os cursos do usuário -->
                     <div id="user-courses-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <p class="text-light-secondary col-span-full">Carregando seus cursos...</p>
+                        <p class="text-light-secondary col-span-full text-center animate-pulse">Carregando seus cursos...</p>
+                        <!-- Cards dos cursos serão carregados aqui pelo JS -->
                     </div>
                 </div>
             </div>
@@ -737,17 +711,39 @@
                  <a href="#dashboard" class="text-accent-indigo-primary hover:text-accent-indigo-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar ao Painel</a>
                 <div class="user-section-container neon-border">
                     <h2 class="text-3xl font-bold mb-8 text-light-primary">Configurações</h2>
-                    <div id="user-settings-content" class="space-y-6">
-                        <p class="text-light-secondary">Carregando configurações...</p>
+                    <div id="user-settings-content" class="space-y-8">
+                        <!-- Seção de Notificações -->
                         <div>
-                            <h3 class="text-xl font-semibold text-light-primary mb-2">Preferências de Notificação</h3>
-                            <label class="flex items-center space-x-3 mb-3">
-                                <input type="checkbox" class="form-checkbox h-5 w-5 text-accent-indigo-primary accent-accent-indigo-primary bg-dark-tertiary border-gray-600 rounded">
+                            <h3 class="text-xl font-semibold text-light-primary mb-4 border-b border-gray-700 pb-2">Preferências de Notificação</h3>
+                            <label class="flex items-center space-x-3 mb-3 cursor-pointer">
+                                <input type="checkbox" class="form-checkbox h-5 w-5 text-accent-indigo-primary accent-accent-indigo-primary bg-dark-tertiary border-gray-600 rounded focus:ring-accent-indigo-primary">
                                 <span class="text-light-secondary">Receber e-mails sobre novos cursos e promoções.</span>
                             </label>
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="checkbox" checked class="form-checkbox h-5 w-5 text-accent-indigo-primary accent-accent-indigo-primary bg-dark-tertiary border-gray-600 rounded focus:ring-accent-indigo-primary">
+                                <span class="text-light-secondary">Receber notificações sobre progresso nos cursos.</span>
+                            </label>
                         </div>
+
+                        <!-- Seção de Mudança de Senha -->
                         <div>
-                            <h3 class="text-xl font-semibold text-light-primary mb-2">Gerenciamento da Conta</h3>
+                            <h3 class="text-xl font-semibold text-light-primary mb-4 border-b border-gray-700 pb-2">Alterar Senha</h3>
+                            <form id="change-password-form" class="space-y-4">
+                                <div>
+                                    <label for="newPassword" class="block text-sm font-medium text-light-tertiary">Nova Senha</label>
+                                    <input type="password" id="newPassword" name="newPassword" required minlength="6" class="mt-1 block w-full md:w-1/2 px-3 py-2 bg-dark-tertiary border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-indigo-primary focus:border-accent-indigo-primary sm:text-sm text-light-primary">
+                                </div>
+                                <div>
+                                    <label for="confirmPassword" class="block text-sm font-medium text-light-tertiary">Confirmar Nova Senha</label>
+                                    <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6" class="mt-1 block w-full md:w-1/2 px-3 py-2 bg-dark-tertiary border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-indigo-primary focus:border-accent-indigo-primary sm:text-sm text-light-primary">
+                                </div>
+                                <button type="submit" class="gradient-cta text-white font-semibold py-2 px-4 rounded-lg cta-button">Alterar Senha</button>
+                            </form>
+                        </div>
+
+                        <!-- Seção de Gerenciamento da Conta -->
+                        <div>
+                            <h3 class="text-xl font-semibold text-light-primary mb-4 border-b border-gray-700 pb-2">Gerenciamento da Conta</h3>
                             <button class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg cta-button">
                                 Excluir Minha Conta
                             </button>
@@ -758,266 +754,174 @@
             </div>
         </section>
 
+        <!-- Seção de Login/Registro (Oculta por padrão se logado) -->
         <section id="login" class="user-section py-16 bg-dark-secondary">
-            <div class="container mx-auto px-6">
-                <div class="max-w-md mx-auto bg-dark-card p-8 rounded-xl shadow-lg neon-border">
-                    <h2 class="text-2xl font-bold mb-8 text-light-primary text-center">Acesse sua conta</h2>
-                    
-                    <div class="mt-6">
-                        <button id="google-login-btn" class="w-full flex items-center justify-center bg-dark-tertiary hover:bg-opacity-80 text-light-primary font-semibold py-3 px-4 rounded-lg cta-button neon-border transition-transform duration-200 ease-in-out hover:scale-105">
-                            <i class="fab fa-google text-red-500 mr-3 fa-lg"></i> Acessar com Google
+            <div class="container mx-auto px-6 max-w-lg">
+                <div class="user-section-container neon-border">
+                    <h2 class="text-3xl font-bold mb-8 text-center text-light-primary">Acesse sua Conta</h2>
+                    <!-- Formulário de Login -->
+                    <form id="login-form" class="space-y-6 mb-6">
+                        <div>
+                            <label for="login-email" class="block text-sm font-medium text-light-tertiary">Email</label>
+                            <input type="email" id="login-email" name="email" required autocomplete="email" class="mt-1 block w-full px-3 py-2 bg-dark-tertiary border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-indigo-primary focus:border-accent-indigo-primary sm:text-sm text-light-primary">
+                        </div>
+                        <div>
+                            <label for="login-password" class="block text-sm font-medium text-light-tertiary">Senha</label>
+                            <input type="password" id="login-password" name="password" required autocomplete="current-password" class="mt-1 block w-full px-3 py-2 bg-dark-tertiary border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-indigo-primary focus:border-accent-indigo-primary sm:text-sm text-light-primary">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm">
+                                <a href="#reset-password" class="font-medium text-accent-indigo-primary hover:text-accent-indigo-secondary">Esqueceu sua senha?</a>
+                            </div>
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-accent-indigo-primary hover:bg-accent-indigo-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-indigo-primary cta-button">Entrar</button>
+                        </div>
+                    </form>
+
+                    <!-- Divisor e Login com Google -->
+                    <div class="relative mb-6">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-600"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-dark-card text-light-tertiary">Ou continue com</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button id="google-login-button" class="w-full inline-flex justify-center py-2 px-4 border border-gray-600 rounded-md shadow-sm bg-dark-tertiary text-sm font-medium text-light-secondary hover:bg-dark-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 cta-button">
+                            <span class="sr-only">Login com Google</span>
+                            <svg class="w-5 h-5 mr-2" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.477 0 10c0 4.418 2.865 8.14 6.839 9.488.5.092.682-.217.682-.483 0-.237-.009-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.851 0 1.733.174 2.503.514 1.909-1.296 2.747-1.026 2.747-1.026.546 1.378.201 2.397.1 2.65.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0020 10c0-5.523-4.477-10-10-10z" clip-rule="evenodd" />
+                            </svg>
+                            Google
                         </button>
                     </div>
 
+                    <!-- Link para Registro -->
                     <p class="mt-8 text-center text-sm text-light-tertiary">
-                        Ao continuar, você concorda com nossos <a href="#termos" class="text-accent-indigo-primary hover:underline">Termos de Uso</a> e <a href="#privacidade" class="text-accent-indigo-primary hover:underline">Política de Privacidade</a>.
-                    </p>
-                    <p class="mt-4 text-center text-sm text-light-tertiary">
-                        Problemas para acessar? <a href="#suporte" class="text-accent-indigo-primary hover:underline">Contate o Suporte</a>.
+                        Não tem uma conta?
+                        <a href="#register" class="font-medium text-accent-indigo-primary hover:text-accent-indigo-secondary">Registre-se</a>
                     </p>
                 </div>
             </div>
         </section>
+
+        <section id="register" class="user-section py-16 bg-dark-secondary">
+            <div class="container mx-auto px-6 max-w-lg">
+                <div class="user-section-container neon-border">
+                    <h2 class="text-3xl font-bold mb-8 text-center text-light-primary">Crie sua Conta</h2>
+                    <form id="register-form" class="space-y-6">
+                        <div>
+                            <label for="register-name" class="block text-sm font-medium text-light-tertiary">Nome Completo</label>
+                            <input type="text" id="register-name" name="name" required autocomplete="name" class="mt-1 block w-full px-3 py-2 bg-dark-tertiary border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-indigo-primary focus:border-accent-indigo-primary sm:text-sm text-light-primary">
+                        </div>
+                        <div>
+                            <label for="register-email" class="block text-sm font-medium text-light-tertiary">Email</label>
+                            <input type="email" id="register-email" name="email" required autocomplete="email" class="mt-1 block w-full px-3 py-2 bg-dark-tertiary border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-indigo-primary focus:border-accent-indigo-primary sm:text-sm text-light-primary">
+                        </div>
+                        <div>
+                            <label for="register-password" class="block text-sm font-medium text-light-tertiary">Senha</label>
+                            <input type="password" id="register-password" name="password" required minlength="6" autocomplete="new-password" class="mt-1 block w-full px-3 py-2 bg-dark-tertiary border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-indigo-primary focus:border-accent-indigo-primary sm:text-sm text-light-primary">
+                        </div>
+                        <div>
+                            <label for="register-confirmPassword" class="block text-sm font-medium text-light-tertiary">Confirmar Senha</label>
+                            <input type="password" id="register-confirmPassword" name="confirmPassword" required minlength="6" autocomplete="new-password" class="mt-1 block w-full px-3 py-2 bg-dark-tertiary border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-indigo-primary focus:border-accent-indigo-primary sm:text-sm text-light-primary">
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-accent-indigo-primary hover:bg-accent-indigo-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-indigo-primary cta-button">Registrar</button>
+                        </div>
+                    </form>
+                    <p class="mt-8 text-center text-sm text-light-tertiary">
+                        Já tem uma conta?
+                        <a href="#login" class="font-medium text-accent-indigo-primary hover:text-accent-indigo-secondary">Faça login</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="reset-password" class="user-section py-16 bg-dark-secondary">
+            <div class="container mx-auto px-6 max-w-lg">
+                <div class="user-section-container neon-border">
+                    <h2 class="text-3xl font-bold mb-8 text-center text-light-primary">Redefinir Senha</h2>
+                    <form id="reset-password-form" class="space-y-6">
+                        <div>
+                            <label for="reset-email" class="block text-sm font-medium text-light-tertiary">Email</label>
+                            <input type="email" id="reset-email" name="email" required autocomplete="email" class="mt-1 block w-full px-3 py-2 bg-dark-tertiary border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-indigo-primary focus:border-accent-indigo-primary sm:text-sm text-light-primary">
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-accent-indigo-primary hover:bg-accent-indigo-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-indigo-primary cta-button">Enviar Link de Redefinição</button>
+                        </div>
+                    </form>
+                    <p class="mt-8 text-center text-sm text-light-tertiary">
+                        Lembrou a senha?
+                        <a href="#login" class="font-medium text-accent-indigo-primary hover:text-accent-indigo-secondary">Faça login</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
     </main>
 
-    <footer class="bg-dark-tertiary text-light-secondary py-12 border-t border-gray-800 overflow-hidden">
-        <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                <div class="animate-on-scroll">
-                    <h3 class="text-xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-accent-indigo-primary to-accent-purple-primary">FullStack Cursos</h3>
-                    <p class="mb-4 text-light-tertiary">Sua plataforma de cursos online para impulsionar sua carreira na tecnologia.</p>
-                    <div class="flex space-x-4">
-                        <a href="https://www.facebook.com/profile.php?id=100010082854484" target="_blank" rel="noopener noreferrer" class="inline-block transition-transform duration-200 ease-in-out hover:scale-110">
-                            <i class="fab fa-facebook-f glow-icon icon-subtle-pulse"></i>
-                        </a>
-                        <a href="https://x.com/BrunoPasso50909/with_replies" target="_blank" rel="noopener noreferrer" class="inline-block transition-transform duration-200 ease-in-out hover:scale-110">
-                            <i class="fab fa-twitter glow-icon icon-subtle-pulse"></i>
-                        </a>
-                        <a href="https://www.instagram.com/bruno_passox/" target="_blank" rel="noopener noreferrer" class="inline-block transition-transform duration-200 ease-in-out hover:scale-110">
-                            <i class="fab fa-instagram glow-icon icon-subtle-pulse"></i>
-                        </a>
-                        <a href="https://www.linkedin.com/in/bruno-passos-380552223/" target="_blank" rel="noopener noreferrer" class="inline-block transition-transform duration-200 ease-in-out hover:scale-110">
-                            <i class="fab fa-linkedin-in glow-icon icon-subtle-pulse"></i>
-                        </a>
-                    </div>
+    <footer class="bg-dark-secondary border-t border-gray-700 mt-16 py-10">
+        <div class="container mx-auto px-6 text-center text-light-tertiary">
+            <div class="mb-6">
+                <a href="#home" class="text-xl font-bold text-accent-indigo-primary flex items-center justify-center mb-4">
+                    <span class="mr-2 glow-icon"><i class="fas fa-code"></i></span>
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-accent-indigo-primary to-accent-purple-primary">FullStack Cursos</span>
+                </a>
+                <div class="flex justify-center space-x-6 mb-6">
+                    <a href="#home" class="animated-footer-link hover:text-light-primary transition-colors">Início</a>
+                    <a href="#courses" class="animated-footer-link hover:text-light-primary transition-colors">Cursos</a>
+                    <a href="#" class="animated-footer-link hover:text-light-primary transition-colors">Política de Privacidade</a>
+                    <a href="#" class="animated-footer-link hover:text-light-primary transition-colors">Termos de Uso</a>
                 </div>
-                <div class="animate-on-scroll delay-200ms">
-                    <h3 class="text-xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-accent-indigo-primary to-accent-purple-primary">Links Rápidos</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#home" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block animated-footer-link">Início</a></li>
-                        <li><a href="#courses" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block animated-footer-link">Cursos</a></li>
-                        <li><a href="#" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block animated-footer-link">Sobre Nós</a></li>
-                        <li><a href="#" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block animated-footer-link">Contato</a></li>
-                        <li><a href="#" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block animated-footer-link">FAQ</a></li>
-                        <li><a href="https://wa.me/5511943035778?text=Olá!%20Tenho%20interesse%20nos%20cursos%20da%20FullStack%20Cursos.%20Poderia%20me%20ajudar?" target="_blank" class="text-light-tertiary hover:text-green-400 transition-all duration-200 ease-in-out hover:translate-x-1 inline-flex items-center animated-footer-link">
-                            <i class="fab fa-whatsapp text-green-400 mr-2 glow-icon transition-transform duration-200 ease-in-out hover:scale-110"></i>
-                            <span>WhatsApp</span>
-                        </a></li>
-                    </ul>
-                </div>
-                <div class="animate-on-scroll delay-400ms">
-                    <h3 class="text-xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-accent-indigo-primary to-accent-purple-primary">Contato</h3>
-                    <ul class="space-y-2">
-                        <li class="flex items-start">
-                            <i class="fas fa-map-marker-alt mt-1 mr-3 text-accent-indigo-primary glow-icon transition-transform duration-200 ease-in-out hover:scale-110"></i>
-                            <span class="text-light-tertiary">Av. Tecnologia, 1000 - São Paulo, SP</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-envelope mt-1 mr-3 text-accent-indigo-primary glow-icon transition-transform duration-200 ease-in-out hover:scale-110"></i>
-                            <span class="text-light-tertiary">bruno1235223@gmail.com</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-phone-alt mt-1 mr-3 text-accent-indigo-primary glow-icon transition-transform duration-200 ease-in-out hover:scale-110"></i>
-                            <span class="text-light-tertiary">(11) 4002-8922</span>
-                        </li>
-                        <li class="flex items-start">
-                            <a href="https://wa.me/5511943035778?text=Olá!%20Tenho%20interesse%20nos%20cursos%20da%20FullStack%20Cursos.%20Poderia%20me%20ajudar?" target="_blank" class="flex items-start text-light-tertiary hover:text-green-400 transition-colors">
-                                <i class="fab fa-whatsapp mt-1 mr-3 text-green-400 glow-icon icon-subtle-pulse transition-transform duration-200 ease-in-out hover:scale-110"></i>
-                                <span>(69) 99967-6075</span>
-                            </a>
-                        </li>
-                    </ul>
+                <div class="flex justify-center space-x-6">
+                    <a href="#" aria-label="Facebook" class="hover:text-accent-indigo-secondary transition-colors"><i class="fab fa-facebook-f fa-lg glow-icon"></i></a>
+                    <a href="#" aria-label="Instagram" class="hover:text-accent-purple-secondary transition-colors"><i class="fab fa-instagram fa-lg glow-icon"></i></a>
+                    <a href="https://www.linkedin.com/in/bruno-passos-380552223/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="hover:text-accent-indigo-secondary transition-colors"><i class="fab fa-linkedin-in fa-lg glow-icon"></i></a>
+                    <a href="https://github.com/5223Bruno" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="hover:text-light-primary transition-colors"><i class="fab fa-github fa-lg glow-icon"></i></a>
                 </div>
             </div>
-            <div class="border-t border-gray-700 pt-8 text-center animate-on-scroll delay-600ms">
-                <p>&copy; 2025 FullStack Cursos. Todos os direitos reservados.</p>
-                <div class="mt-2">
-                    <a href="#" class="text-light-tertiary hover:text-accent-purple-secondary mx-2 text-sm transition-colors animated-footer-link">Termos de Uso</a>
-                    <a href="#" class="text-light-tertiary hover:text-accent-purple-secondary mx-2 text-sm transition-colors animated-footer-link">Política de Privacidade</a>
-                </div>
-            </div>
+            <p class="text-sm">&copy; 2024 FullStack Cursos. Todos os direitos reservados.</p>
         </div>
     </footer>
 
-    <div id="custom-alert" class="custom-alert">
-        <span id="alert-message"></span>
-    </div>
+    <!-- Script principal do Backend -->
+    <script src="backend_corrigido.js"></script>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-functions-compat.js"></script>
-
-    <script src="https://js.stripe.com/v3/"></script>
-
-    <script src="backend_completo.js"></script>
-
+    <!-- Script inline para inicialização básica da UI (opcional, pode estar no backend.js) -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const allDetailSections = document.querySelectorAll('.course-detail-section, .user-section'); // Inclui .user-section
-            const mainContentSections = ['#home', '#courses', '#benefits', '#testimonials', '#blog', '#team', '#alunos-destaque']; // Seções principais que não devem ser tratadas como "detalhe"
-
-            if (mobileMenuButton && mobileMenu) {
-                mobileMenuButton.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('hidden');
-                    this.setAttribute('aria-expanded', mobileMenu.classList.contains('hidden') ? 'false' : 'true');
-                });
-            }
-
-            function hideAllDetailSections() {
-                allDetailSections.forEach(section => {
-                    section.style.display = 'none';
-                });
-            }
-            
-            // Esconder todas as seções de detalhe/usuário inicialmente, exceto se for um link direto
-            if (!window.location.hash || mainContentSections.includes(window.location.hash)) {
-                 hideAllDetailSections();
-            }
-
-
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    const href = this.getAttribute('href');
-                    
-                    // Esconder todas as seções de detalhe/usuário antes de mostrar a nova
-                    hideAllDetailSections();
-
-                    if (href.startsWith('#detail-') || href === '#login' || 
-                        href === '#profile' || href === '#my-courses' || href === '#settings' || href === '#dashboard') {
-                        e.preventDefault();
-                        const targetId = href.substring(1);
-                        const targetElement = document.getElementById(targetId);
-
-                        if (targetElement) {
-                            targetElement.style.display = 'block';
-                            const headerOffset = 80; 
-                            const elementPosition = targetElement.getBoundingClientRect().top;
-                            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-
-                            // Chamar funções específicas para carregar conteúdo dinâmico
-                            if (targetId === 'my-courses' && typeof displayUserCourses === 'function') {
-                                displayUserCourses();
-                            } else if (targetId === 'profile' && typeof displayUserProfile === 'function') {
-                                displayUserProfile();
-                            } else if (targetId === 'settings' && typeof displayUserSettings === 'function') {
-                                displayUserSettings();
-                            } else if (targetId === 'dashboard' && typeof displayUserDashboard === 'function') {
-                                displayUserDashboard();
-                            }
-
-                        }
-                    } else if (href.startsWith('#') && href !== '#') { // Links para seções principais
-                        e.preventDefault();
-                        const targetId = href.substring(1);
-                        const targetElement = document.getElementById(targetId);
-                        if (targetElement) {
-                            // Garantir que seções principais (não .user-section ou .course-detail-section) sejam exibidas corretamente.
-                            // Elas geralmente não têm display:none por padrão no CSS, a menos que sejam dinamicamente alteradas.
-                            // Esta lógica assume que as seções principais estão sempre visíveis ou seu estado é gerenciado por outras lógicas.
-                            targetElement.style.display = ''; // Garante que está visível se foi escondida por engano
-                            
-                            const headerOffset = 80; 
-                            const elementPosition = targetElement.getBoundingClientRect().top;
-                            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-                        }
-                    }
-
-                    if (mobileMenu && !mobileMenu.classList.contains('hidden') && (!mobileMenuButton || this.id !== 'mobile-menu-button')) {
-                        mobileMenu.classList.add('hidden');
-                        if (mobileMenuButton) {
-                            mobileMenuButton.setAttribute('aria-expanded', 'false');
-                        }
-                    }
-                });
-            });
-            
-            // Se houver um hash na URL ao carregar, tentar navegar para ele
-            if (window.location.hash && window.location.hash !== "#") {
-                const targetLink = document.querySelector(`a[href="${window.location.hash}"]`);
-                if (targetLink) {
-                    // Atrasar um pouco para garantir que o DOM e o JS do backend estejam prontos
-                    setTimeout(() => targetLink.click(), 100);
-                } else {
-                    // Se o link não existir, mas a seção existir (ex: #dashboard), tentar mostrá-la.
-                    const targetIdFromHash = window.location.hash.substring(1);
-                    const targetElementFromHash = document.getElementById(targetIdFromHash);
-                    if (targetElementFromHash && (targetElementFromHash.classList.contains('user-section') || targetElementFromHash.classList.contains('course-detail-section'))) {
-                       setTimeout(() => {
-                           hideAllDetailSections();
-                           targetElementFromHash.style.display = 'block';
-                           // Chamar funções de display se necessário
-                           if (targetIdFromHash === 'my-courses' && typeof displayUserCourses === 'function') displayUserCourses();
-                           else if (targetIdFromHash === 'profile' && typeof displayUserProfile === 'function') displayUserProfile();
-                           else if (targetIdFromHash === 'settings' && typeof displayUserSettings === 'function') displayUserSettings();
-                           else if (targetIdFromHash === 'dashboard' && typeof displayUserDashboard === 'function') displayUserDashboard();
-                       }, 100);
-                    }
-                }
-            }
-
-
-            initLazyLoading();
-            initScrollAnimations();
-        });
-
-        function showCustomAlert(message, type) {
-            const alert = document.getElementById('custom-alert');
-            const alertMessage = document.getElementById('alert-message');
-
-            if (alert && alertMessage) {
-                alert.className = 'custom-alert'; 
-                alert.classList.add(type === 'success' ? 'custom-alert-success' : 'custom-alert-error');
-
-                alertMessage.textContent = message;
-                alert.style.display = 'block';
-                alert.style.opacity = '1'; 
-
-                setTimeout(() => {
-                    alert.style.opacity = '0'; 
-                    setTimeout(() => {
-                        alert.style.display = 'none';
-                    }, 300); 
-                }, 3000); 
-            }
-        }
-
+        // Funções básicas que podem ser úteis antes do backend.js carregar completamente
         function initLazyLoading() {
             const lazyImages = document.querySelectorAll('.lazy-load');
-
             if ('IntersectionObserver' in window) {
                 const imageObserver = new IntersectionObserver((entries, observer) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             const img = entry.target;
-                            img.src = img.dataset.src || img.src; 
+                            // Prioriza data-src se existir, senão usa src (para imagens já visíveis)
+                            const src = img.dataset.src || img.src;
+                            if (img.tagName === 'IMG') {
+                                img.src = src;
+                            } else { // Para background-image em divs, etc.
+                                img.style.backgroundImage = `url(${src})`;
+                            }
                             img.classList.add('loaded');
-                            imageObserver.unobserve(img);
+                            observer.unobserve(img);
                         }
                     });
                 });
-
-                lazyImages.forEach(img => {
-                    imageObserver.observe(img);
-                });
+                lazyImages.forEach(img => imageObserver.observe(img));
             } else {
+                // Fallback para navegadores sem IntersectionObserver
                 lazyImages.forEach(img => {
-                    img.src = img.dataset.src || img.src;
+                    const src = img.dataset.src || img.src;
+                     if (img.tagName === 'IMG') {
+                        img.src = src;
+                    } else {
+                        img.style.backgroundImage = `url(${src})`;
+                    }
                     img.classList.add('loaded');
                 });
             }
@@ -1025,27 +929,33 @@
 
         function initScrollAnimations() {
             const animatedElements = document.querySelectorAll('.animate-on-scroll');
-
             if ('IntersectionObserver' in window) {
                 const animationObserver = new IntersectionObserver((entries, observer) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             entry.target.classList.add('visible');
+                            // Opcional: Desobservar após animar uma vez
+                            // observer.unobserve(entry.target);
                         } else {
-                            // entry.target.classList.remove('visible'); // Para re-animar ao sair e entrar
+                            // Opcional: Remover a classe para re-animar ao rolar para cima e para baixo
+                            // entry.target.classList.remove('visible');
                         }
                     });
-                }, { threshold: 0.05 }); 
-
-                animatedElements.forEach(element => {
-                    animationObserver.observe(element);
-                });
+                }, { threshold: 0.1 }); // Ajuste o threshold conforme necessário
+                animatedElements.forEach(element => animationObserver.observe(element));
             } else {
-                animatedElements.forEach(element => {
-                    element.classList.add('visible');
-                });
+                // Fallback para navegadores sem IntersectionObserver
+                animatedElements.forEach(element => element.classList.add('visible'));
             }
         }
+
+        // Chamar inicializadores básicos no DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initLazyLoading();
+            initScrollAnimations();
+        });
     </script>
+
 </body>
 </html>
+

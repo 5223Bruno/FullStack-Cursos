@@ -669,44 +669,18 @@
                 </div>
             </div>
         </section>
-        <section id="login" class="py-16 bg-dark-secondary course-detail-section"> <div class="container mx-auto px-6">
+
+        <section id="login" class="py-16 bg-dark-secondary course-detail-section">
+            <div class="container mx-auto px-6">
                 <div class="max-w-md mx-auto bg-dark-card p-8 rounded-xl shadow-lg neon-border">
                     <h2 class="text-2xl font-bold mb-6 text-light-primary text-center">Acesse sua conta</h2>
-                    <form id="login-form" class="space-y-4">
-                        <div>
-                            <label for="login-email" class="block text-light-secondary mb-1">Email</label>
-                            <input type="email" id="login-email" class="w-full bg-dark-tertiary border border-gray-700 rounded-lg py-2 px-4 text-light-primary focus:outline-none focus:ring-2 focus:ring-accent-indigo-primary" required>
-                        </div>
-                        <div>
-                            <label for="login-password" class="block text-light-secondary mb-1">Senha</label>
-                            <input type="password" id="login-password" class="w-full bg-dark-tertiary border border-gray-700 rounded-lg py-2 px-4 text-light-primary focus:outline-none focus:ring-2 focus:ring-accent-indigo-primary" required>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input type="checkbox" id="remember-me" class="mr-2 accent-accent-indigo-primary">
-                                <label for="remember-me" class="text-sm text-light-tertiary">Lembrar-me</label>
-                            </div>
-                            <a href="#" id="forgot-password-link" class="text-sm text-accent-indigo-primary hover:text-accent-indigo-secondary">Esqueceu a senha?</a>
-                        </div>
-                        <button type="submit" class="w-full bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Entrar</button>
-                    </form>
-                    <div class="mt-6">
-                        <div class="relative">
-                            <div class="absolute inset-0 flex items-center">
-                                <div class="w-full border-t border-gray-700"></div>
-                            </div>
-                            <div class="relative flex justify-center text-sm">
-                                <span class="px-2 bg-dark-card text-light-tertiary">Ou continue com</span>
-                            </div>
-                        </div>
-                        <div class="mt-6">
-                            <button id="google-login-btn" class="w-full flex items-center justify-center bg-dark-tertiary hover:bg-opacity-80 text-light-primary font-semibold py-2 px-4 rounded-lg cta-button neon-border">
-                                <i class="fab fa-google text-red-500 mr-2"></i> Google
-                            </button>
-                        </div>
+                    
+                    <div class="mt-6"> <button id="google-login-btn" class="w-full flex items-center justify-center bg-dark-tertiary hover:bg-opacity-80 text-light-primary font-semibold py-3 px-4 rounded-lg cta-button neon-border transition-transform duration-200 ease-in-out hover:scale-105">
+                            <i class="fab fa-google text-red-500 mr-3 fa-lg"></i> Acessar com Google
+                        </button>
                     </div>
-                    <p class="mt-6 text-center text-sm text-light-tertiary">
-                        Não tem uma conta? <a href="#register" class="text-accent-indigo-primary hover:text-accent-indigo-secondary font-semibold">Registre-se</a>
+
+                    <p class="mt-8 text-center text-sm text-light-tertiary"> Não tem uma conta? <a href="#register" class="text-accent-indigo-primary hover:text-accent-indigo-secondary font-semibold">Registre-se aqui</a>
                     </p>
                 </div>
             </div>
@@ -739,6 +713,8 @@
                         <li><a href="#home" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block animated-footer-link">Início</a></li>
                         <li><a href="#courses" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block animated-footer-link">Cursos</a></li>
                         <li><a href="#" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block animated-footer-link">Sobre Nós</a></li>
+                        <li><a href="#" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block animated-footer-link">Contato</a></li>
+                        <li><a href="#" class="text-light-tertiary hover:text-accent-purple-secondary transition-all duration-200 ease-in-out hover:translate-x-1 inline-block animated-footer-link">FAQ</a></li>
                         <li><a href="https://wa.me/5511943035778?text=Olá!%20Tenho%20interesse%20nos%20cursos%20da%20FullStack%20Cursos.%20Poderia%20me%20ajudar?" target="_blank" class="text-light-tertiary hover:text-green-400 transition-all duration-200 ease-in-out hover:translate-x-1 inline-flex items-center animated-footer-link">
                             <i class="fab fa-whatsapp text-green-400 mr-2 glow-icon transition-transform duration-200 ease-in-out hover:scale-110"></i>
                             <span>WhatsApp</span>
@@ -750,13 +726,16 @@
                     <ul class="space-y-2">
                         <li class="flex items-start">
                             <i class="fas fa-map-marker-alt mt-1 mr-3 text-accent-indigo-primary glow-icon transition-transform duration-200 ease-in-out hover:scale-110"></i>
-                            <span class="text-light-tertiary">Av. Rio Branco, 5259 - Ariquemes, RO</span>
+                            <span class="text-light-tertiary">Av. Tecnologia, 1000 - São Paulo, SP</span>
                         </li>
                         <li class="flex items-start">
                             <i class="fas fa-envelope mt-1 mr-3 text-accent-indigo-primary glow-icon transition-transform duration-200 ease-in-out hover:scale-110"></i>
                             <span class="text-light-tertiary">bruno1235223@gmail.com</span>
                         </li>
-            
+                        <li class="flex items-start">
+                            <i class="fas fa-phone-alt mt-1 mr-3 text-accent-indigo-primary glow-icon transition-transform duration-200 ease-in-out hover:scale-110"></i>
+                            <span class="text-light-tertiary">(11) 4002-8922</span>
+                        </li>
                         <li class="flex items-start">
                             <a href="https://wa.me/5511943035778?text=Olá!%20Tenho%20interesse%20nos%20cursos%20da%20FullStack%20Cursos.%20Poderia%20me%20ajudar?" target="_blank" class="flex items-start text-light-tertiary hover:text-green-400 transition-colors">
                                 <i class="fab fa-whatsapp mt-1 mr-3 text-green-400 glow-icon icon-subtle-pulse transition-transform duration-200 ease-in-out hover:scale-110"></i>
@@ -811,7 +790,8 @@
                         section.style.display = 'none';
                     });
                     const loginSectionEl = document.getElementById('login');
-                    if (loginSectionEl && !loginSectionEl.classList.contains('course-detail-section')) {
+                    // Check if loginSectionEl exists and if it's the target, or if another detail section is the target
+                    if (href !== '#login' && loginSectionEl && !loginSectionEl.classList.contains('course-detail-section')) {
                         loginSectionEl.style.display = 'none';
                     }
 
@@ -823,7 +803,7 @@
 
                         if (targetElement) {
                             targetElement.style.display = 'block';
-                            const headerOffset = 80;
+                            const headerOffset = 80; // Altura do header
                             const elementPosition = targetElement.getBoundingClientRect().top;
                             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
                             window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
@@ -833,16 +813,18 @@
                         const targetId = href.substring(1);
                         const targetElement = document.getElementById(targetId);
                         if (targetElement) {
+                            // Garante que seções não-detalhe que podem ter sido escondidas (como #login antes da modificação) sejam mostradas
                             if(targetElement.style.display === 'none' && !targetElement.classList.contains('course-detail-section')) {
-                                targetElement.style.display = '';
+                                targetElement.style.display = ''; // ou 'block'/'flex' dependendo do display original
                             }
-                            const headerOffset = 80;
+                            const headerOffset = 80; // Altura do header
                             const elementPosition = targetElement.getBoundingClientRect().top;
                             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
                             window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                         }
                     }
 
+                    // Fecha o menu mobile se estiver aberto e o clique não for no botão do menu
                     if (mobileMenu && !mobileMenu.classList.contains('hidden') && (!mobileMenuButton || this.id !== 'mobile-menu-button')) {
                         mobileMenu.classList.add('hidden');
                         if (mobileMenuButton) {
@@ -861,19 +843,19 @@
             const alertMessage = document.getElementById('alert-message');
 
             if (alert && alertMessage) {
-                alert.className = 'custom-alert';
+                alert.className = 'custom-alert'; // Reset classes
                 alert.classList.add(type === 'success' ? 'custom-alert-success' : 'custom-alert-error');
 
                 alertMessage.textContent = message;
                 alert.style.display = 'block';
-                alert.style.opacity = '1';
+                alert.style.opacity = '1'; // Fade in
 
                 setTimeout(() => {
-                    alert.style.opacity = '0';
+                    alert.style.opacity = '0'; // Fade out
                     setTimeout(() => {
                         alert.style.display = 'none';
-                    }, 300);
-                }, 3000);
+                    }, 300); // Time for fade out transition
+                }, 3000); // Alert visible duration
             }
         }
 
@@ -885,7 +867,7 @@
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             const img = entry.target;
-                            img.src = img.dataset.src || img.src;
+                            img.src = img.dataset.src || img.src; // Use data-src if available, otherwise keep src
                             img.classList.add('loaded');
                             imageObserver.unobserve(img);
                         }
@@ -896,6 +878,7 @@
                     imageObserver.observe(img);
                 });
             } else {
+                // Fallback for browsers that don't support IntersectionObserver
                 lazyImages.forEach(img => {
                     img.src = img.dataset.src || img.src;
                     img.classList.add('loaded');
@@ -911,16 +894,19 @@
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             entry.target.classList.add('visible');
-                            // observer.unobserve(entry.target); // Descomente para animar apenas uma vez
+                            // observer.unobserve(entry.target); // Para animar apenas uma vez, descomente esta linha
+                        } else {
+                            // Para re-animar quando sai e entra na viewport (opcional)
+                            // entry.target.classList.remove('visible');
                         }
                     });
-                }, { threshold: 0.05 }); // Diminuído o threshold para acionar um pouco antes
+                }, { threshold: 0.05 }); // Trigger when 5% of the element is visible
 
                 animatedElements.forEach(element => {
                     animationObserver.observe(element);
                 });
             } else {
-                // Fallback para navegadores sem IntersectionObserver
+                // Fallback for older browsers
                 animatedElements.forEach(element => {
                     element.classList.add('visible');
                 });

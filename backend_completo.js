@@ -1,112 +1,680 @@
-/**************************************************************************\n * BACKEND COMPLETO PARA O SITE FullStackCursos (CORRIGIDO)\n **************************************************************************/\n\n// ============================================================================\n// CONFIGURAÇÃO DO FIREBASE\n// ============================================================================\nconst firebaseConfig = {\n  apiKey: "AIzaSyB3IPLPzZpJtWJRmf-C466P4mu1fXa05es", // MANTENHA A SUA CHAVE ORIGINAL\n  authDomain: "fullstack-cursos.firebaseapp.com",\n  projectId: "fullstack-cursos",\n  storageBucket: "fullstack-cursos.appspot.com", // Corrigido: .appspot.com é mais comum\n  messagingSenderId: "934193250493",\n  appId: "1:934193250493:web:e4ecf68f0c5ce85739f7d4",\n  measurementId: "G-6SW1JH0LX6"\n};\n\n// Inicializa o Firebase\nfirebase.initializeApp(firebaseConfig);\n\nconst auth = firebase.auth();\nconst db = firebase.firestore();\nconst storage = firebase.storage(); // Mantido caso seja usado futuramente\nconst functions = firebase.functions(); // Mantido caso seja usado futuramente\n\n// Configuração opcional do Firestore (pode ser removida se não necessária)\n// db.settings({ timestampsInSnapshots: true });\n\n// ============================================================================\n// SISTEMA DE AUTENTICAÇÃO E USUÁRIOS\n// ============================================================================\nconst AuthSystem = {\n  currentUser: null,\n  currentUserProfile: null, // Armazena o perfil do Firestore\n\n  initAuthObserver: function() {\n    auth.onAuthStateChanged(async user => {\n      if (user) {\n        this.currentUser = user;\n        console.log('[AuthObserver] Usuário detectado:', user.uid);\n        try {\n          this.currentUserProfile = await this.getUserProfile(user.uid);\n          console.log('[AuthObserver] Perfil obtido:', this.currentUserProfile);\n          updateUserInterface(user, this.currentUserProfile);\n\n          // Redirecionamento após login/refresh se estiver em página pública/login\n          const currentHash = window.location.hash.substring(1);\n          const publicOrAuthPages = ['home', 'courses', 'benefits', 'testimonials', 'blog', 'team', 'alunos-destaque', 'login', 'register', 'reset-password', ''];\n          if (publicOrAuthPages.includes(currentHash)) {\n            console.log('[AuthObserver] Redirecionando para #dashboard');\n            window.location.hash = '#dashboard'; // Redireciona para o dashboard\n          } else {\n            // Se já está numa seção de usuário, apenas atualiza a UI (handleHashChange fará isso)\n            handleHashChange();\n          }\n        } catch (error) {\n            console.error("[AuthObserver] Erro ao buscar perfil para UI:", error);\n            updateUserInterface(user, null); // Fallback com dados do Auth\n            // Decide se redireciona mesmo sem perfil completo\n            const currentHash = window.location.hash.substring(1);\n            const publicOrAuthPages = ['home', 'courses', 'benefits', 'testimonials', 'blog', 'team', 'alunos-destaque', 'login', 'register', 'reset-password', ''];\n            if (publicOrAuthPages.includes(currentHash)) {\n                window.location.hash = '#dashboard';\n            }\n        }\n      } else {\n        this.currentUser = null;\n        this.currentUserProfile = null;\n        console.log('[AuthObserver] Nenhum usuário logado.');\n        updateUserInterface(null, null);\n        // Se o usuário deslogou e estava em uma seção protegida, redireciona para #home\n        const currentHash = window.location.hash.substring(1);\n        const protectedSections = ['dashboard', 'profile', 'my-courses', 'settings'];\n        if (protectedSections.includes(currentHash)) {\n            console.log('[AuthObserver] Usuário deslogou, redirecionando para #home');\n            window.location.hash = '#home';\n        }\n      }\n    });\n  },\n\n  registerUser: async function(name, email, password) {\n    try {\n      const userCredential = await auth.createUserWithEmailAndPassword(email, password);\n      const user = userCredential.user;\n      await user.updateProfile({ displayName: name });\n      // Criar perfil no Firestore\n      await db.collection('users').doc(user.uid).set({\n        name: name,\n        email: email,\n        role: 'student',\n        createdAt: firebase.firestore.FieldValue.serverTimestamp(),\n        courses: [], // Lista de IDs dos cursos comprados\n        // Adicione outros campos se necessário (ex: photoURL inicial)\n      });\n      showCustomAlert('Registro realizado com sucesso! Você já está logado.', 'success');\n      // onAuthStateChanged cuidará do redirecionamento e UI\n      return user;\n    } catch (error) {\n      console.error("Erro no registro:", error);\n      showCustomAlert(`Erro no registro: ${getFirebaseAuthErrorMessage(error)}`, 'error');\n      throw error;\n    }\n  },\n\n  loginUser: async function(email, password) {\n    try {\n      const userCredential = await auth.signInWithEmailAndPassword(email, password);\n      showCustomAlert('Login realizado com sucesso!', 'success');\n      // onAuthStateChanged cuidará do redirecionamento e UI\n      return userCredential.user;\n    } catch (error) {\n      console.error("Erro no login:", error);\n      showCustomAlert(`Erro no login: ${getFirebaseAuthErrorMessage(error)}`, 'error');\n      throw error;\n    }\n  },\n\n  loginWithGoogle: async function() {\n    try {\n      console.log('[AuthSystem.loginWithGoogle] Iniciando login com Google...');\n      const provider = new firebase.auth.GoogleAuthProvider();\n      // Forçar seleção de conta (opcional)\n      // provider.setCustomParameters({ prompt: 'select_account' });\n      const userCredential = await auth.signInWithPopup(provider);\n      const user = userCredential.user;\n      console.log('[AuthSystem.loginWithGoogle] Usuário autenticado:', user.displayName, user.uid);\n\n      const userDocRef = db.collection('users').doc(user.uid);\n      const userDoc = await userDocRef.get();\n\n      if (!userDoc.exists) {\n        console.log('[AuthSystem.loginWithGoogle] Usuário novo, criando perfil no Firestore...');\n        await userDocRef.set({\n          name: user.displayName || 'Usuário Google',\n          email: user.email,\n          photoURL: user.photoURL || null,\n          role: 'student',\n          createdAt: firebase.firestore.FieldValue.serverTimestamp(),\n          courses: [],\n        }, { merge: true });\n        console.log('[AuthSystem.loginWithGoogle] Perfil criado para:', user.displayName);\n      } else {\n        console.log('[AuthSystem.loginWithGoogle] Usuário já existe:', user.displayName);\n        // Atualiza nome/foto caso tenham mudado no Google\n        await userDocRef.update({\n            name: user.displayName || userDoc.data().name, // Mantém nome existente se Google não fornecer\n            photoURL: user.photoURL || userDoc.data().photoURL // Mantém foto existente se Google não fornecer\n        });\n        console.log('[AuthSystem.loginWithGoogle] Perfil atualizado para:', user.displayName);\n      }\n      showCustomAlert('Login com Google realizado com sucesso!', 'success');\n      // onAuthStateChanged cuidará do redirecionamento e UI\n      return user;\n    } catch (error) {\n      console.error("[AuthSystem.loginWithGoogle] Erro:", error);\n      if (error.code === 'auth/popup-closed-by-user') {\n        showCustomAlert('Login com Google cancelado.', 'info');\n      } else if (error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-blocked') {\n         showCustomAlert('Popup de login bloqueado ou cancelado. Verifique as configurações do seu navegador.', 'error');\n      } else {\n        showCustomAlert(`Erro no login com Google: ${getFirebaseAuthErrorMessage(error)}`, 'error');\n      }\n      throw error;\n    }\n  },\n\n  logoutUser: async function() {\n    try {\n      await auth.signOut();\n      showCustomAlert('Logout realizado com sucesso.', 'success');\n      // onAuthStateChanged cuidará da UI e redirecionamento para #home\n    } catch (error) {\n      console.error("Erro no logout:", error);\n      showCustomAlert(`Erro ao fazer logout: ${error.message}`, 'error');\n      throw error;\n    }\n  },\n\n  resetPassword: async function(email) {\n    try {\n      await auth.sendPasswordResetEmail(email);\n      showCustomAlert('Email de redefinição de senha enviado! Verifique sua caixa de entrada (e spam).', 'success');\n    } catch (error) {\n      console.error("Erro ao enviar email de redefinição:", error);\n      showCustomAlert(`Erro ao enviar email: ${getFirebaseAuthErrorMessage(error)}`, 'error');\n      throw error;\n    }\n  },\n\n  getUserProfile: async function(userId) {\n    if (!userId) {\n        console.error("[getUserProfile] ID do usuário não fornecido.");\n        throw new Error("ID do usuário não fornecido");\n    }\n    try {\n      const userDocRef = db.collection('users').doc(userId);\n      const userDoc = await userDocRef.get();\n      if (userDoc.exists) {\n        console.log("[getUserProfile] Perfil encontrado no Firestore para", userId);\n        return { id: userDoc.id, ...userDoc.data() };\n      } else {\n        // Tenta criar um perfil básico se não existir (pode acontecer em fluxos rápidos de login social)\n        const currentUserAuth = auth.currentUser;\n        if (currentUserAuth && currentUserAuth.uid === userId) {\n            console.warn("[getUserProfile] Perfil não encontrado no Firestore. Criando perfil básico com dados do Auth.");\n            const basicProfile = {\n                name: currentUserAuth.displayName || 'Usuário',\n                email: currentUserAuth.email,\n                photoURL: currentUserAuth.photoURL || null,\n                role: 'student',\n                courses: [],\n                createdAt: firebase.firestore.FieldValue.serverTimestamp()\n            };\n            await userDocRef.set(basicProfile, { merge: true });\n            return { id: userId, ...basicProfile };\n        } else {\n             console.error("[getUserProfile] Perfil de usuário não encontrado no Firestore e Auth não corresponde.");\n             throw new Error("Perfil de usuário não encontrado");\n        }\n      }\n    } catch (error) {\n      console.error("[getUserProfile] Erro ao obter/criar perfil:", error);\n      throw error;\n    }\n  },\n\n  updateUserProfile: async function(userId, profileData) {\n    if (!userId) throw new Error("ID do usuário não fornecido");\n    if (!profileData || !profileData.name) {\n        showCustomAlert('Nome inválido para atualização.', 'error');\n        throw new Error("Dados de perfil inválidos");\n    }\n    try {\n      const userDocRef = db.collection('users').doc(userId);\n      await userDocRef.update({ name: profileData.name }); // Atualiza apenas o nome por enquanto\n      showCustomAlert('Nome atualizado com sucesso!', 'success');\n      // Atualiza o nome no estado local e na UI imediatamente\n      if (this.currentUserProfile) {\n          this.currentUserProfile.name = profileData.name;\n      }\n      updateUserInterface(this.currentUser, this.currentUserProfile);\n    } catch (error) {\n      console.error("Erro ao atualizar perfil:", error);\n      showCustomAlert(`Erro ao atualizar perfil: ${error.message}`, 'error');\n      throw error;\n    }\n  }\n  // isAdmin pode ser adicionado se necessário\n};\n\n// ============================================================================\n// SISTEMA DE GERENCIAMENTO DE CURSOS (Exemplo Básico)\n// ============================================================================\nconst CourseSystem = {\n  // Simula a busca de cursos (substituir por chamada real ao Firestore)\n  getAllCourses: async function() {\n    console.log("[CourseSystem] Buscando todos os cursos (simulado)");\n    // Simulação - Substitua por chamada ao Firestore: db.collection('courses').get()\n    await new Promise(resolve => setTimeout(resolve, 500)); // Simula delay da rede\n    return [\n        { id: 'logica', title: 'Lógica de Programação Avançada', description: 'Desenvolva o raciocínio lógico fundamental...', imageUrl: 'images/logica.png', price: '97,00', tag: 'Para Iniciantes', tagColor: 'indigo' },\n        { id: 'minicurso', title: 'Minicurso Programar do Zero', description: 'Dê seus primeiros passos no universo da programação...', imageUrl: 'images/minicurso.png', price: '120,00', tag: 'Para Iniciantes', tagColor: 'emerald' },\n        { id: 'python', title: 'Python Básico para Iniciantes', description: 'Aprenda os fundamentos da linguagem Python...', imageUrl: 'images/python.png', price: '97,00', tag: 'Mais Popular', tagColor: 'red' },\n        { id: 'uxui', title: 'UX/UI Vision: Interfaces que Encantam', description: 'Crie interfaces intuitivas e visualmente atraentes...', imageUrl: 'images/curso-ux-ui-vision.png', price: '197,00', tag: 'Design', tagColor: 'purple' },\n        { id: 'devops', title: 'Cloud Ops Elite: DevOps e Nuvem', description: 'Domine práticas DevOps e ferramentas de nuvem...', imageUrl: 'images/curso-cloud-ops.png', price: '247,00', tag: 'Avançado', tagColor: 'amber' },\n        { id: 'mobile', title: 'App Impact: Criando Apps Multiplataforma', description: 'Desenvolva aplicativos para iOS e Android...', imageUrl: 'images/curso-app-impact.png', price: '297,00', tag: 'Mobile', tagColor: 'pink' },\n    ];\n  },\n\n  // Simula a busca de informações básicas de um curso\n  getBasicCourseInfo: async function(courseId) {\n    console.log(`[CourseSystem] Buscando info básica do curso: ${courseId} (simulado)`);\n    // Simulação - Substitua por chamada ao Firestore: db.collection('courses').doc(courseId).get()\n    await new Promise(resolve => setTimeout(resolve, 100)); // Simula delay\n    const allCourses = await this.getAllCourses(); // Reutiliza a função simulada\n    const course = allCourses.find(c => c.id === courseId);\n    if (course) {\n        return {\n            id: course.id,\n            title: course.title,\n            imageUrl: course.imageUrl,\n            description: course.description // Retorna a descrição completa aqui\n        };\n    }\n    console.warn(`[getBasicCourseInfo] Curso com ID ${courseId} não encontrado (simulado).`);\n    return null;\n  }\n};\n\n// ============================================================================\n// FUNÇÕES DE EXIBIÇÃO DE CONTEÚDO DAS SEÇÕES\n// ============================================================================\n
-// Função genérica para mostrar uma seção e esconder as outras\nfunction showSection(sectionId) {\n    console.log(`[showSection] Tentando exibir: #${sectionId}`);\n    const sections = document.querySelectorAll('main > section, .user-section, .course-detail-section');\n    let sectionFound = false;\n    sections.forEach(section => {\n        if (section.id === sectionId) {\n            section.style.display = 'block';\n            sectionFound = true;\n            console.log(`[showSection] Exibindo #${sectionId}`);\n        } else {\n            section.style.display = 'none';\n        }\n    });\n    if (!sectionFound) {\n        console.warn(`[showSection] Seção #${sectionId} não encontrada no DOM. Exibindo #home.`);\n        document.getElementById('home').style.display = 'block';\n        window.location.hash = '#home'; // Corrige URL se seção não existe\n    }\n    // Rola para o topo da página ao mudar de seção\n    window.scrollTo(0, 0);\n}\n\n// Exibe o Painel do Usuário\nasync function displayUserDashboard() {\n    console.log("[displayUserDashboard] Exibindo painel.");\n    const dashboardSection = document.getElementById('dashboard');\n    if (!dashboardSection) {\n        console.error("[displayUserDashboard] Seção #dashboard não encontrada.");\n        showSection('home');\n        return;\n    }\n    showSection('dashboard');\n\n    // Atualiza mensagem de boas-vindas\n    const welcomeMsg = document.getElementById('dashboard-welcome');\n    if (welcomeMsg) {\n        const userName = AuthSystem.currentUserProfile?.name || AuthSystem.currentUser?.displayName || 'Aluno(a)';\n        welcomeMsg.textContent = `Bem-vindo(a) de volta, ${userName}!`;\n    }\n}\n\n// Exibe a seção Meus Cursos\nasync function displayUserCourses() {\n    console.log("[displayUserCourses] Exibindo Meus Cursos.");\n    const myCoursesSection = document.getElementById('my-courses');\n    const coursesContainer = document.getElementById('user-courses-container');\n    if (!myCoursesSection || !coursesContainer) {\n        console.error("[displayUserCourses] Elementos da seção 'Meus Cursos' não encontrados.");\n        showSection('dashboard');\n        return;\n    }\n    showSection('my-courses');\n\n    if (!AuthSystem.currentUser) {\n        coursesContainer.innerHTML = '<p class="text-light-tertiary col-span-full text-center">Você precisa estar logado para ver seus cursos.</p>';\n        setTimeout(() => { window.location.hash = '#login'; }, 1500);\n        return;\n    }\n\n    try {\n        coursesContainer.innerHTML = '<p class="text-light-tertiary col-span-full text-center animate-pulse">Carregando seus cursos...</p>';\n        // Busca o perfil ATUALIZADO do usuário para pegar a lista de cursos\n        const userProfile = await AuthSystem.getUserProfile(AuthSystem.currentUser.uid);\n        const courseIds = userProfile.courses || [];\n        console.log("[displayUserCourses] IDs dos cursos do usuário:", courseIds);\n\n        if (courseIds.length === 0) {\n            coursesContainer.innerHTML = '<p class="text-light-tertiary col-span-full text-center">Você ainda não está matriculado em nenhum curso. <a href="#courses" class="text-accent-indigo-primary hover:underline">Explore nossos cursos!</a></p>';\n            return;\n        }\n\n        // Busca informações dos cursos do usuário (usando a simulação)\n        const coursePromises = courseIds.map(id => CourseSystem.getBasicCourseInfo(id));\n        const coursesDetails = (await Promise.all(coursePromises)).filter(c => c !== null); // Filtra cursos não encontrados\n\n        console.log("[displayUserCourses] Detalhes dos cursos obtidos:", coursesDetails);\n\n        if (coursesDetails.length === 0 && courseIds.length > 0) {\n             coursesContainer.innerHTML = '<p class="text-yellow-400 col-span-full text-center">Não foi possível carregar os detalhes dos seus cursos. Tente novamente mais tarde.</p>';\n             return;\n        }\n        if (coursesDetails.length === 0 && courseIds.length === 0) {\n             coursesContainer.innerHTML = '<p class="text-light-tertiary col-span-full text-center">Você ainda não está matriculado em nenhum curso. <a href="#courses" class="text-accent-indigo-primary hover:underline">Explore nossos cursos!</a></p>';\n             return;\n        }\n\n        let coursesHTML = '';\n        coursesDetails.forEach((course, index) => {\n            // Card do curso SEM link externo, apenas informativo\n            coursesHTML += `\n                <div class="course-card bg-dark-card rounded-xl shadow-lg overflow-hidden flex flex-col neon-border animate-on-scroll delay-${(index % 3) * 200}ms">\n                    <img src="${course.imageUrl}" alt="${course.title}" class="w-full h-48 object-cover lazy-load">\n                    <div class="p-6 flex flex-col flex-grow">\n                        <h4 class="text-xl font-semibold mb-2 text-light-primary">${course.title}</h4>\n                        <p class="text-light-tertiary text-sm mb-4 flex-grow">${course.description ? (course.description.length > 100 ? course.description.substring(0, 100) + '...' : course.description) : 'Descrição indisponível.'}</p>\n                        <div class="mt-auto pt-2 border-t border-gray-700 flex justify-between items-center">\n                            <span class="text-sm text-accent-emerald-text font-medium">Matriculado</span>\n                            <!-- Poderia adicionar um botão interno para "Acessar Curso" que leva a outra seção/página interna -->\n                            <!-- <button class="text-xs bg-accent-purple-primary hover:bg-accent-purple-hover text-white py-1 px-2 rounded">Acessar</button> -->\n                        </div>\n                    </div>\n                </div>\n            `;\n        });\n\n        coursesContainer.innerHTML = coursesHTML;\n        // Re-inicializa lazy loading e animações para os novos cards\n        initLazyLoading();\n        initScrollAnimations();\n\n    } catch (error) {\n        console.error("[displayUserCourses] Erro ao exibir cursos do usuário:", error);\n        coursesContainer.innerHTML = '<p class="text-red-500 col-span-full text-center">Ocorreu um erro ao carregar seus cursos. Tente novamente mais tarde.</p>';\n    }\n}\n\n// Exibe a seção Meu Perfil\nasync function displayUserProfile() {\n    console.log("[displayUserProfile] Exibindo Perfil do Usuário.");\n    const profileSection = document.getElementById('profile');\n    const profileContent = document.getElementById('user-profile-content');\n    const profileForm = document.getElementById('profile-form');\n    if (!profileSection || !profileContent || !profileForm) {\n        console.error("[displayUserProfile] Elementos da seção 'Perfil' não encontrados.");\n        showSection('dashboard');\n        return;\n    }\n    showSection('profile');\n\n    if (!AuthSystem.currentUser) {\n        window.location.hash = '#login';\n        return;\n    }\n\n    try {\n        profileContent.innerHTML = '<p class="text-light-secondary animate-pulse">Carregando informações do perfil...</p>';\n        const profile = await AuthSystem.getUserProfile(AuthSystem.currentUser.uid);\n\n        // Preencher informações básicas (não editáveis aqui)\n        let profileHTML = '';\n        profileHTML += `\n            <div class="mb-4">\n                <label class="block text-sm font-medium text-light-tertiary">Email</label>\n                <p class="mt-1 text-lg text-light-primary">${profile.email || 'Não informado'}</p>\n            </div>\n        `;\n        if (profile.createdAt && profile.createdAt.seconds) {\n             profileHTML += `\n                <div class="mb-4">\n                    <label class="block text-sm font-medium text-light-tertiary">Membro desde</label>\n                    <p class="mt-1 text-lg text-light-primary">${new Date(profile.createdAt.seconds * 1000).toLocaleDateString()}</p>\n                </div>\n            `;\n        }\n        // Adicionar mais campos se existirem no Firestore (ex: role, etc.)\n\n        profileContent.innerHTML = profileHTML;\n\n        // Preencher o campo de nome no formulário de edição\n        const nameInput = profileForm.querySelector('input[name="name"]');\n        if (nameInput) {\n            nameInput.value = profile.name || '';\n        }\n\n    } catch (error) {\n        console.error("[displayUserProfile] Erro ao carregar perfil:", error);\n        profileContent.innerHTML = '<p class="text-red-500">Erro ao carregar dados do perfil.</p>';\n        showCustomAlert('Erro ao carregar dados do perfil.', 'error');\n    }\n}\n\n// Exibe a seção Configurações\nasync function displayUserSettings() {\n    console.log("[displayUserSettings] Exibindo Configurações.");\n    const settingsSection = document.getElementById('settings');\n    if (!settingsSection) {\n        console.error("[displayUserSettings] Seção #settings não encontrada.");\n        showSection('dashboard');\n        return;\n    }\n    showSection('settings');\n\n    if (!AuthSystem.currentUser) {\n        window.location.hash = '#login';\n        return;\n    }\n    // Limpar campos de senha ao exibir a seção\n    const changePasswordForm = document.getElementById('change-password-form');\n    if (changePasswordForm) changePasswordForm.reset();\n    // Carregar preferências do usuário se houver (ex: do Firestore)\n    // Exemplo: const prefs = await getUserPreferences(AuthSystem.currentUser.uid);\n    //          document.getElementById('email-prefs-checkbox').checked = prefs.receiveEmails;\n}\n\n// Exibe a seção de Login\nfunction displayLogin() {\n    console.log("[displayLogin] Exibindo Login.");\n    showSection('login');\n    // Limpar formulários ao exibir\n    const loginForm = document.getElementById('login-form');\n    if (loginForm) loginForm.reset();\n}\n\n// Exibe a seção de Registro\nfunction displayRegister() {\n    console.log("[displayRegister] Exibindo Registro.");\n    showSection('register');\n    const registerForm = document.getElementById('register-form');\n    if (registerForm) registerForm.reset();\n}\n\n// Exibe a seção de Reset de Senha\nfunction displayResetPassword() {\n    console.log("[displayResetPassword] Exibindo Reset de Senha.");\n    showSection('reset-password');\n    const resetForm = document.getElementById('reset-password-form');\n    if (resetForm) resetForm.reset();\n}\n
-// Exibe a seção pública de Cursos\nasync function displayPublicCourses() {\n    console.log("[displayPublicCourses] Exibindo cursos públicos.");\n    const coursesContainer = document.getElementById('public-courses-container');\n    if (!coursesContainer) {\n        console.warn('[displayPublicCourses] Container #public-courses-container não encontrado.');\n        showSection('courses'); // Mostra a seção mesmo sem container, mas avisa\n        return;\n    }\n    showSection('courses');\n    coursesContainer.innerHTML = '<p class="text-light-tertiary text-center col-span-full animate-pulse">Carregando cursos...</p>';\n    try {\n        const courses = await CourseSystem.getAllCourses(); // Usando simulação\n        let coursesHTML = '';\n        if (courses.length === 0) {\n            coursesHTML = '<p class="text-light-tertiary text-center col-span-full">Nenhum curso disponível no momento.</p>';\n        } else {\n            courses.forEach((course, index) => {\n                // Define a cor da tag com base no tagColor ou usa indigo como padrão\n                const tagColorClass = course.tagColor ? `accent-${course.tagColor}-text bg-accent-${course.tagColor}-primary` : 'accent-indigo-text bg-accent-indigo-primary';\n                const buttonColorClass = course.tagColor ? `bg-accent-${course.tagColor}-primary hover:bg-accent-${course.tagColor}-hover` : 'bg-accent-indigo-primary hover:bg-accent-indigo-hover';\n                const priceColorClass = course.tagColor ? `text-accent-${course.tagColor}-primary` : 'text-accent-indigo-primary';\n\n                coursesHTML += `\n                    <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll delay-${(index % 3) * 200}ms">\n                        <img src="${course.imageUrl || 'images/placeholder-course.jpg'}" alt="${course.title}" class="w-full h-48 object-cover lazy-load">\n                        <div class="p-6 flex flex-col flex-grow">\n                            <h3 class="text-xl font-semibold mb-2 text-light-primary">${course.title}</h3>\n                            <p class="text-light-tertiary mb-4 text-sm flex-grow">${course.description ? (course.description.length > 120 ? course.description.substring(0, 120) + '...' : course.description) : ''}</p>\n                            <div class="mb-4">\n                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full ${tagColorClass} bg-opacity-20">${course.tag || 'Novo'}</span>\n                            </div>\n                            <div class="flex justify-between items-center mb-3">\n                                <p class="text-lg font-bold ${priceColorClass}">R$ ${course.price || 'Grátis'}</p>\n                                <!-- Pode adicionar número de alunos ou avaliação aqui -->\n                            </div>\n                            <a href="#detail-${course.id}" class="mt-auto block w-full text-center ${buttonColorClass} text-white font-semibold py-2 px-4 rounded-lg cta-button">\n                                Ver Detalhes\n                            </a>\n                        </div>\n                    </div>\n                `;\n            });\n        }\n        coursesContainer.innerHTML = coursesHTML;\n        initLazyLoading();\n        initScrollAnimations();\n    } catch (error) {\n        console.error("[displayPublicCourses] Erro ao carregar cursos públicos:", error);\n        coursesContainer.innerHTML = '<p class="text-red-500 text-center col-span-full">Erro ao carregar cursos.</p>';\n    }\n}\n
-// Exibe Detalhes de um Curso Específico\nasync function displayCourseDetail(courseId) {\n    console.log(`[displayCourseDetail] Exibindo detalhes do curso: ${courseId}`);\n    const detailSectionId = `detail-${courseId}`;\n    const detailSection = document.getElementById(detailSectionId);\n\n    if (!detailSection) {\n        console.error(`[displayCourseDetail] Seção de detalhe #${detailSectionId} não encontrada.`);\n        showSection('courses'); // Volta para a lista de cursos\n        return;\n    }\n\n    // Esconde todas as outras seções e mostra a de detalhe específica\n    showSection(detailSectionId);\n\n    // Aqui você pode carregar dados mais detalhados do curso se necessário\n    // Ex: const courseData = await CourseSystem.getCourseDetails(courseId);\n    // E preencher elementos dentro da detailSection com esses dados.\n    // Por enquanto, o conteúdo é estático no HTML.\n    initLazyLoading(); // Garante que imagens na seção de detalhe carreguem\n}\n
-// ============================================================================\n// MANIPULAÇÃO DA INTERFACE E EVENTOS\n// ============================================================================\n
-// Atualiza a UI (cabeçalho, menus) baseada no estado de login\nfunction updateUserInterface(user, profile) {
-    const loginButton = document.getElementById('login-button');
-    const userMenuContainer = document.getElementById('user-menu-container');
-    const userNameDisplay = document.getElementById('user-name-display');
-    const mobileLoginLink = document.getElementById('mobile-login-link');
-    const mobileMenuUserLinks = document.getElementById('mobile-menu-user-links');
-    const userDropdownMenu = document.getElementById('user-dropdown-menu');
+/**
+ * BACKEND COMPLETO PARA O SITE FullStackCursos
+ */
 
-    if (user) {\n        // Logado\n        if (loginButton) loginButton.style.display = 'none';\n        if (userMenuContainer) userMenuContainer.style.display = 'block'; // Ou 'flex'\n        if (userNameDisplay) {\n            userNameDisplay.textContent = profile?.name || user.displayName || 'Usuário';\n        }\n        // Atualizar menu mobile\n        if (mobileLoginLink) mobileLoginLink.style.display = 'none';\n        if (mobileMenuUserLinks) mobileMenuUserLinks.style.display = 'block'; // Ou 'flex'\n
-    } else {\n        // Deslogado\n        if (loginButton) loginButton.style.display = 'block'; // Ou 'inline-block'\n        if (userMenuContainer) userMenuContainer.style.display = 'none';\n        // Esconder dropdown explicitamente ao deslogar\n        if (userDropdownMenu) userDropdownMenu.classList.add('hidden');\n        // Resetar nome\n        if (userNameDisplay) userNameDisplay.textContent = 'Usuário';\n        // Atualizar menu mobile\n        if (mobileLoginLink) mobileLoginLink.style.display = 'block';\n        if (mobileMenuUserLinks) mobileMenuUserLinks.style.display = 'none';\n    }\n}\n
-// Configura o dropdown do usuário no cabeçalho\nfunction setupUserDropdown() {
-    const userMenuButton = document.getElementById('user-menu-button');\n    const userDropdownMenu = document.getElementById('user-dropdown-menu');\n    const logoutButtonDropdown = document.getElementById('logout-button-dropdown');
-    const logoutButtonMobile = document.getElementById('logout-button-mobile');
+// ============================================================================
+// CONFIGURAÇÃO DO FIREBASE
+// ============================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyB3IPLPzZpJtWJRmf-C466P4mu1fXa05es", // MANTENHA A SUA CHAVE ORIGINAL
+  authDomain: "fullstack-cursos.firebaseapp.com",
+  projectId: "fullstack-cursos",
+  storageBucket: "fullstack-cursos.firebasestorage.app",
+  messagingSenderId: "934193250493",
+  appId: "1:934193250493:web:e4ecf68f0c5ce85739f7d4",
+  measurementId: "G-6SW1JH0LX6"
+};
 
-    if (!userMenuButton || !userDropdownMenu || !logoutButtonDropdown || !logoutButtonMobile) {\n        console.warn('Elementos do menu/dropdown do usuário não encontrados.');\n        return;\n    }\n
-    userMenuButton.addEventListener('click', (event) => {\n        event.stopPropagation(); // Impede que o clique feche o menu imediatamente\n        userDropdownMenu.classList.toggle('hidden');\n    });\n
-    // Fechar dropdown se clicar fora\n    document.addEventListener('click', (event) => {\n        if (!userMenuButton.contains(event.target) && !userDropdownMenu.contains(event.target)) {\n            if (!userDropdownMenu.classList.contains('hidden')) {\n                 userDropdownMenu.classList.add('hidden');\n            }\n        }\n    });\n
-    // Fechar dropdown ao clicar em um item do menu (link de navegação)\n    userDropdownMenu.querySelectorAll('a').forEach(link => {\n        link.addEventListener('click', () => {\n            userDropdownMenu.classList.add('hidden');\n            // A navegação será tratada pelo handleHashChange\n        });\n    });\n
-    // Logout pelo botão do dropdown\n    logoutButtonDropdown.addEventListener('click', async () => {\n        userDropdownMenu.classList.add('hidden');\n        await AuthSystem.logoutUser();\n    });
+firebase.initializeApp(firebaseConfig);
 
-    // Logout pelo botão do menu mobile\n    logoutButtonMobile.addEventListener('click', async () => {\n        // Fecha o menu mobile primeiro\n        const mobileMenu = document.getElementById('mobile-menu');\n        const mobileMenuButton = document.getElementById('mobile-menu-button');\n        if (mobileMenu && mobileMenuButton) {\n            mobileMenu.classList.add('hidden');\n            mobileMenuButton.setAttribute('aria-expanded', 'false');\n        }\n        await AuthSystem.logoutUser();\n    });\n}\n
-// Lida com a navegação SPA baseada em Hash\nfunction handleHashChange() {
-    const hash = window.location.hash.substring(1) || 'home';\n    console.log(`[handleHashChange] Navegando para: #${hash}`);\n
-    // Fechar menu mobile se estiver aberto\n    const mobileMenu = document.getElementById('mobile-menu');\n    const mobileMenuButton = document.getElementById('mobile-menu-button');\n    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {\n        mobileMenu.classList.add('hidden');\n        if (mobileMenuButton) mobileMenuButton.setAttribute('aria-expanded', 'false');\n    }\n
-    // Seções que requerem login\n    const protectedSections = ['dashboard', 'profile', 'my-courses', 'settings'];\n    // Seções de autenticação (não protegidas, mas tratadas)\n    const authSections = ['login', 'register', 'reset-password'];\n    // Seções de detalhe de curso\n    const isCourseDetail = hash.startsWith('detail-');\n    const courseId = isCourseDetail ? hash.substring('detail-'.length) : null;\n
-    if (protectedSections.includes(hash)) {\n        if (AuthSystem.currentUser) {\n            // Usuário logado, carrega a seção protegida\n            switch (hash) {\n                case 'dashboard': displayUserDashboard(); break;\n                case 'profile': displayUserProfile(); break;\n                case 'my-courses': displayUserCourses(); break;\n                case 'settings': displayUserSettings(); break;\n            }\n        } else {\n            // Usuário não logado tentando acessar seção protegida\n            console.warn(`[handleHashChange] Acesso negado à seção protegida: #${hash}. Redirecionando para login.`);\n            window.location.hash = '#login'; // Redireciona para a página de login\n            // Chama displayLogin explicitamente para garantir a exibição\n            displayLogin();\n        }\n    } else if (authSections.includes(hash)) {\n        // Seções de autenticação\n        if (AuthSystem.currentUser) {\n            // Se usuário já está logado, redireciona para dashboard\n            console.log(`[handleHashChange] Usuário logado tentou acessar #${hash}. Redirecionando para #dashboard.`);\n            window.location.hash = '#dashboard';\n            displayUserDashboard();\n        } else {\n            // Usuário não logado, mostra a seção de autenticação correta\n            switch (hash) {\n                case 'login': displayLogin(); break;\n                case 'register': displayRegister(); break;\n                case 'reset-password': displayResetPassword(); break;\n            }\n        }\n    } else if (isCourseDetail) {\n        // Seção de detalhe de curso (pública)\n        displayCourseDetail(courseId);\n    } else {\n        // Seção pública ou não encontrada\n        const targetSection = document.getElementById(hash);\n        if (targetSection) {\n            showSection(hash);\n            // Carregar dados dinâmicos para seções públicas se necessário\n            if (hash === 'courses') {\n                displayPublicCourses();\n            }\n            // Adicionar outras chamadas para carregar dados de seções públicas aqui (ex: blog, team)\n        } else {\n            console.warn(`[handleHashChange] Seção #${hash} não encontrada. Exibindo #home.`);\n            showSection('home');\n            window.location.hash = '#home'; // Corrige o hash na URL\n        }\n    }\n}\n
-// Função para exibir alertas customizados\nfunction showCustomAlert(message, type = 'info') { // types: info, success, error\n    const alertContainer = document.getElementById('custom-alert-container');\n    if (!alertContainer) {\n        console.error("Elemento #custom-alert-container não encontrado no DOM.");\n        return; // Não pode exibir alerta\n    }\n
-    const alertDiv = document.createElement('div');\n    alertDiv.className = `custom-alert custom-alert-${type}`;
-    alertDiv.textContent = message;\n    alertDiv.style.opacity = '0'; // Começa invisível para animar\n
-    alertContainer.appendChild(alertDiv);\n
-    // Força reflow para garantir que a transição funcione\n    void alertDiv.offsetWidth;\n
-    alertDiv.style.opacity = '1'; // Fade in\n
-    // Remover alerta após alguns segundos\n    setTimeout(() => {\n        alertDiv.style.opacity = '0';\n        setTimeout(() => {\n            alertDiv.remove();\n        }, 500); // Tempo para a animação de fade-out\n    }, 5000); // Tempo que o alerta fica visível (5 segundos)\n}\n
-// Tradução simples de erros comuns do Firebase Auth\nfunction getFirebaseAuthErrorMessage(error) {\n    switch (error.code) {\n        case 'auth/user-not-found':\n            return 'Usuário não encontrado. Verifique o email.';\n        case 'auth/wrong-password':\n            return 'Senha incorreta.';\n        case 'auth/invalid-email':\n            return 'Formato de email inválido.';\n        case 'auth/email-already-in-use':\n            return 'Este email já está em uso por outra conta.';\n        case 'auth/weak-password':\n            return 'A senha é muito fraca. Use pelo menos 6 caracteres.';\n        case 'auth/requires-recent-login':\n            return 'Esta operação requer login recente. Faça logout e login novamente.';\n        case 'auth/too-many-requests':\n            return 'Muitas tentativas de login falharam. Tente novamente mais tarde.';\n        case 'auth/network-request-failed':\n            return 'Erro de rede. Verifique sua conexão com a internet.';\n        default:\n            return error.message; // Retorna a mensagem original se não for um erro conhecido\n    }\n}\n
-// ============================================================================\n// INICIALIZAÇÃO E EVENT LISTENERS GLOBAIS\n// ============================================================================\ndocument.addEventListener('DOMContentLoaded', () => {\n    console.log('DOM carregado. Iniciando scripts...');\n
-    // Inicializa o observador de autenticação PRIMEIRO\n    AuthSystem.initAuthObserver();\n
-    // Configura o dropdown do usuário\n    setupUserDropdown();\n
-    // Listener para mudanças de Hash na URL\n    window.addEventListener('hashchange', handleHashChange);\n    // Chama handleHashChange na carga inicial para tratar o hash existente ou default\n    // Atraso leve para garantir que o AuthObserver tenha chance de rodar primeiro\n    setTimeout(handleHashChange, 100);\n
-    // Listener para o botão do menu mobile\n    const mobileMenuButton = document.getElementById('mobile-menu-button');\n    const mobileMenu = document.getElementById('mobile-menu');\n    if (mobileMenuButton && mobileMenu) {\n        mobileMenuButton.addEventListener('click', () => {\n            const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';\n            mobileMenu.classList.toggle('hidden');\n            mobileMenuButton.setAttribute('aria-expanded', !isExpanded);\n        });\n        // Fechar menu mobile ao clicar em um link dentro dele\n        mobileMenu.querySelectorAll('a, button').forEach(item => {\n            item.addEventListener('click', () => {\n                // Não fecha se for o botão de logout (ele já faz isso)\n                if (item.id !== 'logout-button-mobile') {\n                    mobileMenu.classList.add('hidden');\n                    mobileMenuButton.setAttribute('aria-expanded', 'false');\n                }\n            });\n        });\n    }\n
-    // --- Listeners para Formulários e Botões --- \n
-    // Formulário de Login\n    const loginForm = document.getElementById('login-form');\n    if (loginForm) {\n        loginForm.addEventListener('submit', async (e) => {\n            e.preventDefault();\n            const email = loginForm.email.value;\n            const password = loginForm.password.value;\n            loginForm.querySelector('button[type="submit"]').disabled = true; // Desabilita botão\n            try {\n                await AuthSystem.loginUser(email, password);\n                // Sucesso: onAuthStateChanged cuidará da UI e redirecionamento\n            } catch (error) {\n                // Erro já tratado em loginUser com showCustomAlert\n            } finally {\n                 loginForm.querySelector('button[type="submit"]').disabled = false; // Reabilita botão\n            }\n        });\n    }\n
-    // Botão Login com Google\n    const googleLoginButton = document.getElementById('google-login-button');\n    if (googleLoginButton) {\n        googleLoginButton.addEventListener('click', async () => {\n            googleLoginButton.disabled = true;\n            try {\n                await AuthSystem.loginWithGoogle();\n                // Sucesso: onAuthStateChanged cuidará da UI e redirecionamento\n            } catch (error) {\n                // Erro já tratado em loginWithGoogle com showCustomAlert\n            } finally {\n                googleLoginButton.disabled = false;\n            }\n        });\n    }\n
-    // Formulário de Registro\n    const registerForm = document.getElementById('register-form');\n    if (registerForm) {\n        registerForm.addEventListener('submit', async (e) => {\n            e.preventDefault();\n            const name = registerForm.name.value;\n            const email = registerForm.email.value;\n            const password = registerForm.password.value;\n            const confirmPassword = registerForm.confirmPassword.value;\n            if (password !== confirmPassword) {\n                showCustomAlert('As senhas não coincidem!', 'error');\n                return;\n            }\n            if (password.length < 6) {\n                showCustomAlert('A senha deve ter pelo menos 6 caracteres.', 'error');\n                return;\n            }\n            registerForm.querySelector('button[type="submit"]').disabled = true;\n            try {\n                await AuthSystem.registerUser(name, email, password);\n                // Sucesso: onAuthStateChanged cuidará da UI e redirecionamento\n            } catch (error) {\n                // Erro já tratado em registerUser com showCustomAlert\n            } finally {\n                 registerForm.querySelector('button[type="submit"]').disabled = false;\n            }\n        });\n    }\n
-    // Formulário de Reset de Senha\n    const resetPasswordForm = document.getElementById('reset-password-form');\n    if (resetPasswordForm) {\n        resetPasswordForm.addEventListener('submit', async (e) => {\n            e.preventDefault();\n            const email = resetPasswordForm.email.value;\n            resetPasswordForm.querySelector('button[type="submit"]').disabled = true;\n            try {\n                await AuthSystem.resetPassword(email);\n                resetPasswordForm.reset();\n            } catch (error) {\n                // Erro já tratado em resetPassword com showCustomAlert\n            } finally {\n                 resetPasswordForm.querySelector('button[type="submit"]').disabled = false;\n            }\n        });\n    }\n
-    // Formulário de Atualização de Perfil (Nome)\n    const profileForm = document.getElementById('profile-form');\n    if (profileForm) {\n        profileForm.addEventListener('submit', async (e) => {\n            e.preventDefault();\n            if (!AuthSystem.currentUser) return;\n            const name = profileForm.name.value.trim();\n            if (!name) {\n                showCustomAlert('O nome não pode ficar em branco.', 'error');\n                return;\n            }\n            const profileData = { name };\n            profileForm.querySelector('button[type="submit"]').disabled = true;\n            try {\n                await AuthSystem.updateUserProfile(AuthSystem.currentUser.uid, profileData);\n            } catch (error) {\n                // Erro já tratado em updateUserProfile\n            } finally {\n                 profileForm.querySelector('button[type="submit"]').disabled = false;\n            }\n        });\n    }\n
-    // Formulário de Mudança de Senha\n    const changePasswordForm = document.getElementById('change-password-form');\n    if (changePasswordForm) {\n        changePasswordForm.addEventListener('submit', async (e) => {\n            e.preventDefault();\n            if (!AuthSystem.currentUser) return;\n            const newPassword = changePasswordForm.newPassword.value;\n            const confirmPassword = changePasswordForm.confirmPassword.value;\n            if (newPassword !== confirmPassword) {\n                showCustomAlert('As novas senhas não coincidem!', 'error');\n                return;\n            }\n            if (newPassword.length < 6) {\n                 showCustomAlert('A nova senha deve ter pelo menos 6 caracteres.', 'error');\n                return;\n            }\n            changePasswordForm.querySelector('button[type="submit"]').disabled = true;\n            try {\n                await AuthSystem.currentUser.updatePassword(newPassword);\n                showCustomAlert('Senha alterada com sucesso!', 'success');\n                changePasswordForm.reset();\n            } catch (error) {\n                console.error("Erro ao alterar senha:", error);\n                showCustomAlert(`Erro ao alterar senha: ${getFirebaseAuthErrorMessage(error)}`, 'error');\n            } finally {\n                 changePasswordForm.querySelector('button[type="submit"]').disabled = false;\n            }\n        });\n    }\n
-    // Inicializar funcionalidades visuais (Lazy Loading, Animações)\n    // Estas são chamadas aqui e também após carregar conteúdo dinâmico (cursos)\n    initLazyLoading();\n    initScrollAnimations();
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+const functions = firebase.functions();
 
-    console.log('Inicialização do frontend completa.');\n});
+db.settings({ timestampsInSnapshots: true });
 
-// Funções de inicialização visual (exemplo)
-function initLazyLoading() {
-    const lazyElements = document.querySelectorAll('.lazy-load');
-    if ('IntersectionObserver' in window) {
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const element = entry.target;
-                    if (element.tagName === 'IMG') {
-                        element.src = element.dataset.src || element.src;
-                    } else {
-                        // Para outros elementos (ex: background)
-                        const src = element.dataset.src;
-                        if (src) element.style.backgroundImage = `url(${src})`;
-                    }
-                    element.classList.add('loaded');
-                    element.classList.remove('lazy-load'); // Remove a classe para não observar novamente
-                    observer.unobserve(element);
-                }
-            });
-        }, { rootMargin: '0px 0px 100px 0px' }); // Carrega um pouco antes de entrar na viewport
-        lazyElements.forEach(el => observer.observe(el));
-    } else {
-        // Fallback
-        lazyElements.forEach(element => {
-             if (element.tagName === 'IMG') {
-                element.src = element.dataset.src || element.src;
-            } else {
-                const src = element.dataset.src;
-                if (src) element.style.backgroundImage = `url(${src})`;
-            }
-            element.classList.add('loaded');
-            element.classList.remove('lazy-load');
-        });
-    }
-}
-
-function initScrollAnimations() {
-    const animatedElements = document.querySelectorAll('.animate-on-scroll');
-    if ('IntersectionObserver' in window) {
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    // observer.unobserve(entry.target); // Descomente para animar apenas uma vez
+// ============================================================================
+// SISTEMA DE AUTENTICAÇÃO E USUÁRIOS
+// ============================================================================
+const AuthSystem = {
+  currentUser: null,
+  initAuthObserver: function() {
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        this.currentUser = user;
+        console.log('[AuthObserver] Usuário detectado:', user.uid);
+        this.getUserProfile(user.uid).then(profile => {
+          console.log('[AuthObserver] Perfil obtido:', profile);
+          updateUserInterface(user); // Chama a função global de UI
+          // Atualiza o placeholder do nome no dashboard se ele existir
+          const userNameDashboardEl = document.querySelector('#dashboard .user-name-placeholder');
+          if (userNameDashboardEl && profile) {
+              userNameDashboardEl.textContent = profile.name || user.displayName || "Usuário";
+          }
+          // Se o usuário está logado e não há hash ou é #home, redireciona para #dashboard
+          if(window.location.hash === '' || window.location.hash === '#home' || window.location.hash === '#login') {
+            console.log('[AuthObserver] Redirecionando para #dashboard');
+            window.location.href = '#dashboard';
+          } else {
+            // Se já existe um hash para uma seção de usuário, tenta revalidar/recarregar
+            // A lógica de clique simulado pode ser conflituosa com o roteador do HTML.
+            // Considerar chamar as funções display diretamente se necessário, ou deixar o roteador HTML cuidar.
+            const currentHash = window.location.hash.substring(1);
+            if (['dashboard', 'profile', 'my-courses', 'settings'].includes(currentHash)) {
+                const targetLink = document.querySelector(`a[href="${window.location.hash}"]`);
+                if (targetLink && typeof targetLink.click === 'function') {
+                     // console.log('[AuthObserver] Tentando simular clique para recarregar seção:', window.location.hash);
+                     // targetLink.click(); // Simula clique para re-renderizar - PODE CAUSAR PROBLEMAS, OBSERVAR
                 } else {
-                    // entry.target.classList.remove('visible'); // Descomente para re-animar ao sair/entrar
+                    // Se não há link, mas o hash corresponde a uma função de display, chamá-la.
+                    // Isso pode ser mais seguro que simular clique.
+                    if (currentHash === 'dashboard' && typeof displayUserDashboard === 'function') displayUserDashboard();
+                    else if (currentHash === 'profile' && typeof displayUserProfile === 'function') displayUserProfile();
+                    else if (currentHash === 'my-courses' && typeof displayUserCourses === 'function') displayUserCourses();
+                    else if (currentHash === 'settings' && typeof displayUserSettings === 'function') displayUserSettings();
                 }
-            });
-        }, { threshold: 0.1 });
-        animatedElements.forEach(el => observer.observe(el));
+            }
+          }
+        }).catch(error => {
+            console.error("[AuthObserver] Erro ao buscar perfil para UI:", error);
+            updateUserInterface(user); // Fallback com dados do Auth
+        });
+      } else {
+        this.currentUser = null;
+        console.log('[AuthObserver] Nenhum usuário logado.');
+        updateUserInterface(null); // Chama a função global de UI
+        const userNameDashboardEl = document.querySelector('#dashboard .user-name-placeholder');
+        if (userNameDashboardEl) {
+            userNameDashboardEl.textContent = "Usuário"; // Reset placeholder
+        }
+        // Se o usuário deslogou e estava em uma seção protegida, redireciona para #home
+        const currentHash = window.location.hash.substring(1);
+        if (['dashboard', 'profile', 'my-courses', 'settings'].includes(currentHash)) {
+            window.location.href = '#home';
+        }
+      }
+    });
+  },
+  registerUser: async function(name, email, password) { /* ... (código original mantido) ... */ },
+  loginUser: async function(email, password) { /* ... (código original mantido) ... */ },
+  loginWithGoogle: async function() {
+    try {
+      console.log('[AuthSystem.loginWithGoogle] Iniciando login com Google via Firebase...');
+      const provider = new firebase.auth.GoogleAuthProvider();
+      const userCredential = await auth.signInWithPopup(provider);
+      const user = userCredential.user;
+      console.log('[AuthSystem.loginWithGoogle] Usuário retornado pelo Google:', user);
+
+      const userDocRef = db.collection('users').doc(user.uid);
+      const userDoc = await userDocRef.get();
+      
+      if (!userDoc.exists) {
+        console.log('[AuthSystem.loginWithGoogle] Usuário novo, criando perfil no Firestore...');
+        await userDocRef.set({
+          name: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          role: 'student',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          courses: [],
+          completedLessons: {}
+        });
+        console.log('[AuthSystem.loginWithGoogle] Perfil criado para:', user.displayName);
+      } else {
+        console.log('[AuthSystem.loginWithGoogle] Usuário já existe:', user.displayName);
+        await userDocRef.update({ // Atualiza nome/foto caso tenham mudado no Google
+            name: user.displayName,
+            photoURL: user.photoURL 
+        });
+        console.log('[AuthSystem.loginWithGoogle] Perfil atualizado para:', user.displayName);
+      }
+      return user; // Retorna o objeto user
+    } catch (error) {
+      console.error("[AuthSystem.loginWithGoogle] Erro dentro da função:", error, "Código:", error.code);
+      throw error; 
+    }
+  },
+  logoutUser: async function() { 
+      await auth.signOut(); // Código original mantido, mas o reload na updateUserInterface já cuida da UI
+      console.log('[AuthSystem.logoutUser] Usuário deslogado.');
+      // A lógica de redirecionamento agora está no AuthObserver
+  },
+  resetPassword: async function(email) { /* ... (código original mantido) ... */ },
+  getUserProfile: async function(userId) {
+    try {
+      const userDoc = await db.collection('users').doc(userId).get();
+      if (userDoc.exists) {
+        return { id: userDoc.id, ...userDoc.data() };
+      } else {
+        const currentUser = auth.currentUser; // Usar o auth.currentUser mais recente
+        if(currentUser && currentUser.uid === userId){
+            console.warn("[getUserProfile] Perfil não encontrado no Firestore para usuário Google. Usando dados do Auth e criando perfil básico.");
+            const basicProfile = {
+                id: userId,
+                name: currentUser.displayName,
+                email: currentUser.email,
+                photoURL: currentUser.photoURL,
+                role: 'student',
+                courses: [],
+                completedLessons: {},
+                createdAt: firebase.firestore.FieldValue.serverTimestamp() // Adicionar timestamp de criação
+            };
+            // Tenta criar o perfil se não existir
+            await db.collection('users').doc(userId).set(basicProfile, { merge: true });
+            return basicProfile;
+        }
+        console.error("[getUserProfile] Perfil de usuário não encontrado e não há usuário logado correspondente.");
+        throw new Error("Perfil de usuário não encontrado");
+      }
+    } catch (error) {
+      console.error("[getUserProfile] Erro ao obter perfil:", error);
+      throw error;
+    }
+  },
+  updateUserProfile: async function(userId, profileData) { /* ... (código original mantido) ... */ },
+  isAdmin: async function(userId) { /* ... (código original mantido) ... */ }
+};
+
+// ============================================================================
+// SISTEMA DE GERENCIAMENTO DE CURSOS (Seu código original)
+// ============================================================================
+const CourseSystem = {
+  getAllCourses: async function() { /* ... seu código original ... */ },
+  getFeaturedCourses: async function() { /* ... seu código original ... */ },
+  getCourseDetails: async function(courseId) { /* ... seu código original ... */ },
+  addCourse: async function(courseData) { /* ... seu código original ... */ },
+  updateCourse: async function(courseId, courseData) { /* ... seu código original ... */ },
+  addModule: async function(courseId, moduleData) { /* ... seu código original ... */ },
+  addLesson: async function(courseId, moduleId, lessonData) { /* ... seu código original ... */ },
+  uploadLessonVideo: async function(courseId, moduleId, lessonId, videoFile) { /* ... seu código original ... */ },
+  markLessonAsCompleted: async function(courseId, moduleId, lessonId) { /* ... seu código original ... */ },
+  isLessonCompleted: async function(courseId, moduleId, lessonId) { /* ... seu código original ... */ },
+  getCourseProgress: async function(courseId) { /* ... seu código original ... */ },
+  searchCourses: async function(query) { /* ... seu código original ... */ },
+  getBasicCourseInfo: async function(courseId) {
+    try {
+      const courseDoc = await db.collection('courses').doc(courseId).get();
+      if (courseDoc.exists) {
+        const data = courseDoc.data();
+        return {
+          id: courseDoc.id,
+          title: data.title,
+          imageUrl: data.imageUrl,
+          description: data.description 
+        };
+      }
+      console.warn(`[getBasicCourseInfo] Curso com ID ${courseId} não encontrado.`);
+      return null;
+    } catch (error) {
+      console.error("[getBasicCourseInfo] Erro ao obter informações básicas do curso:", courseId, error);
+      throw error;
+    }
+  }
+};
+
+// ============================================================================
+// SISTEMA DE PAGAMENTOS (Seu código original)
+// ============================================================================
+const PaymentSystem = { /* ... seu código original ... */ };
+// ============================================================================
+// SISTEMA DE ADMINISTRAÇÃO (Seu código original)
+// ============================================================================
+const AdminSystem = { /* ... seu código original ... */ };
+// ============================================================================
+// SISTEMA DE NOTIFICAÇÕES (Seu código original)
+// ============================================================================
+const NotificationSystem = { /* ... seu código original ... */ };
+// ============================================================================
+// SISTEMA DE AVALIAÇÕES E COMENTÁRIOS (Seu código original)
+// ============================================================================
+const ReviewSystem = { /* ... seu código original ... */ };
+// ============================================================================
+// SISTEMA DE CERTIFICADOS (Seu código original)
+// ============================================================================
+const CertificateSystem = { /* ... seu código original ... */ };
+
+// ============================================================================
+// NOVAS FUNÇÕES PARA EXIBIR CONTEÚDO DAS SEÇÕES DO USUÁRIO
+// ============================================================================
+async function displayUserDashboard() {
+    console.log("[displayUserDashboard] Tentando exibir painel.");
+    const dashboardSection = document.getElementById('dashboard');
+    if (!dashboardSection) {
+        console.error("[displayUserDashboard] Seção #dashboard não encontrada.");
+        return;
+    }
+    // A seção já deve estar visível pelo roteador do HTML antes desta função ser chamada.
+    // Esta função foca em popular o conteúdo dinâmico.
+    if (AuthSystem.currentUser) {
+        try {
+            const userProfile = await AuthSystem.getUserProfile(AuthSystem.currentUser.uid);
+            const userNameEl = dashboardSection.querySelector('.user-name-placeholder');
+            if (userNameEl && userProfile) {
+                userNameEl.textContent = userProfile.name || AuthSystem.currentUser.displayName || "Usuário";
+            } else if (userNameEl) {
+                userNameEl.textContent = AuthSystem.currentUser.displayName || "Usuário"; // Fallback
+            }
+        } catch (error) {
+            console.error("[displayUserDashboard] Erro ao buscar perfil para dashboard:", error);
+            const userNameEl = dashboardSection.querySelector('.user-name-placeholder');
+            if(userNameEl && AuthSystem.currentUser) userNameEl.textContent = AuthSystem.currentUser.displayName || "Usuário";
+        }
     } else {
-        // Fallback
-        animatedElements.forEach(el => el.classList.add('visible'));
+        // Se não há usuário, o AuthObserver deveria ter redirecionado.
+        // Mas por segurança, podemos limpar o nome aqui.
+        const userNameEl = dashboardSection.querySelector('.user-name-placeholder');
+        if (userNameEl) userNameEl.textContent = "Usuário";
     }
 }
 
+async function displayUserCourses() {
+    console.log("[displayUserCourses] Tentando exibir Meus Cursos.");
+    const myCoursesSection = document.getElementById('my-courses');
+    const coursesContainer = document.getElementById('user-courses-container'); 
+    if (!myCoursesSection || !coursesContainer) {
+        console.error("[displayUserCourses] Elementos da seção 'Meus Cursos' não encontrados.");
+        return;
+    }
+
+    if (!AuthSystem.currentUser) {
+        coursesContainer.innerHTML = '<p class="text-light-tertiary col-span-full text-center">Você precisa estar logado para ver seus cursos.</p>';
+        return;
+    }
+
+    try {
+        coursesContainer.innerHTML = '<p class="text-light-tertiary col-span-full text-center animate-pulse">Carregando seus cursos...</p>';
+        const userProfile = await AuthSystem.getUserProfile(AuthSystem.currentUser.uid);
+        const courseIds = userProfile.courses || [];
+        console.log("[displayUserCourses] IDs dos cursos do usuário:", courseIds);
+
+        if (courseIds.length === 0) {
+            coursesContainer.innerHTML = '<p class="text-light-tertiary col-span-full text-center">Você ainda não está matriculado em nenhum curso. <a href="#courses" class="text-accent-indigo-primary hover:underline">Explore nossos cursos!</a></p>';
+            return;
+        }
+
+        let coursesHTML = '';
+        for (const courseId of courseIds) {
+            try {
+                const course = await CourseSystem.getBasicCourseInfo(courseId);
+                if (course) {
+                    console.log("[displayUserCourses] Detalhes do curso:", course.title);
+                    // ATENÇÃO: VOCÊ PRECISA SUBSTITUIR ESTE LINK POR UM REAL OU UMA LÓGICA PARA GERÁ-LO
+                    const hotmartLink = `https://pay.hotmart.com/SEU_PRODUCT_ID?checkoutMode=X&offDiscount=SEU_CUPOM&핫딜=${courseId}`; // Placeholder
+                    coursesHTML += `
+                        <div class="course-card bg-dark-card rounded-xl shadow-lg overflow-hidden flex flex-col neon-border">
+                            <img src="${course.imageUrl || 'images/placeholder-course.jpg'}" alt="${course.title || 'Título do Curso'}" class="w-full h-48 object-cover lazy-load">
+                            <div class="p-6 flex flex-col flex-grow">
+                                <h4 class="text-xl font-semibold mb-2 text-light-primary">${course.title || 'Título Indisponível'}</h4>
+                                <p class="text-light-tertiary text-sm mb-4 flex-grow">${course.description ? course.description.substring(0,100)+'...' : 'Acesse para saber mais sobre este curso.'}</p>
+                                <a href="${hotmartLink}" target="_blank" class="mt-auto block w-full text-center bg-accent-emerald-primary hover:bg-accent-emerald-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">
+                                    Assistir na Hotmart <i class="fas fa-external-link-alt ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                     coursesHTML += `<div class="bg-dark-card rounded-lg p-4 text-red-400 col-span-full">Informações do curso ID ${courseId} não encontradas.</div>`;
+                }
+            } catch (courseError) {
+                console.error("[displayUserCourses] Erro ao buscar detalhes do curso:", courseId, courseError);
+                coursesHTML += `<div class="bg-dark-card rounded-lg p-4 text-red-400 col-span-full">Não foi possível carregar o curso ID: ${courseId}.</div>`;
+            }
+        }
+        coursesContainer.innerHTML = coursesHTML || '<p class="text-light-tertiary col-span-full text-center">Nenhum curso para exibir.</p>';
+        if (typeof initLazyLoading === "function") initLazyLoading(); // Re-inicializa lazy loading
+    } catch (error) {
+        console.error("[displayUserCourses] Erro ao exibir cursos do usuário:", error);
+        coursesContainer.innerHTML = '<p class="text-red-500 col-span-full text-center">Ocorreu um erro ao carregar seus cursos. Tente novamente mais tarde.</p>';
+    }
+}
+
+async function displayUserProfile() {
+    console.log("[displayUserProfile] Tentando exibir Perfil.");
+    const profileSection = document.getElementById('profile');
+    const profileContent = document.getElementById('user-profile-content');
+    if (!profileSection || !profileContent) {
+        console.error("[displayUserProfile] Elementos da seção #profile não encontrados.");
+        return;
+    }
+
+    if (!AuthSystem.currentUser) {
+        profileContent.innerHTML = '<p class="text-light-tertiary">Você precisa estar logado para ver seu perfil.</p>';
+        return;
+    }
+    try {
+        profileContent.innerHTML = '<p class="text-light-tertiary animate-pulse">Carregando seu perfil...</p>';
+        const user = AuthSystem.currentUser;
+        const userProfileData = await AuthSystem.getUserProfile(user.uid);
+        console.log("[displayUserProfile] Dados do perfil:", userProfileData);
+
+        profileContent.innerHTML = `
+            <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-8">
+                <img src="${userProfileData.photoURL || user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(userProfileData.name || user.email) + '&background=4f46e5&color=fff&size=128'}" 
+                     alt="Foto de perfil" 
+                     class="w-32 h-32 rounded-full border-4 border-accent-indigo-primary object-cover">
+                <div>
+                    <h3 class="text-3xl font-bold text-light-primary">${userProfileData.name || user.displayName}</h3>
+                    <p class="text-accent-indigo-text text-lg">${userProfileData.email || user.email}</p>
+                    <p class="text-sm text-light-tertiary mt-1">Membro desde: ${userProfileData.createdAt && userProfileData.createdAt.seconds ? new Date(userProfileData.createdAt.seconds * 1000).toLocaleDateString() : 'Data indisponível'}</p>
+                </div>
+            </div>
+            <div class="space-y-6">
+                <div>
+                    <label for="profile-bio" class="block text-sm font-medium text-light-secondary mb-1">Sobre Mim (em breve)</label>
+                    <textarea id="profile-bio" class="w-full bg-dark-tertiary border border-gray-700 rounded-lg py-2 px-4 text-light-primary focus:outline-none focus:ring-2 focus:ring-accent-indigo-primary" rows="3" placeholder="Conte um pouco sobre você e seus interesses na área de tecnologia..." disabled></textarea>
+                </div>
+                <button class="bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold py-2 px-4 rounded-lg cta-button opacity-50 cursor-not-allowed" disabled>
+                    Salvar Alterações (em breve)
+                </button>
+            </div>
+        `;
+    } catch (error) {
+        console.error("[displayUserProfile] Erro ao exibir perfil do usuário:", error);
+        profileContent.innerHTML = '<p class="text-red-500">Ocorreu um erro ao carregar seu perfil.</p>';
+    }
+}
+
+async function displayUserSettings() {
+    console.log("[displayUserSettings] Tentando exibir Configurações.");
+    const settingsSection = document.getElementById('settings'); // Garante que a seção existe
+    const settingsContent = document.getElementById('user-settings-content'); // Onde o conteúdo dinâmico (se houver) iria
+    
+    if (!settingsSection || !settingsContent) {
+        console.error("[displayUserSettings] Elementos da seção #settings não encontrados.");
+        return;
+    }
+
+    if (!AuthSystem.currentUser) {
+        // O HTML já deve ter um placeholder para "Carregando...", mas podemos adicionar um se necessário.
+        // Normalmente, o roteador do HTML e o AuthObserver impediriam de chegar aqui sem usuário.
+        settingsContent.innerHTML = '<p class="text-light-tertiary">Você precisa estar logado para ver as configurações.</p>';
+        return;
+    }
+    
+    // CORREÇÃO: Limpar o placeholder "Carregando configurações..." se ele existir, pois o HTML já tem o conteúdo.
+    const loadingPlaceholder = settingsContent.querySelector('p.text-light-secondary');
+    if(loadingPlaceholder && loadingPlaceholder.textContent.includes('Carregando configurações...')) {
+      loadingPlaceholder.remove(); // Remove o parágrafo de carregamento
+    }
+    // O restante do conteúdo da seção de configurações é estático no HTML.
+    // Apenas precisamos garantir que o listener do botão de exclusão seja anexado.
+
+    const deleteBtn = document.getElementById('delete-account-btn'); // ID corrigido no HTML
+    if (deleteBtn) {
+        // Remover listener antigo para evitar duplicação se a função for chamada múltiplas vezes
+        const newDeleteBtn = deleteBtn.cloneNode(true);
+        deleteBtn.parentNode.replaceChild(newDeleteBtn, deleteBtn);
+
+        newDeleteBtn.onclick = async () => { // Adiciona ao botão clonado
+            if (confirm("Tem certeza que deseja excluir sua conta? Esta ação é irreversível e todos os seus dados e acesso aos cursos serão perdidos.")) {
+                if (confirm("Confirmação final: Realmente deseja excluir sua conta?")) {
+                    try {
+                        // Aqui você implementaria a lógica de exclusão no Firebase
+                        // await AuthSystem.currentUser.delete(); // CUIDADO: Isso deleta o usuário do Auth
+                        // Em seguida, deletar dados do Firestore e Storage associados
+                        showCustomAlert("Funcionalidade de exclusão de conta ainda não implementada completamente.", "error");
+                        console.log("Tentativa de exclusão de conta (não implementado).");
+                    } catch (error) {
+                        console.error("Erro ao tentar excluir conta:", error);
+                        showCustomAlert("Erro ao excluir conta: " + error.message, "error");
+                    }
+                }
+            }
+        };
+    } else {
+        console.warn("[displayUserSettings] Botão 'delete-account-btn' não encontrado.");
+    }
+}
+
+
+// ============================================================================
+// NOVA FUNÇÃO PARA CONFIGURAR O BOTÃO DE LOGIN DO GOOGLE
+// ============================================================================
+function setupGoogleLoginButton() {
+  const googleLoginBtn = document.getElementById('google-login-btn');
+  if (googleLoginBtn) {
+    console.log('[setupGoogleLoginButton] Configurando listener para o botão google-login-btn');
+    googleLoginBtn.addEventListener('click', function() {
+      console.log('[googleLoginBtn.onClick] Botão "Acessar com Google" CLICADO!');
+      AuthSystem.loginWithGoogle()
+        .then((loggedInUser) => { 
+          showCustomAlert('Login com Google realizado com sucesso!', 'success');
+          // O AuthObserver já deve lidar com o redirecionamento para #dashboard
+          // window.location.href = '#dashboard'; 
+        })
+        .catch(error => {
+          console.error("[googleLoginBtn.onClick] Erro detalhado no login com Google:", error, "Código:", error.code);
+          showCustomAlert(`Erro no login com Google: ${error.message} (Código: ${error.code})`, 'error');
+        });
+    });
+  } else {
+    console.error('[setupGoogleLoginButton] Botão google-login-btn não encontrado no DOM.');
+  }
+}
+
+// ============================================================================
+// INICIALIZAÇÃO E EVENTOS
+// ============================================================================
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("[DOMContentLoaded] Evento disparado. Inicializando sistemas...");
+  AuthSystem.initAuthObserver(); // Esta função agora é a principal fonte de verdade para o estado de auth e UI do header.
+  
+  if (typeof PaymentSystem !== 'undefined' && PaymentSystem.init) {
+    PaymentSystem.init();
+  }
+  
+  if (document.getElementById('featured-courses') && typeof CourseSystem !== 'undefined' && CourseSystem.getFeaturedCourses) {
+    CourseSystem.getFeaturedCourses()
+      .then(courses => {
+        if (typeof displayFeaturedCourses === 'function') {
+            displayFeaturedCourses(courses);
+        } else {
+            console.warn("displayFeaturedCourses não definida globalmente, mas esperada.")
+        }
+      })
+      .catch(error => {
+        console.error("Erro ao carregar cursos em destaque:", error);
+      });
+  }
+  
+  if (typeof setupGoogleLoginButton === 'function') {
+    setupGoogleLoginButton();
+  } else {
+    console.error("setupGoogleLoginButton não está definida.");
+  }
+  
+  if (typeof setupContactForm === 'function') setupContactForm(); 
+  if (typeof setupCourseSearch === 'function') setupCourseSearch(); 
+});
+
+// ============================================================================
+// Funções de UI Globais (MANTENHA AS QUE VOCÊ JÁ TINHA NO SEU ARQUIVO ORIGINAL)
+// ============================================================================
+function displayFeaturedCourses(courses) {
+  const container = document.getElementById('featured-courses'); 
+  if (!container) {
+      return;
+  }
+  container.innerHTML = '';
+  courses.forEach(course => {
+    const courseElement = document.createElement('div');
+    courseElement.className = 'course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll'; 
+    courseElement.innerHTML = `
+      <img src="${course.imageUrl || 'https://placehold.co/600x400/3498db/ffffff?text=Curso'}" 
+           alt="${course.title}" 
+           class="w-full h-48 object-cover lazy-load">
+      <div class="p-6 flex flex-col flex-grow">
+        <h3 class="text-xl font-semibold mb-2 text-light-primary">${course.title}</h3>
+        <p class="text-light-tertiary mb-4 text-sm flex-grow">${course.description}</p>
+        <div class="mb-4">
+          ${course.featured ? '<span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-accent-indigo-text bg-accent-indigo-primary bg-opacity-20">Em Destaque</span>' : ''}
+        </div>
+        <div class="flex justify-between items-center mb-3">
+          <p class="text-lg font-bold text-accent-indigo-primary">R$ ${course.price ? course.price.toFixed(2) : 'N/A'}</p>
+          <span class="text-sm text-light-tertiary">
+            <i class="fas fa-star mr-1 text-yellow-400"></i> 
+            ${course.averageRating ? course.averageRating.toFixed(1) : '0.0'}
+            (${course.numReviews || 0})
+          </span>
+        </div>
+        <a href="#detail-${course.id}"  class="mt-auto block w-full text-center bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">
+          Ver Detalhes
+        </a>
+      </div>
+    `;
+    container.appendChild(courseElement);
+  });
+  if (typeof initScrollAnimations === "function") initScrollAnimations(); 
+  if (typeof initLazyLoading === "function") initLazyLoading(); 
+}
+
+function setupContactForm() {
+  const contactForm = document.getElementById('contact-form'); 
+  if (!contactForm) return;
+  contactForm.addEventListener('submit', function(e) { /* ... seu código original ... */ });
+}
+
+function setupCourseSearch() {
+  const searchForm = document.getElementById('course-search-form'); 
+  if (!searchForm) return;
+  searchForm.addEventListener('submit', function(e) { /* ... seu código original ... */ });
+}
+
+function displaySearchResults(courses, query) {
+    const searchResultsSection = document.getElementById('search-results'); 
+    const resultsContainer = document.getElementById('search-results-container'); 
+    if (!searchResultsSection || !resultsContainer) return;
+    // ... seu código original ...
+    if (typeof initScrollAnimations === "function") initScrollAnimations();
+    if (typeof initLazyLoading === "function") initLazyLoading();
+}
+
+// ============================================================================
+// CÓDIGO PARA EXIBIR FOTO DO USUÁRIO E MENU
+// ============================================================================
+function updateUserInterface(user) {
+  const desktopAuthSection = document.getElementById('user-auth-section-desktop'); // ID CORRIGIDO NO HTML
+  const mobileAuthSection = document.getElementById('user-auth-section-mobile');   // ID CORRIGIDO NO HTML
+
+  if(desktopAuthSection) desktopAuthSection.innerHTML = ''; // Limpa antes de preencher
+  if(mobileAuthSection) mobileAuthSection.innerHTML = '';   // Limpa antes de preencher
+
+  if (user) { // Usuário está logado
+    // --- Menu Desktop ---
+    if(desktopAuthSection){
+        const userProfileDesktopContainer = document.createElement('div');
+        userProfileDesktopContainer.className = 'relative';
+
+        const userProfileDesktopTrigger = document.createElement('div');
+        userProfileDesktopTrigger.className = 'flex items-center cursor-pointer group';
+        userProfileDesktopTrigger.innerHTML = `
+          <img src="${user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || user.email.split('@')[0]) + '&background=4f46e5&color=fff&length=1'}" 
+               alt="Foto de perfil" 
+               class="w-10 h-10 rounded-full border-2 border-accent-indigo-primary mr-2 object-cover">
+          <span class="text-light-primary hidden lg:inline">${user.displayName || user.email.split('@')[0]}</span>
+          <i class="fas fa-chevron-down text-light-secondary ml-2 hidden lg:inline group-hover:rotate-180 transition-transform"></i>
+        `;
+        
+        const dropdownMenuDesktop = document.createElement('div');
+        dropdownMenuDesktop.className = 'hidden group-hover:block absolute right-0 top-full mt-2 w-60 bg-dark-card rounded-lg shadow-xl z-[100] py-2 border border-gray-700 neon-border';
+        dropdownMenuDesktop.innerHTML = `
+            <div class="px-4 py-3 border-b border-gray-700">
+                <p class="text-sm text-light-primary font-semibold truncate">${user.displayName || user.email.split('@')[0]}</p>
+                <p class="text-xs text-light-tertiary truncate">${user.email}</p>
+            </div>
+            <a href="#dashboard" class="flex items-center px-4 py-2.5 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary transition-colors">
+              <i class="fas fa-tachometer-alt w-5 mr-3 text-accent-indigo-secondary"></i>Painel
+            </a>
+            <a href="#profile" class="flex items-center px-4 py-2.5 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary transition-colors">
+              <i class="fas fa-user w-5 mr-3 text-accent-indigo-secondary"></i>Meu Perfil
+            </a>
+            <a href="#my-courses" class="flex items-center px-4 py-2.5 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary transition-colors">
+              <i class="fas fa-graduation-cap w-5 mr-3 text-accent-indigo-secondary"></i>Meus Cursos
+            </a>
+            <a href="#settings" class="flex items-center px-4 py-2.5 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary transition-colors">
+              <i class="fas fa-cog w-5 mr-3 text-accent-indigo-secondary"></i>Configurações
+            </a>
+            <div class="border-t border-gray-700 my-1"></div>
+            <a href="#" id="logout-button-desktop" class="flex items-center px-4 py-2.5 text-light-secondary hover:bg-dark-tertiary hover:text-accent-red-secondary transition-colors">
+              <i class="fas fa-sign-out-alt w-5 mr-3"></i>Sair
+            </a>
+        `;
+        userProfileDesktopContainer.appendChild(userProfileDesktopTrigger);
+        userProfileDesktopContainer.appendChild(dropdownMenuDesktop);
+        desktopAuthSection.appendChild(userProfileDesktopContainer);
+
+        const logoutBtnDesktop = document.getElementById('logout-button-desktop');
+        if(logoutBtnDesktop) {
+            logoutBtnDesktop.addEventListener('click', (e) => {
+              e.preventDefault();
+              AuthSystem.logoutUser().then(() => {
+                showCustomAlert('Você saiu com sucesso!', 'success');
+                // O AuthObserver cuidará do redirecionamento para #home se necessário.
+              });
+            });
+        }
+    }
+
+    // --- Menu Mobile ---
+    if(mobileAuthSection){
+        const mobileMenuUserArea = document.createElement('div');
+        mobileMenuUserArea.className = 'px-6 py-4 bg-dark-tertiary border-b border-gray-700'; // Área do perfil no menu mobile
+        mobileMenuUserArea.innerHTML = `
+          <div class="flex items-center">
+            <img src="${user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || user.email.split('@')[0]) + '&background=4f46e5&color=fff&length=1'}" 
+                 alt="Foto de perfil" 
+                 class="w-10 h-10 rounded-full border-2 border-accent-indigo-primary mr-3 object-cover">
+            <div>
+                <p class="text-light-primary font-semibold">${user.displayName || user.email.split('@')[0]}</p>
+                <p class="text-xs text-light-tertiary truncate">${user.email}</p>
+            </div>
+          </div>
+        `;
+        // Adiciona a área do perfil no TOPO da seção de autenticação móvel
+        mobileAuthSection.appendChild(mobileMenuUserArea);
+
+
+        const mobileMenuLinks = [ // Estes são os links DEPOIS da informação do usuário
+            { href: "#dashboard", icon: "fa-tachometer-alt", text: "Painel" },
+            { href: "#profile", icon: "fa-user", text: "Meu Perfil" },
+            { href: "#my-courses", icon: "fa-graduation-cap", text: "Meus Cursos" },
+            { href: "#settings", icon: "fa-cog", text: "Configurações" }
+        ];
+        
+        mobileMenuLinks.forEach(link => {
+            const linkEl = document.createElement('a');
+            linkEl.href = link.href;
+            // Ajustando classes para se parecerem com os links originais do menu mobile, mas dentro da seção de auth
+            linkEl.className = "block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-light-primary transition-colors";
+            linkEl.innerHTML = `<i class="fas ${link.icon} w-5 mr-2 text-accent-indigo-secondary"></i> ${link.text}`;
+            mobileAuthSection.appendChild(linkEl);
+        });
+        
+        const logoutLinkMobile = document.createElement('a');
+        logoutLinkMobile.href = "#";
+        logoutLinkMobile.id = "logout-button-mobile";
+        logoutLinkMobile.className = "block px-6 py-3 text-light-secondary hover:bg-dark-tertiary hover:text-accent-red-secondary transition-colors";
+        logoutLinkMobile.innerHTML = `<i class="fas fa-sign-out-alt w-5 mr-2"></i> Sair`;
+        mobileAuthSection.appendChild(logoutLinkMobile);
+
+        logoutLinkMobile.addEventListener('click', (e) => {
+            e.preventDefault();
+            AuthSystem.logoutUser().then(() => {
+                showCustomAlert('Você saiu com sucesso!', 'success');
+                 // O AuthObserver cuidará do redirecionamento para #home se necessário.
+            });
+          });
+    }
+    
+  } else { // Usuário não está logado
+    if(desktopAuthSection){
+        desktopAuthSection.innerHTML = `<a href="#login" class="gradient-cta text-white px-4 py-2 rounded-lg cta-button">Login</a>`;
+    }
+    if(mobileAuthSection){ // No menu mobile, o botão de login também deve se parecer com o original.
+        mobileAuthSection.innerHTML = `<a href="#login" class="block px-6 py-3 gradient-cta text-white text-center rounded-b-lg">Login</a>`;
+    }
+  }
+}
+
+// CORREÇÃO: Removido o listener firebase.auth().onAuthStateChanged e o DOMContentLoaded que chamavam updateUserInterface.
+// A chamada para updateUserInterface agora é centralizada através do AuthSystem.initAuthObserver.
+
+// Exportar sistemas para uso global
+window.FullStackCursosAuth = AuthSystem;
+window.FullStackCursosCourses = CourseSystem;
+window.FullStackCursosPayment = PaymentSystem;
+window.FullStackCursosAdmin = AdminSystem;
+window.FullStackCursosNotifications = NotificationSystem;
+window.FullStackCursosReviews = ReviewSystem;
+window.FullStackCursosCertificates = CertificateSystem;

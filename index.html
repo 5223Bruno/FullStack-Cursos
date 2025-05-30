@@ -174,8 +174,8 @@
             outline: 2px solid #4f46e5;
             outline-offset: 2px;
         }
-        /* Esconder seções de detalhe de curso por padrão */
-        .course-detail-section {
+        /* Esconder seções de detalhe de curso e usuário por padrão */
+        .course-detail-section, .user-section {
             display: none;
         }
 
@@ -218,21 +218,29 @@
         /* Sublinhado animado para links do rodapé */
         .animated-footer-link {
             position: relative;
-            /* As classes de Tailwind para cor, transição, inline-block são aplicadas no HTML */
         }
         .animated-footer-link::after {
             content: '';
             position: absolute;
             width: 0;
-            height: 1.5px; /* Espessura do sublinhado */
-            bottom: -4px; /* Distância do texto */
+            height: 1.5px; 
+            bottom: -4px; 
             left: 50%;
-            transform: translateX(-50%); /* Centraliza o sublinhado enquanto cresce */
+            transform: translateX(-50%); 
             background-color: #a78bfa; /* accent.purple.secondary */
             transition: width 0.35s ease-in-out;
         }
         .animated-footer-link:hover::after {
             width: 100%;
+        }
+        /* Estilos para as novas seções de usuário */
+        .user-section-container {
+            background: rgba(26, 31, 46, 0.8); /* bg-dark-card com opacidade */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem; /* Equivalente a p-8 */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); /* shadow-xl */
         }
 
     </style>
@@ -252,7 +260,7 @@
                 <a href="#testimonials" class="text-light-secondary hover:text-light-primary hover:text-glow transition-all">Depoimentos</a>
                 <a href="#blog" class="text-light-secondary hover:text-light-primary hover:text-glow transition-all">Blog</a>
                 <a href="#team" class="text-light-secondary hover:text-light-primary hover:text-glow transition-all">Equipe</a>
-                 <a href="#alunos-destaque" class="text-light-secondary hover:text-light-primary hover:text-glow transition-all">Alunos</a>
+                <a href="#alunos-destaque" class="text-light-secondary hover:text-light-primary hover:text-glow transition-all">Alunos</a>
                 <a href="https://wa.me/5511943035778?text=Olá!%20Tenho%20interesse%20nos%20cursos%20da%20FullStack%20Cursos.%20Poderia%20me%20ajudar?" target="_blank" class="text-light-secondary hover:text-green-400 hover:text-glow transition-all flex items-center">
                     <i class="fab fa-whatsapp text-green-400 mr-1 glow-icon"></i>
                     <span>WhatsApp</span>
@@ -310,7 +318,6 @@
                 <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Alunos Satisfeitos</h2>
                 <div class="animate-on-scroll max-w-full md:max-w-4xl lg:max-w-5xl mx-auto">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                         <div class="horizontal-testimonial-card p-6 rounded-lg shadow-lg neon-border">
                             <div class="flex items-center mb-4">
                                 <img src="images/amor.png" alt="Avatar do Aluno 1" class="w-32 h-32 rounded-full mr-4 border-2 border-accent-purple-secondary">
@@ -321,7 +328,6 @@
                             </div>
                             <p class="text-light-secondary italic">Adorei o curso! A didática é excelente e direto ao ponto, me ajudou a pensar da melhor forma possível. Recomendo muito!</p>
                         </div>
-
                         <div class="horizontal-testimonial-card p-6 rounded-lg shadow-lg neon-border">
                             <div class="flex items-center mb-4">
                                 <img src="images/elias.png" alt="Avatar do Aluno 2" class="w-32 h-32 rounded-full mr-4 border-2 border-accent-emerald-secondary">
@@ -332,7 +338,6 @@
                             </div>
                             <p class="text-light-secondary italic">Consegui entender o básico de programação e me motivou a seguir na área, um lugar para aprender o Básico faz diferença.</p>
                         </div>
-
                         <div class="horizontal-testimonial-card p-6 rounded-lg shadow-lg neon-border">
                             <div class="flex items-center mb-4">
                                 <img src="images/emily.png" alt="Avatar do Aluno 3" class="w-32 h-32 rounded-full mr-4 border-2 border-accent-indigo-secondary">
@@ -343,7 +348,6 @@
                             </div>
                             <p class="text-light-secondary italic">Achei que nunca entenderia lógica de programação, mas este curso tornou tudo claro e acessível. Obrigada Bruno!</p>
                         </div>
-
                         <div class="horizontal-testimonial-card p-6 rounded-lg shadow-lg neon-border">
                             <div class="flex items-center mb-4">
                                 <img src="images/lauanne.png" alt="Avatar do Aluno 4" class="w-32 h-32 rounded-full mr-4 border-2 border-accent-red-secondary">
@@ -354,7 +358,6 @@
                             </div>
                             <p class="text-light-secondary italic">Já sabendo o básico, esse curso me fez alcanças um novo patamar de conhecimento, agradeço ao bruno por poder testar de graça, e dar esse feedback para os futuros alunos.</p>
                         </div>
-
                         <div class="horizontal-testimonial-card p-6 rounded-lg shadow-lg neon-border">
                             <div class="flex items-center mb-4">
                                 <img src="images/depoimento5.png" alt="Avatar do Aluno 5" class="w-32 h-32 rounded-full mr-4 border-2 border-accent-purple-secondary">
@@ -385,7 +388,6 @@
             <div class="container mx-auto px-6">
                 <h2 class="text-3xl font-bold text-center mb-12 text-light-primary animate-on-scroll">Nossos Cursos Mais Populares</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
                         <img src="images/logica.png" alt="Imagem do Curso Lógica de Programação Essencial" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
@@ -401,7 +403,6 @@
                             <a href="#detail-logica" class="mt-auto block w-full text-center bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
-
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
                         <img src="images/minicurso.png" alt="Imagem do Mini Curso de Programação" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
@@ -417,7 +418,6 @@
                             <a href="#detail-minicurso" class="mt-auto block w-full text-center bg-accent-emerald-primary hover:bg-accent-emerald-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
-
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
                         <img src="images/python.png" alt="Imagem do Curso Python Básico para Iniciantes" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
@@ -433,7 +433,6 @@
                             <a href="#detail-python" class="mt-auto block w-full text-center bg-accent-red-primary hover:bg-accent-red-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
-
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
                         <img src="images/curso-ux-ui-vision.png" alt="Imagem do Curso UX/UI Vision: Interfaces que Encantam" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
@@ -449,7 +448,6 @@
                             <a href="#detail-uxui" class="mt-auto block w-full text-center bg-accent-purple-primary hover:bg-accent-purple-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
-
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
                         <img src="images/curso-cloud-ops.png" alt="Imagem do Curso Cloud Ops Elite: DevOps e Nuvem na Prática" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
@@ -465,7 +463,6 @@
                             <a href="#detail-devops" class="mt-auto block w-full text-center bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg cta-button">Ver Detalhes</a>
                         </div>
                     </div>
-
                     <div class="course-card rounded-xl shadow-lg overflow-hidden flex flex-col animate-on-scroll">
                         <img src="images/curso-app-impact.png" alt="Imagem do Curso App Impact: Criando Apps Multiplataforma" class="w-full h-48 object-cover lazy-load">
                         <div class="p-6 flex flex-col flex-grow">
@@ -573,7 +570,7 @@
         </section>
 
         <section id="detail-logica" class="course-detail-section py-16 bg-dark-primary">
-            <div class="container mx-auto px-6">
+             <div class="container mx-auto px-6">
                 <a href="#courses" class="text-accent-indigo-primary hover:text-accent-indigo-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
                 <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
                     <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">Lógica de Programação Essencial</h1>
@@ -593,7 +590,6 @@
                 </div>
             </div>
         </section>
-
         <section id="detail-minicurso" class="course-detail-section py-16 bg-dark-primary">
             <div class="container mx-auto px-6">
                 <a href="#courses" class="text-accent-emerald-primary hover:text-accent-emerald-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
@@ -613,9 +609,8 @@
                 </div>
             </div>
         </section>
-
         <section id="detail-python" class="course-detail-section py-16 bg-dark-primary">
-            <div class="container mx-auto px-6">
+             <div class="container mx-auto px-6">
                 <a href="#courses" class="text-accent-red-primary hover:text-accent-red-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
                 <div class="bg-dark-card p-8 md:p-12 rounded-xl shadow-xl neon-border">
                     <h1 class="text-3xl md:text-4xl font-bold mb-4 text-light-primary">Python Básico para Iniciantes</h1>
@@ -635,7 +630,6 @@
                 </div>
             </div>
         </section>
-
         <section id="detail-uxui" class="course-detail-section py-16 bg-dark-primary">
              <div class="container mx-auto px-6">
                 <a href="#courses" class="text-accent-purple-primary hover:text-accent-purple-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar para Cursos</a>
@@ -669,51 +663,102 @@
                 </div>
             </div>
         </section>
-        <section id="login" class="py-16 bg-dark-secondary course-detail-section"> <div class="container mx-auto px-6">
-                <div class="max-w-md mx-auto bg-dark-card p-8 rounded-xl shadow-lg neon-border">
-                    <h2 class="text-2xl font-bold mb-6 text-light-primary text-center">Acesse sua conta</h2>
-                    <form id="login-form" class="space-y-4">
+
+        <section id="dashboard" class="user-section py-16 bg-dark-secondary">
+            <div class="container mx-auto px-6">
+                <div class="user-section-container neon-border">
+                    <h2 class="text-3xl font-bold mb-6 text-light-primary">Meu Painel</h2>
+                    <p class="text-light-secondary mb-4">Bem-vindo(a) de volta, <span class="user-name-placeholder font-semibold">Usuário</span>!</p>
+                    <p class="text-light-secondary">A partir daqui você pode acessar seus cursos, perfil e configurações.</p>
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <a href="#my-courses" class="bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold p-6 rounded-lg cta-button text-center">
+                            <i class="fas fa-graduation-cap fa-2x mb-2"></i><br>Meus Cursos
+                        </a>
+                        <a href="#profile" class="bg-accent-purple-primary hover:bg-accent-purple-hover text-white font-semibold p-6 rounded-lg cta-button text-center">
+                            <i class="fas fa-user fa-2x mb-2"></i><br>Meu Perfil
+                        </a>
+                        <a href="#settings" class="bg-dark-tertiary hover:bg-opacity-80 text-white font-semibold p-6 rounded-lg cta-button text-center">
+                            <i class="fas fa-cog fa-2x mb-2"></i><br>Configurações
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="profile" class="user-section py-16 bg-dark-secondary">
+            <div class="container mx-auto px-6">
+                <a href="#dashboard" class="text-accent-indigo-primary hover:text-accent-indigo-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar ao Painel</a>
+                <div class="user-section-container neon-border">
+                    <h2 class="text-3xl font-bold mb-8 text-light-primary">Meu Perfil</h2>
+                    <div id="user-profile-content" class="space-y-6">
+                        <p class="text-light-secondary">Carregando informações do perfil...</p>
+                        </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="my-courses" class="user-section py-16 bg-dark-secondary">
+            <div class="container mx-auto px-6">
+                 <a href="#dashboard" class="text-accent-indigo-primary hover:text-accent-indigo-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar ao Painel</a>
+                <div class="user-section-container neon-border">
+                    <h2 class="text-3xl font-bold mb-8 text-light-primary">Meus Cursos</h2>
+                    <div id="user-courses-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <p class="text-light-secondary col-span-full">Carregando seus cursos...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="settings" class="user-section py-16 bg-dark-secondary">
+            <div class="container mx-auto px-6">
+                 <a href="#dashboard" class="text-accent-indigo-primary hover:text-accent-indigo-secondary mb-8 inline-block"><i class="fas fa-arrow-left mr-2"></i> Voltar ao Painel</a>
+                <div class="user-section-container neon-border">
+                    <h2 class="text-3xl font-bold mb-8 text-light-primary">Configurações</h2>
+                    <div id="user-settings-content" class="space-y-6">
+                        <p class="text-light-secondary">Carregando configurações...</p>
                         <div>
-                            <label for="login-email" class="block text-light-secondary mb-1">Email</label>
-                            <input type="email" id="login-email" class="w-full bg-dark-tertiary border border-gray-700 rounded-lg py-2 px-4 text-light-primary focus:outline-none focus:ring-2 focus:ring-accent-indigo-primary" required>
+                            <h3 class="text-xl font-semibold text-light-primary mb-2">Preferências de Notificação</h3>
+                            <label class="flex items-center space-x-3 mb-3">
+                                <input type="checkbox" class="form-checkbox h-5 w-5 text-accent-indigo-primary accent-accent-indigo-primary bg-dark-tertiary border-gray-600 rounded">
+                                <span class="text-light-secondary">Receber e-mails sobre novos cursos e promoções.</span>
+                            </label>
                         </div>
                         <div>
-                            <label for="login-password" class="block text-light-secondary mb-1">Senha</label>
-                            <input type="password" id="login-password" class="w-full bg-dark-tertiary border border-gray-700 rounded-lg py-2 px-4 text-light-primary focus:outline-none focus:ring-2 focus:ring-accent-indigo-primary" required>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input type="checkbox" id="remember-me" class="mr-2 accent-accent-indigo-primary">
-                                <label for="remember-me" class="text-sm text-light-tertiary">Lembrar-me</label>
-                            </div>
-                            <a href="#" id="forgot-password-link" class="text-sm text-accent-indigo-primary hover:text-accent-indigo-secondary">Esqueceu a senha?</a>
-                        </div>
-                        <button type="submit" class="w-full bg-accent-indigo-primary hover:bg-accent-indigo-hover text-white font-semibold py-2 px-4 rounded-lg cta-button">Entrar</button>
-                    </form>
-                    <div class="mt-6">
-                        <div class="relative">
-                            <div class="absolute inset-0 flex items-center">
-                                <div class="w-full border-t border-gray-700"></div>
-                            </div>
-                            <div class="relative flex justify-center text-sm">
-                                <span class="px-2 bg-dark-card text-light-tertiary">Ou continue com</span>
-                            </div>
-                        </div>
-                        <div class="mt-6">
-                            <button id="google-login-btn" class="w-full flex items-center justify-center bg-dark-tertiary hover:bg-opacity-80 text-light-primary font-semibold py-2 px-4 rounded-lg cta-button neon-border">
-                                <i class="fab fa-google text-red-500 mr-2"></i> Google
+                            <h3 class="text-xl font-semibold text-light-primary mb-2">Gerenciamento da Conta</h3>
+                            <button class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg cta-button">
+                                Excluir Minha Conta
                             </button>
+                            <p class="text-xs text-light-tertiary mt-1">Atenção: Esta ação é irreversível.</p>
                         </div>
                     </div>
-                    <p class="mt-6 text-center text-sm text-light-tertiary">
-                        Não tem uma conta? <a href="#register" class="text-accent-indigo-primary hover:text-accent-indigo-secondary font-semibold">Registre-se</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="login" class="user-section py-16 bg-dark-secondary">
+            <div class="container mx-auto px-6">
+                <div class="max-w-md mx-auto bg-dark-card p-8 rounded-xl shadow-lg neon-border">
+                    <h2 class="text-2xl font-bold mb-8 text-light-primary text-center">Acesse sua conta</h2>
+                    
+                    <div class="mt-6">
+                        <button id="google-login-btn" class="w-full flex items-center justify-center bg-dark-tertiary hover:bg-opacity-80 text-light-primary font-semibold py-3 px-4 rounded-lg cta-button neon-border transition-transform duration-200 ease-in-out hover:scale-105">
+                            <i class="fab fa-google text-red-500 mr-3 fa-lg"></i> Acessar com Google
+                        </button>
+                    </div>
+
+                    <p class="mt-8 text-center text-sm text-light-tertiary">
+                        Ao continuar, você concorda com nossos <a href="#termos" class="text-accent-indigo-primary hover:underline">Termos de Uso</a> e <a href="#privacidade" class="text-accent-indigo-primary hover:underline">Política de Privacidade</a>.
+                    </p>
+                    <p class="mt-4 text-center text-sm text-light-tertiary">
+                        Problemas para acessar? <a href="#suporte" class="text-accent-indigo-primary hover:underline">Contate o Suporte</a>.
                     </p>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="bg-dark-tertiary text-light-secondary py-12 border-t border-gray-800 overflow-hidden"> <div class="container mx-auto px-6">
+    <footer class="bg-dark-tertiary text-light-secondary py-12 border-t border-gray-800 overflow-hidden">
+        <div class="container mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                 <div class="animate-on-scroll">
                     <h3 class="text-xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-accent-indigo-primary to-accent-purple-primary">FullStack Cursos</h3>
@@ -799,7 +844,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
-            const allCourseDetailSections = document.querySelectorAll('.course-detail-section');
+            const allDetailSections = document.querySelectorAll('.course-detail-section, .user-section'); // Inclui .user-section
+            const mainContentSections = ['#home', '#courses', '#benefits', '#testimonials', '#blog', '#team', '#alunos-destaque']; // Seções principais que não devem ser tratadas como "detalhe"
 
             if (mobileMenuButton && mobileMenu) {
                 mobileMenuButton.addEventListener('click', function() {
@@ -808,40 +854,61 @@
                 });
             }
 
+            function hideAllDetailSections() {
+                allDetailSections.forEach(section => {
+                    section.style.display = 'none';
+                });
+            }
+            
+            // Esconder todas as seções de detalhe/usuário inicialmente, exceto se for um link direto
+            if (!window.location.hash || mainContentSections.includes(window.location.hash)) {
+                 hideAllDetailSections();
+            }
+
+
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
                     const href = this.getAttribute('href');
+                    
+                    // Esconder todas as seções de detalhe/usuário antes de mostrar a nova
+                    hideAllDetailSections();
 
-                    allCourseDetailSections.forEach(section => {
-                        section.style.display = 'none';
-                    });
-                    const loginSectionEl = document.getElementById('login');
-                    if (loginSectionEl && !loginSectionEl.classList.contains('course-detail-section')) {
-                        loginSectionEl.style.display = 'none';
-                    }
-
-
-                    if (href.startsWith('#detail-') || href === '#login' || href.startsWith('#course-detail-')) {
+                    if (href.startsWith('#detail-') || href === '#login' || 
+                        href === '#profile' || href === '#my-courses' || href === '#settings' || href === '#dashboard') {
                         e.preventDefault();
                         const targetId = href.substring(1);
                         const targetElement = document.getElementById(targetId);
 
                         if (targetElement) {
                             targetElement.style.display = 'block';
-                            const headerOffset = 80;
+                            const headerOffset = 80; 
                             const elementPosition = targetElement.getBoundingClientRect().top;
                             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
                             window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+
+                            // Chamar funções específicas para carregar conteúdo dinâmico
+                            if (targetId === 'my-courses' && typeof displayUserCourses === 'function') {
+                                displayUserCourses();
+                            } else if (targetId === 'profile' && typeof displayUserProfile === 'function') {
+                                displayUserProfile();
+                            } else if (targetId === 'settings' && typeof displayUserSettings === 'function') {
+                                displayUserSettings();
+                            } else if (targetId === 'dashboard' && typeof displayUserDashboard === 'function') {
+                                displayUserDashboard();
+                            }
+
                         }
-                    } else if (href.startsWith('#') && href !== '#') {
+                    } else if (href.startsWith('#') && href !== '#') { // Links para seções principais
                         e.preventDefault();
                         const targetId = href.substring(1);
                         const targetElement = document.getElementById(targetId);
                         if (targetElement) {
-                            if(targetElement.style.display === 'none' && !targetElement.classList.contains('course-detail-section')) {
-                                targetElement.style.display = '';
-                            }
-                            const headerOffset = 80;
+                            // Garantir que seções principais (não .user-section ou .course-detail-section) sejam exibidas corretamente.
+                            // Elas geralmente não têm display:none por padrão no CSS, a menos que sejam dinamicamente alteradas.
+                            // Esta lógica assume que as seções principais estão sempre visíveis ou seu estado é gerenciado por outras lógicas.
+                            targetElement.style.display = ''; // Garante que está visível se foi escondida por engano
+                            
+                            const headerOffset = 80; 
                             const elementPosition = targetElement.getBoundingClientRect().top;
                             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
                             window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
@@ -856,6 +923,31 @@
                     }
                 });
             });
+            
+            // Se houver um hash na URL ao carregar, tentar navegar para ele
+            if (window.location.hash && window.location.hash !== "#") {
+                const targetLink = document.querySelector(`a[href="${window.location.hash}"]`);
+                if (targetLink) {
+                    // Atrasar um pouco para garantir que o DOM e o JS do backend estejam prontos
+                    setTimeout(() => targetLink.click(), 100);
+                } else {
+                    // Se o link não existir, mas a seção existir (ex: #dashboard), tentar mostrá-la.
+                    const targetIdFromHash = window.location.hash.substring(1);
+                    const targetElementFromHash = document.getElementById(targetIdFromHash);
+                    if (targetElementFromHash && (targetElementFromHash.classList.contains('user-section') || targetElementFromHash.classList.contains('course-detail-section'))) {
+                       setTimeout(() => {
+                           hideAllDetailSections();
+                           targetElementFromHash.style.display = 'block';
+                           // Chamar funções de display se necessário
+                           if (targetIdFromHash === 'my-courses' && typeof displayUserCourses === 'function') displayUserCourses();
+                           else if (targetIdFromHash === 'profile' && typeof displayUserProfile === 'function') displayUserProfile();
+                           else if (targetIdFromHash === 'settings' && typeof displayUserSettings === 'function') displayUserSettings();
+                           else if (targetIdFromHash === 'dashboard' && typeof displayUserDashboard === 'function') displayUserDashboard();
+                       }, 100);
+                    }
+                }
+            }
+
 
             initLazyLoading();
             initScrollAnimations();
@@ -866,19 +958,19 @@
             const alertMessage = document.getElementById('alert-message');
 
             if (alert && alertMessage) {
-                alert.className = 'custom-alert';
+                alert.className = 'custom-alert'; 
                 alert.classList.add(type === 'success' ? 'custom-alert-success' : 'custom-alert-error');
 
                 alertMessage.textContent = message;
                 alert.style.display = 'block';
-                alert.style.opacity = '1';
+                alert.style.opacity = '1'; 
 
                 setTimeout(() => {
-                    alert.style.opacity = '0';
+                    alert.style.opacity = '0'; 
                     setTimeout(() => {
                         alert.style.display = 'none';
-                    }, 300);
-                }, 3000);
+                    }, 300); 
+                }, 3000); 
             }
         }
 
@@ -890,7 +982,7 @@
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             const img = entry.target;
-                            img.src = img.dataset.src || img.src;
+                            img.src = img.dataset.src || img.src; 
                             img.classList.add('loaded');
                             imageObserver.unobserve(img);
                         }
@@ -916,16 +1008,16 @@
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             entry.target.classList.add('visible');
-                            // observer.unobserve(entry.target); // Descomente para animar apenas uma vez
+                        } else {
+                            // entry.target.classList.remove('visible'); // Para re-animar ao sair e entrar
                         }
                     });
-                }, { threshold: 0.05 }); // Diminuído o threshold para acionar um pouco antes
+                }, { threshold: 0.05 }); 
 
                 animatedElements.forEach(element => {
                     animationObserver.observe(element);
                 });
             } else {
-                // Fallback para navegadores sem IntersectionObserver
                 animatedElements.forEach(element => {
                     element.classList.add('visible');
                 });

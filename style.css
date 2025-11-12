@@ -1,130 +1,156 @@
-/* style.css - versão ajustada para evitar imagens gigantes e manter o visual original */
+/* ======= ESTILO PRINCIPAL - FULLSTACK CURSOS ======= */
 
-/* Reset / base */
-*{box-sizing:border-box}
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f8f9fa;
-    color: #333;
+/* Reset básico */
+* {
+  box-sizing: border-box;
 }
 
+body {
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+/* Cabeçalho */
 header {
-    background-color: #007bff;
-    color: white;
-    text-align: center;
-    padding: 20px 0;
+  background-color: #007bff;
+  color: white;
+  text-align: center;
+  padding: 25px 10px;
 }
 
 header h1 {
-    margin: 0;
-    font-size: 2em;
+  margin: 0;
+  font-size: 2em;
 }
 
+/* Conteúdo principal */
 main {
-    padding: 20px;
-    max-width: 900px;
-    margin: auto;
+  padding: 20px;
+  max-width: 950px;
+  margin: auto;
 }
 
 h2 {
-    color: #007bff;
+  color: #007bff;
+  margin-bottom: 10px;
 }
 
-/* Form */
+/* Formulário */
 form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 25px;
 }
 
 input[type="text"],
 input[type="url"] {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1em;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
+  transition: border 0.2s;
+}
+
+input:focus {
+  outline: none;
+  border-color: #007bff;
 }
 
 button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 4px;
-    font-size: 1em;
-    cursor: pointer;
-}
-button:hover { background-color: #0056b3; }
-
-/* Courses grid */
-#courses {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-    margin-top: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-/* Course card */
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Grid de cursos */
+#courses-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* Card de curso */
 .course-card {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.06);
-    padding: 15px;
-    text-align: center;
-    transition: transform 0.15s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    align-items: center;
-}
-.course-card:hover { transform: translateY(-3px); }
-
-/* Course image: responsive and limited height to avoid huge images */
-.course-card img,
-.course-img {
-    width: 100%;
-    height: auto;
-    max-height: 180px; /* limita a altura */
-    object-fit: cover;
-    border-radius: 8px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  padding: 15px;
+  transition: transform 0.2s ease;
 }
 
-/* Title */
+.course-card:hover {
+  transform: translateY(-4px);
+}
+
+.course-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
 .course-card h3 {
-    margin: 0;
-    font-size: 1.1em;
+  margin: 10px 0;
+  font-size: 1.15em;
 }
 
-/* Link button */
 .course-card a {
-    display: inline-block;
-    background-color: #28a745;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 4px;
-    text-decoration: none;
+  display: inline-block;
+  background-color: #28a745;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background 0.2s;
 }
-.course-card a:hover { background-color: #218838; }
 
-/* Messages */
-.loading { color: #666; }
-.error-message { color: #b91c1c; padding: 8px 0; }
+.course-card a:hover {
+  background-color: #218838;
+}
 
-/* Footer */
+/* Mensagens */
+.loading {
+  text-align: center;
+  color: #666;
+}
+
+.error {
+  color: #c62828;
+  text-align: center;
+  padding: 10px;
+}
+
+/* Rodapé */
 footer {
-    background-color: #007bff;
-    color: white;
-    text-align: center;
-    padding: 10px;
-    margin-top: 30px;
+  background-color: #007bff;
+  color: white;
+  text-align: center;
+  padding: 12px;
+  margin-top: 30px;
+  font-size: 0.9em;
 }
 
 /* Responsivo */
 @media (max-width: 600px) {
-    main { padding: 12px; }
-    .course-card { padding: 12px; }
-    .course-card img { max-height: 140px; }
+  main {
+    padding: 12px;
+  }
+  .course-card img {
+    height: 140px;
+  }
 }

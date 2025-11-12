@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FullStack Cursos</title>
-    <meta name="description" content="FullStack Cursos - adicione e acesse cursos gratuitos.">
+    <meta name="description" content="Plataforma gratuita de cursos online. Adicione e acesse cursos.">
 
-    <!-- simples CSP que permite Firebase, CDN e imagens externas (ajuste se necessário) -->
-    <meta http-equiv="Content-Security-Policy"
-          content="default-src 'self' https:; script-src 'self' https://www.gstatic.com https://www.googleapis.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://images.unsplash.com https://i.ytimg.com https://via.placeholder.com; connect-src 'self' https://firestore.googleapis.com https://*.firebaseio.com https://securetoken.googleapis.com https://*.googleapis.com;">
-
-    <link rel="stylesheet" href="style.css">
-    <!-- Firebase v8 compat (mantive sua versão para manter compatibilidade com o JS) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Content Security Policy básica (para segurança no GitHub Pages) -->
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self' https:; script-src 'self' https://www.gstatic.com https://www.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://via.placeholder.com https://images.unsplash.com https://i.ytimg.com; connect-src 'self' https://firestore.googleapis.com https://*.firebaseio.com https://securetoken.googleapis.com;">
 </head>
+
 <body>
     <header>
         <h1>FullStack Cursos</h1>
@@ -34,7 +37,7 @@
 
         <section id="courses">
             <h2>Cursos Disponíveis</h2>
-            <!-- A lista de cursos será injetada aqui pelo JS -->
+            <div id="courses-container"></div>
         </section>
     </main>
 
@@ -42,7 +45,6 @@
         <p>&copy; 2025 FullStack Cursos - Todos os direitos reservados.</p>
     </footer>
 
-    <!-- App script: carregue seu backend corrigido -->
     <script src="backend_completo.js"></script>
 </body>
 </html>

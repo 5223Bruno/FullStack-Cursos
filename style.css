@@ -1,144 +1,65 @@
-/* Conteúdo para o novo arquivo style.css */
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: #0f172a; /* dark.primary */
-    color: #f8fafc; /* light.primary */
-}
-.hero-bg {
-    background-color: #0f172a;
-    background-image: linear-gradient(to bottom right, #0f172a, #1e1f3d, #312e81);
-}
-.cta-button {
-    transition: all 0.3s ease;
-}
-.cta-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 20px rgba(79, 70, 229, 0.6); /* accent.indigo.primary com alpha */
-}
-.course-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    background: rgba(26, 31, 46, 0.8); /* dark.card com alpha */
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-.course-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
-    background: linear-gradient(to bottom, rgba(30, 41, 59, 0.9), rgba(26, 31, 46, 0.8)); /* dark.secondary e dark.card com alpha */
-}
-.testimonial-card {
-    min-height: 200px;
-    background: rgba(30, 41, 59, 0.7); /* dark.secondary com alpha */
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-.horizontal-testimonial-card {
-    background: rgba(26, 31, 46, 0.8); /* dark.card com alpha */
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-.benefit-card {
-    background: rgba(30, 41, 59, 0.7); /* dark.secondary com alpha */
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-}
-.benefit-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-}
-.blog-card {
-    background: rgba(30, 41, 59, 0.7); /* dark.secondary com alpha */
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-.custom-alert {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
-    display: none;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-}
-.custom-alert-success {
-    background-color: rgba(16, 185, 129, 0.8); /* accent.emerald.primary com alpha */
-    color: white;
-    border: 1px solid rgba(16, 185, 129, 0.3);
-}
-.custom-alert-error {
-    background-color: rgba(239, 68, 68, 0.8); /* accent.red.primary com alpha */
-    color: white;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-}
-.glow-icon {
-    filter: drop-shadow(0 0 5px currentColor);
-}
-.neon-border {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-}
-.gradient-cta {
-    background: linear-gradient(135deg, #4f46e5, #7c3aed); /* accent.indigo.primary, accent.purple.primary */
-}
-.gradient-cta:hover {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6); /* accent.indigo.hover, accent.purple.hover */
-}
-.lazy-load {
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-.lazy-load.loaded {
-    opacity: 1;
-}
-.animate-on-scroll {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.animate-on-scroll.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-.animate-on-scroll.delay-200ms { transition-delay: 0.2s; }
-.animate-on-scroll.delay-400ms { transition-delay: 0.4s; }
-.animate-on-scroll.delay-600ms { transition-delay: 0.6s; }
+/* style.css - versão final gerada pelo assistente */
 
-a:focus, button:focus, input:focus, select:focus, textarea:focus {
-    outline: 2px solid #4f46e5; /* accent.indigo.primary */
-    outline-offset: 2px;
+/* Acessibilidade */
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0);
+  white-space: nowrap; border: 0;
 }
-.course-detail-section, .user-section {
-    display: none; /* Escondidas por padrão, JS controla a exibição */
+
+/* Estrutura geral */
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  margin: 0;
+  padding: 0;
+  color: #111;
+  background: #fff;
+  line-height: 1.4;
+  padding-bottom: 4rem;
 }
-.typewriter-text {
-    overflow: hidden;
-    border-right: .15em solid orange;
-    white-space: nowrap;
-    letter-spacing: .05em;
-    animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+
+header, footer {
+  padding: 1rem;
+  background: #f4f4f5;
+  text-align: center;
 }
-@keyframes typing { from { width: 0 } to { width: 100% } }
-@keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: orange; } }
-@keyframes subtlePulseGlow { 0%, 100% { transform: scale(1); opacity: 0.85; } 50% { transform: scale(1.08); opacity: 1; } }
-.icon-subtle-pulse { animation: subtlePulseGlow 2.8s infinite ease-in-out; }
-.animated-footer-link { position: relative; }
-.animated-footer-link::after {
-    content: ''; position: absolute; width: 0; height: 1.5px;
-    bottom: -4px; left: 50%; transform: translateX(-50%);
-    background-color: #a78bfa; /* accent.purple.secondary */
-    transition: width 0.35s ease-in-out;
+
+main {
+  max-width: 900px;
+  margin: 1.25rem auto;
+  padding: 0 1rem;
 }
-.animated-footer-link:hover::after { width: 100%; }
-.user-section-container {
-    background: rgba(26, 31, 46, 0.8); /* bg-dark-card com opacidade */
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 2rem; /* p-8 */
-    border-radius: 0.75rem; /* rounded-xl */
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); /* shadow-xl */
+
+input#courseSearch {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.course-item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.course-item a {
+  text-decoration: none;
+  color: #1a73e8;
+}
+
+.disabled-buy {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Imagens responsivas e prevenção de CLS */
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
 }

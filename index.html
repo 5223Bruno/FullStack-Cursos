@@ -1,3 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Meu Site - Cursos</title>
+  <meta name="description" content="Plataforma de cursos online.">
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' https:;
+        script-src 'self' https://www.gstatic.com https://www.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://pay.hotmart.com;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+        img-src 'self' data: https: https://images.unsplash.com https://i.ytimg.com https://pay.hotmart.com;
+        connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://securetoken.googleapis.com https://*.googleapis.com https://pay.hotmart.com;
+        font-src https://fonts.gstatic.com;">
+  <meta property="og:title" content="Meu Site - Cursos">
+  <meta property="og:description" content="Plataforma de cursos online">
+  <meta property="og:image" content="images/og-image.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Plataforma de Cursos</h1>
+  </header>
+
+  <main>
+    <section id="searchSection">
+      <label for="courseSearch" class="sr-only">Buscar cursos</label>
+      <input id="courseSearch" placeholder="Pesquisar cursos..." />
+      <div id="courseResults"></div>
+    </section>
+
+    <section id="about">
+      <h2>Sobre</h2>
+      <p>Exemplo de site hospedado no GitHub Pages + Firebase.</p>
+      <img src="images/sample.jpg" alt="Imagem exemplo" loading="lazy" style="aspect-ratio:16/9;">
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 - Seu Projeto</p>
+  </footer>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
+  <!-- Script principal -->
+  <script src="backend_completo_final.js" defer></script>
+</body>
+</html>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>

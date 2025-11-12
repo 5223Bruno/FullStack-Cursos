@@ -1,9 +1,12 @@
-// backend_completo_final.js
-// Versão final gerada pelo assistente — contém medidas de segurança e helpers.
-// DEBUG: ative apenas em desenvolvimento
-const DEBUG = false; // set to true for local debugging (do NOT enable in production)
+// backend_completo_merged.js
+// Versão mesclada: mantém funcionalidades originais, corrige bugs, adiciona segurança e fluxos seguros.
+// DEBUG: ative somente em desenvolvimento (não deixe true em produção)
+const DEBUG = false;
 
-// Firebase config (insira os outros campos do seu projeto caso necessite)
+// -----------------
+// Firebase config
+// -----------------
+// Sua apiKey já incluída (se quiser, substitua os outros campos com os valores do seu projeto)
 const firebaseConfig = {
   apiKey: "AIzaSyB3IPLPzZpJtWJRmf-C466P4mu1fXa05es",
   authDomain: "SEU_PROJECT.firebaseapp.com",
@@ -13,106 +16,144 @@ const firebaseConfig = {
   appId: "APP_ID"
 };
 
-// Inicializa Firebase se necessário
-if (typeof firebase !== 'undefined' && (!firebase.apps || !firebase.apps.length)) {
-  firebase.initializeApp(firebaseConfig);
-  if (DEBUG) console.log('Firebase inicializado', firebaseConfig.projectId);
+// Initialize Firebase safely if SDK present
+try {
+  if (typeof firebase !== 'undefined' && (!firebase.apps || !firebase.apps.length)) {
+    firebase.initializeApp(firebaseConfig);
+    if (DEBUG) console.log('Firebase inicializado', firebaseConfig.projectId);
+  }
+} catch (err) {
+  if (DEBUG) console.error('Erro ao inicializar Firebase:', err);
 }
 
-// Helper: build Hotmart link — retorna null se não houver hotmartId
+// -----------------
+// Utilities / fixes
+// -----------------
+
+// Console guard (already used by replacing console.log calls in code)
+function safeLog(...args) {
+  if (typeof DEBUG !== 'undefined' && DEBUG) console.log(...args);
+}
+
+// Build Hotmart link: prefer course.hotmartId or course.productId; return null if missing
 function buildHotmartLink(course) {
-  const id = (course && course.hotmartId) ? course.hotmartId : null;
+  const id = course && (course.hotmartId || course.productId) ? (course.hotmartId || course.productId) : null;
   if (!id) return null;
   return `https://pay.hotmart.com/${encodeURIComponent(id)}`;
 }
 
-// Unified delete helper that handles reauthentication when needed.
+// Unified delete helper: reauth if needed, fallback to credential prompt
 async function deleteAccountFor(user = null) {
-  const target = user || (firebase && firebase.auth && firebase.auth().currentUser);
+  const target = user || (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser);
   if (!target) throw new Error('Nenhum usuário logado para deletar');
 
   try {
     await target.delete();
-    if (DEBUG) console.log('Usuário deletado:', target.uid || '(unknown uid)');
+    safeLog('Usuário deletado:', target.uid || '(unknown uid)');
     return;
   } catch (err) {
-    if (DEBUG) console.log('Erro ao deletar (tentando reauth):', err);
+    safeLog('Erro ao deletar (inicial):', err);
     if (err && err.code === 'auth/requires-recent-login') {
+      // reauth via popup (Google) first
       try {
+        if (typeof firebase === 'undefined') throw new Error('Firebase não disponível');
         const provider = new firebase.auth.GoogleAuthProvider();
-        await (firebase.auth().currentUser).reauthenticateWithPopup(provider);
-        await (firebase.auth().currentUser).delete();
-        if (DEBUG) console.log('Deletado após reauth popup');
+        await firebase.auth().currentUser.reauthenticateWithPopup(provider);
+        await firebase.auth().currentUser.delete();
+        safeLog('Deletado após reauth popup');
         return;
       } catch (popupErr) {
-        if (DEBUG) console.log('Popup reauth falhou:', popupErr);
+        safeLog('Popup reauth falhou:', popupErr);
+        // fallback: email/password credential prompt
         const email = firebase.auth().currentUser && firebase.auth().currentUser.email;
         if (email) {
           const password = prompt('Por favor, insira sua senha para reautenticar e permitir exclusão da conta:');
-          if (password) {
-            const credential = firebase.auth.EmailAuthProvider.credential(email, password);
-            try {
-              await (firebase.auth().currentUser).reauthenticateWithCredential(credential);
-              await (firebase.auth().currentUser).delete();
-              if (DEBUG) console.log('Deletado após reauth com credencial');
-              return;
-            } catch (credErr) {
-              throw new Error('Reautenticação falhou: ' + (credErr.message || credErr));
-            }
-          } else throw new Error('Senha não fornecida para reautenticação');
+          if (!password) throw new Error('Senha não fornecida para reautenticação');
+          const credential = firebase.auth.EmailAuthProvider.credential(email, password);
+          try {
+            await firebase.auth().currentUser.reauthenticateWithCredential(credential);
+            await firebase.auth().currentUser.delete();
+            safeLog('Deletado após reauth com credencial');
+            return;
+          } catch (credErr) {
+            throw new Error('Reautenticação falhou: ' + (credErr.message || credErr));
+          }
         }
-        throw new Error('Reautenticação necessária, mas não foi possível reautenticar via popup/credencial');
+        throw new Error('Reautenticação necessária, não foi possível via popup/credencial');
       }
     }
     throw err;
   }
 }
 
-// Sistema de cursos simples (exemplo)
+// -----------------
+// Course system (preserva lógica original, mas com segurança)
+// -----------------
 const CourseSystem = (() => {
   async function searchCourses(query) {
-    if (typeof firebase === 'undefined') return [];
-    const db = firebase.firestore();
-    const q = query ? query.trim() : '';
-    const snapshot = await db.collection('courses').orderBy('title').limit(20).get();
-    const results = [];
-    snapshot.forEach(doc => results.push({ id: doc.id, ...doc.data() }));
-    return results.filter(c => !q || (c.title && c.title.toLowerCase().includes(q.toLowerCase())));
+    try {
+      if (typeof firebase === 'undefined' || !firebase.firestore) return [];
+      const db = firebase.firestore();
+      const q = query ? query.trim() : '';
+      // keep original behavior: list courses ordered by title, limit to a reasonable amount
+      const snapshot = await db.collection('courses').orderBy('title').limit(50).get();
+      const results = [];
+      snapshot.forEach(doc => results.push({ id: doc.id, ...doc.data() }));
+      return results.filter(c => !q || (c.title && c.title.toLowerCase().includes(q.toLowerCase())));
+    } catch (e) {
+      safeLog('Erro em searchCourses:', e);
+      return [];
+    }
   }
+
   return { searchCourses };
 })();
 
-// Inicialização básica do frontend
+// -----------------
+// Frontend init: safe, non-blocking
+// -----------------
 document.addEventListener('DOMContentLoaded', () => {
-  const searchInput = document.getElementById('courseSearch');
-  const resultsEl = document.getElementById('courseResults');
+  try {
+    const searchInput = document.getElementById('courseSearch');
+    const resultsEl = document.getElementById('courseResults');
 
-  async function renderResults(list) {
-    resultsEl.innerHTML = '';
-    if (!list.length) { resultsEl.innerHTML = '<p>Nenhum curso encontrado.</p>'; return; }
-    list.forEach(course => {
-      const a = document.createElement('a');
-      a.href = buildHotmartLink(course) || '#';
-      if (!course.hotmartId) a.classList.add('disabled-buy');
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.textContent = course.title || 'Curso sem título';
-      const li = document.createElement('div');
-      li.className = 'course-item';
-      li.appendChild(a);
-      resultsEl.appendChild(li);
-    });
-  }
+    async function renderResults(list) {
+      if (!resultsEl) return;
+      resultsEl.innerHTML = '';
+      if (!list || !list.length) { resultsEl.innerHTML = '<p>Nenhum curso encontrado.</p>'; return; }
+      list.forEach(course => {
+        const item = document.createElement('div');
+        item.className = 'course-item';
+        const a = document.createElement('a');
+        const link = buildHotmartLink(course);
+        a.href = link || '#';
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = course.title || 'Curso sem título';
+        if (!link) a.classList.add('disabled-buy');
+        item.appendChild(a);
+        resultsEl.appendChild(item);
+      });
+    }
 
-  if (searchInput) {
-    let timeout = null;
-    searchInput.addEventListener('input', async (e) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(async () => {
-        const q = e.target.value;
-        const list = await CourseSystem.searchCourses(q);
-        await renderResults(list);
-      }, 300);
-    });
+    if (searchInput) {
+      let timeout = null;
+      searchInput.addEventListener('input', async (e) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(async () => {
+          const q = e.target.value;
+          const list = await CourseSystem.searchCourses(q);
+          await renderResults(list);
+        }, 300);
+      });
+    }
+  } catch (err) {
+    safeLog('Erro no init do frontend:', err);
   }
 });
+
+// Export helpers to window for debugging if needed (only in dev)
+if (typeof window !== 'undefined' && typeof DEBUG !== 'undefined' && DEBUG) {
+  window.__deleteAccountFor = deleteAccountFor;
+  window.__buildHotmartLink = buildHotmartLink;
+}

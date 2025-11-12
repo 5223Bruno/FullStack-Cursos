@@ -1,58 +1,39 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Meu Site - Cursos</title>
-  <meta name="description" content="Plataforma de cursos online.">
-
-  <!-- Content Security Policy: ajuste se usar domínios extras -->
-  <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self' https:; script-src 'self' https://www.gstatic.com https://www.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://pay.hotmart.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https://images.unsplash.com https://i.ytimg.com https://pay.hotmart.com; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://securetoken.googleapis.com https://*.googleapis.com https://pay.hotmart.com; font-src https://fonts.gstatic.com;">
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="Meu Site - Cursos">
-  <meta property="og:description" content="Plataforma de cursos online">
-  <meta property="og:image" content="images/og-image.png">
-
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FullStack Cursos</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 </head>
 <body>
-  <div class="container">
     <header>
-      <h1>Plataforma de Cursos</h1>
+        <h1>FullStack Cursos</h1>
+        <p>Adicione e acesse cursos gratuitos!</p>
     </header>
 
     <main>
-      <!-- Search / Results -->
-      <section id="searchSection" class="card" aria-labelledby="search-title">
-        <h2 id="search-title" class="sr-only">Pesquisar cursos</h2>
-        <label for="courseSearch" class="sr-only">Buscar cursos</label>
-        <input id="courseSearch" placeholder="Pesquisar cursos..." aria-label="Pesquisar cursos" />
-        <div id="courseResults" class="results" role="list"></div>
-      </section>
+        <section id="add-course">
+            <h2>Adicionar Novo Curso</h2>
+            <form id="add-course-form">
+                <input type="text" id="course-title" placeholder="Título do curso" required>
+                <input type="url" id="course-link" placeholder="Link do curso" required>
+                <input type="url" id="course-image" placeholder="URL da imagem" required>
+                <button type="submit">Adicionar Curso</button>
+            </form>
+        </section>
 
-      <!-- About / Example image -->
-      <section id="about" class="card" aria-labelledby="about-title">
-        <h2 id="about-title">Sobre</h2>
-        <p>Exemplo de site hospedado no GitHub Pages + Firebase. Conteúdo atualizado para melhor performance e segurança.</p>
-        <div class="image-wrap" aria-hidden="false">
-          <img src="images/sample.jpg" alt="Imagem exemplo" class="img--responsive">
-        </div>
-      </section>
+        <section id="courses">
+            <h2>Cursos Disponíveis</h2>
+        </section>
     </main>
 
     <footer>
-      <p>&copy; 2025 - Seu Projeto</p>
+        <p>&copy; 2025 FullStack Cursos - Todos os direitos reservados.</p>
     </footer>
-  </div>
 
-  <!-- Firebase SDKs: carregados antes do seu script (mantém ordem e defer) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" defer></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" defer></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" defer></script>
-
-  <!-- Seu script principal (garanta o nome correto) -->
-  <script src="backend_completo_merged.js" defer></script>
+    <script src="backend_completo.js"></script>
 </body>
 </html>
